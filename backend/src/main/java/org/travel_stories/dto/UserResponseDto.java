@@ -1,0 +1,18 @@
+package org.travel_stories.dto;
+
+import lombok.Data;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Data
+public class UserResponseDto {
+
+    private UUID userId;
+    private String username;
+    private String email;
+    private String profilePicUrl;
+    private String bio;
+    private Instant createdAt;
+
+}
