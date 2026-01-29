@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.entity.User;
+import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.UserRepository;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     public UserResponseDto map(User user){
         UserResponseDto userResponseDto = new UserResponseDto();
@@ -27,6 +29,8 @@ public class UserService {
         userResponseDto.setProfilePicUrl(user.getProfilePicUrl());
         userResponseDto.setBio(user.getBio());
         userResponseDto.setCreatedAt(user.getCreatedAt());
+        userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());
+        userResponseDto.setFollowingCount(followRepository.findFollowing(user.getUserId()).size());
 
         return userResponseDto;
     }

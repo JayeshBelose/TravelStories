@@ -14,5 +14,7 @@ public class UserResponseDto {
     private String profilePicUrl;
     private String bio;
     private Instant createdAt;
+    private Integer followersCount;
+    private Integer followingCount;
 
 }

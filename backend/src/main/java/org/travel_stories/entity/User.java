@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -69,5 +69,19 @@ public class User {
             updatable = false
     )
     private Instant createdAt;
+
+    @OneToMany(
+            mappedBy = "follower",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Follow> following = new HashSet<>();//Users this user following
+
+    @OneToMany(
+            mappedBy = "following",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Follow> followers = new HashSet<>();//Users following this user
 
 }
