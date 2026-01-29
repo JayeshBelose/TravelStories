@@ -84,4 +84,11 @@ public class User {
     )
     private Set<Follow> followers = new HashSet<>();//Users following this user
 
+    @OneToMany(
+            mappedBy = "createdBy",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Itinerary> itineraries = new ArrayList<>();
+
 }

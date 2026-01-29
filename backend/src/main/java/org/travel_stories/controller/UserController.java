@@ -24,21 +24,21 @@ public class UserController {
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto){
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
+        return ResponseEntity.ok().body(userResponseDto);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable("userId") UUID userId){
         UserResponseDto userResponseDto = userService.getUserById(userId);
 
-        return ResponseEntity.status(HttpStatus.FOUND).body(userResponseDto);
+        return ResponseEntity.ok().body(userResponseDto);
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers(){
         List<UserResponseDto> users = userService.getAllUsers();
 
-        return ResponseEntity.status(HttpStatus.FOUND).body(users);
+        return ResponseEntity.ok().body(users);
     }
 
     @DeleteMapping("/{userId}")
@@ -46,6 +46,16 @@ public class UserController {
         userService.deleteUser(userId);
 
         return ResponseEntity.ok("User deleted.");
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseDto> updateUser(
+            @RequestBody UserRequestDto userRequestDto,
+            @PathVariable("userId") UUID userId
+    ){
+        UserResponseDto userResponseDto = userService.updateUser(userRequestDto, userId);
+
+        return ResponseEntity.ok().body(userResponseDto);
     }
 
 }

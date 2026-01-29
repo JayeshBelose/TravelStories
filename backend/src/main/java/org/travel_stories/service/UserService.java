@@ -68,4 +68,20 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    public UserResponseDto updateUser(UserRequestDto userRequestDto, UUID userId){
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found."));
+
+        user.setUsername(userRequestDto.getUsername());
+        user.setEmail(userRequestDto.getEmail());
+        user.setPassword(userRequestDto.getPassword());
+        user.setProfilePicUrl(userRequestDto.getProfilePicUrl());
+        user.setBio(userRequestDto.getBio());
+        user.setCreatedAt(Instant.now());
+
+        userRepository.save(user);
+
+        return map(user);
+    }
+
 }
