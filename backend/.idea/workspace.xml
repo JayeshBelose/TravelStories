@@ -5,19 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryRequestDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryResponseDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryTypeDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Itinerary.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/ItineraryType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/ItineraryRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/ItineraryTypeRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryTypeService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryMemberController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/ItineraryMember.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/SavedItinerary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/ItineraryMemberRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/SavedItineraryRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryMemberService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/SavedItineraryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/UserResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/UserResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Itinerary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Itinerary.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

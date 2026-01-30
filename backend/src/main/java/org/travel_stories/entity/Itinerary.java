@@ -6,9 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -70,7 +73,7 @@ public class Itinerary {
             name = "total_days",
             nullable = false
     )
-    private Integer totalDays;
+    private Long totalDays;
 
     @Column(
             name = "is_public",
@@ -96,7 +99,7 @@ public class Itinerary {
     )
     private Instant createdAt;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(
             name = "last_updated",
             nullable = false,
@@ -124,5 +127,11 @@ public class Itinerary {
     )
     private ItineraryType type;
 
+    @OneToMany(
+            mappedBy = "itinerary",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ItineraryMember> members = new ArrayList<>();
 
 }

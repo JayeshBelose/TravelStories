@@ -4,24 +4,27 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 public class ItineraryResponseDto {
 
+    private UUID itineraryId;
     private String place;
     private String title;
     private String thumbnailUrl;
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer totalDays;
+    private Long totalDays;
     private Boolean isPublic;
     private Integer likeCount;
     private Integer saveCount;
     private Instant createdAt;
     private Instant lasUpdated;
-    private String createdBy;
+    private UUID createdBy;
     private String type;
+    private List<UUID> members;
 
 }

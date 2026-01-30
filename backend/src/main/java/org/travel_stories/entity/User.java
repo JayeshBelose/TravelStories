@@ -91,4 +91,18 @@ public class User {
     )
     private List<Itinerary> itineraries = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ItineraryMember> membership = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SavedItinerary> savedItineraries = new ArrayList<>();
+
 }

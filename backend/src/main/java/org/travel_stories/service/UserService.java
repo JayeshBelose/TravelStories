@@ -2,6 +2,7 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.entity.User;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -31,6 +33,27 @@ public class UserService {
         userResponseDto.setCreatedAt(user.getCreatedAt());
         userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());
         userResponseDto.setFollowingCount(followRepository.findFollowing(user.getUserId()).size());
+        userResponseDto.setItineraries(
+                user.getItineraries().stream()
+                        .map(i -> {
+                            return i.getItineraryId();
+                        })
+                        .collect(Collectors.toList())
+        );
+        userResponseDto.setMemberships(
+                user.getMembership().stream()
+                        .map(m ->{
+                            return m.getItinerary().getItineraryId();
+                        })
+                        .collect(Collectors.toList())
+        );
+        userResponseDto.setSavedItinerary(
+                user.getSavedItineraries().stream()
+                        .map(s -> {
+                            return s.getItinerary().getItineraryId();
+                        })
+                        .collect(Collectors.toList())
+        );
 
         return userResponseDto;
     }
