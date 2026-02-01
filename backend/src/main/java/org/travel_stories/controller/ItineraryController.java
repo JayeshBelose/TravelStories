@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.dto.ItineraryTypeDto;
+import org.travel_stories.entity.Itinerary;
 import org.travel_stories.service.ItineraryService;
 import org.travel_stories.service.ItineraryTypeService;
 
@@ -17,7 +18,6 @@ import java.util.UUID;
 @RequestMapping("/api/itinerary")
 public class ItineraryController {
 
-    private final ItineraryTypeService itineraryTypeService;
     private final ItineraryService itineraryService;
 
     @PostMapping
@@ -47,24 +47,10 @@ public class ItineraryController {
         return ResponseEntity.ok().body(itineraries);
     }
 
-    @PostMapping("/type")
-    public ResponseEntity<ItineraryTypeDto> addType(@RequestBody ItineraryTypeDto requestDto){
-        ItineraryTypeDto itineraryTypeDto = itineraryTypeService.addType(requestDto);
-        return ResponseEntity.ok().body(itineraryTypeDto);
-    }
-
-    @GetMapping("/type")
-    public ResponseEntity<List<ItineraryTypeDto>> getAllTypes(){
-        List<ItineraryTypeDto> types = itineraryTypeService.getAllTypes();
-
-        return ResponseEntity.ok().body(types);
-    }
-
-    @DeleteMapping("/type/{name}")
-    public ResponseEntity<String> deleteTypeByName(@PathVariable("name") String name){
-        itineraryTypeService.deleteTypeByName(name);
-
-        return ResponseEntity.ok("Type Deleted.");
+    @GetMapping("/{typeId}")
+    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByType(@PathVariable Long typeId){
+        List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByType(typeId);
+        return ResponseEntity.ok().body(itineraries);
     }
 
 }

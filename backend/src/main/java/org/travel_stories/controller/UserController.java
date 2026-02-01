@@ -1,13 +1,11 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
-import org.travel_stories.repository.UserRepository;
 import org.travel_stories.service.SavedItineraryService;
 import org.travel_stories.service.UserService;
 
@@ -20,7 +18,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final SavedItineraryService savedItineraryService;
 
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto){
@@ -58,20 +55,6 @@ public class UserController {
         UserResponseDto userResponseDto = userService.updateUser(userRequestDto, userId);
 
         return ResponseEntity.ok().body(userResponseDto);
-    }
-
-    @Transactional
-    @PostMapping("/savedItinerary/{userId}/{itineraryId}")
-    public ResponseEntity<String> saveItinerary(@PathVariable UUID userId, @PathVariable UUID itineraryId){
-        savedItineraryService.saveItinerary(userId, itineraryId);
-        return ResponseEntity.ok().body("Itinerary Saved.");
-    }
-
-    @Transactional
-    @DeleteMapping("/savedItinerary/{userId}/{itineraryId}")
-    public ResponseEntity<String> removeItinerary(@PathVariable UUID userId, @PathVariable UUID itineraryId){
-        savedItineraryService.removeItinerary(userId, itineraryId);
-        return ResponseEntity.ok().body("Itinerary Removed.");
     }
 
 }

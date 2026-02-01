@@ -3,8 +3,10 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.dto.DayResponseDto;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
+import org.travel_stories.entity.Day;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
@@ -13,6 +15,7 @@ import org.travel_stories.repository.ItineraryTypeRepository;
 import org.travel_stories.repository.UserRepository;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,6 +47,18 @@ public class ItineraryService {
         itineraryResponseDto.setLasUpdated(itinerary.getLastUpdated());
         itineraryResponseDto.setCreatedBy(itinerary.getCreatedBy().getUserId());
         itineraryResponseDto.setType(itinerary.getType().getName());
+        itineraryResponseDto.setDays(
+                itinerary.getDays().stream()
+                        .sorted(Comparator.comparing(Day::getDayNumber))
+                        .map(d -> {
+                            DayResponseDto dayResponseDto = new DayResponseDto();
+                            dayResponseDto.setDayId(d.getDayId());
+                            dayResponseDto.setDayNumber(d.getDayNumber());
+                            dayResponseDto.setDescription(d.getDescription());
+                            return dayResponseDto;
+                        })
+                        .collect(Collectors.toList())
+        );
         itineraryResponseDto.setMembers(
                 itinerary.getMembers().stream()
                         .map(i -> {
@@ -111,6 +126,13 @@ public class ItineraryService {
 
     public List<ItineraryResponseDto> getAllItineraries(){
         return itineraryRepository.findAll()
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItineraryResponseDto> getAllItinerariesByType(Long typeId){
+        return itineraryRepository.findAllByTypeTypeId(typeId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());

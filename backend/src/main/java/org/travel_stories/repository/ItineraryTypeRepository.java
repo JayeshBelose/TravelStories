@@ -8,9 +8,6 @@ import org.travel_stories.entity.ItineraryType;
 
 public interface ItineraryTypeRepository extends JpaRepository<ItineraryType, Long> {
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM ItineraryType t WHERE t.name = :name")
-    void deleteByName(String name);
+
 
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.ItineraryTypeDto;
 import org.travel_stories.entity.ItineraryType;
+import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ItineraryTypeRepository;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class ItineraryTypeService {
                 .stream()
                 .map(t -> {
                     ItineraryTypeDto itineraryTypeDto = new ItineraryTypeDto();
+                    itineraryTypeDto.setTypeId(t.getTypeId());
                     itineraryTypeDto.setName(t.getName());
                     return itineraryTypeDto;
                 })
@@ -40,8 +42,8 @@ public class ItineraryTypeService {
     }
 
     @Transactional
-    public void deleteTypeByName(String name){
-        itineraryTypeRepository.deleteByName(name);
+    public void deleteTypeById(Long typeId){
+        itineraryTypeRepository.deleteById(typeId);
     }
 
 }

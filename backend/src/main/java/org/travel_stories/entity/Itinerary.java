@@ -132,6 +132,14 @@ public class Itinerary {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @OrderBy("dayNumber ASC")
+    private List<Day> days;
+
+    @OneToMany(
+            mappedBy = "itinerary",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<ItineraryMember> members = new ArrayList<>();
 
 }
