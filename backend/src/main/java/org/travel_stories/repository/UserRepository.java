@@ -6,7 +6,13 @@ import org.travel_stories.entity.Follow;
 import org.travel_stories.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
+
+    Optional<User> findByEmail(String email);
+
+    Boolean existsByEmail(String email);
+
 }

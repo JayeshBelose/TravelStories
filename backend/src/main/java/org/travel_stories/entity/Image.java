@@ -13,38 +13,44 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "saved_itinerary",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "itinerary_id"})
-)
-public class SavedItinerary {
+@Table( name = "image" )
+public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(
-            name = "saving_id",
+            name = "image_id",
+            nullable = false,
+            updatable = false
+    )
+    private UUID imageId;
+
+    @Column(
+            name = "order_number",
             nullable = false
     )
-    private UUID savingId;
+    private Integer orderNumber;
+
+    @Column(
+            name = "image_data",
+            nullable = false
+    )
+    private byte[] imageData;
+
+    @Column(
+            name = "content_type",
+            nullable = false
+    )
+    private String contentType;
 
     @ManyToOne(
             fetch = FetchType.LAZY,
             optional = false
     )
     @JoinColumn(
-            name = "user_id",
+            name = "location_id",
             nullable = false
     )
-    private User user;
-
-    @ManyToOne(
-            fetch = FetchType.LAZY,
-            optional = false
-    )
-    @JoinColumn(
-            name = "itinerary_id",
-            nullable = false
-    )
-    private Itinerary itinerary;
+    private Location location;
 
 }

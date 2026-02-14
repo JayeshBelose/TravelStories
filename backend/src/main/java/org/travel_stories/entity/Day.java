@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -31,12 +32,13 @@ public class Day {
 
     @Column(
             name = "day_number",
-             updatable = false
+            updatable = false
     )
     private Integer dayNumber;
 
     @Column(
-            name = "description"
+            name = "description",
+            length = 500
     )
     private String description;
 
@@ -46,5 +48,13 @@ public class Day {
             nullable = false
     )
     private Itinerary itinerary;
+
+    @OneToMany(
+            mappedBy = "day",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("locationNumber ASC")
+    private List<Location> locations;
 
 }

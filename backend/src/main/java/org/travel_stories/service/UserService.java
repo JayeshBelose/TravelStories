@@ -3,6 +3,8 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.dto.LoginDto;
+import org.travel_stories.dto.SignupDto;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.entity.User;
@@ -28,44 +30,21 @@ public class UserService {
         userResponseDto.setUserId(user.getUserId());
         userResponseDto.setUsername(user.getUsername());
         userResponseDto.setEmail(user.getEmail());
-        userResponseDto.setProfilePicUrl(user.getProfilePicUrl());
+        userResponseDto.setProfilePicture(user.getProfilePicture());
         userResponseDto.setBio(user.getBio());
         userResponseDto.setCreatedAt(user.getCreatedAt());
         userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());
         userResponseDto.setFollowingCount(followRepository.findFollowing(user.getUserId()).size());
-        userResponseDto.setItineraries(
-                user.getItineraries().stream()
-                        .map(i -> {
-                            return i.getItineraryId();
-                        })
-                        .collect(Collectors.toList())
-        );
-        userResponseDto.setMemberships(
-                user.getMembership().stream()
-                        .map(m ->{
-                            return m.getItinerary().getItineraryId();
-                        })
-                        .collect(Collectors.toList())
-        );
-        userResponseDto.setSavedItinerary(
-                user.getSavedItineraries().stream()
-                        .map(s -> {
-                            return s.getItinerary().getItineraryId();
-                        })
-                        .collect(Collectors.toList())
-        );
 
         return userResponseDto;
     }
 
-    public UserResponseDto createUser(UserRequestDto userRequestDto){
+    public UserResponseDto signup(SignupDto signupDto){
         User user = new User();
 
-        user.setUsername(userRequestDto.getUsername());
-        user.setEmail(userRequestDto.getEmail());
-        user.setPassword(userRequestDto.getPassword());
-        user.setProfilePicUrl(userRequestDto.getProfilePicUrl());
-        user.setBio(userRequestDto.getBio());
+        user.setUsername(signupDto.getUsername());
+        user.setEmail(signupDto.getEmail());
+        user.setPassword(signupDto.getPassword());
         user.setCreatedAt(Instant.now());
 
         userRepository.save(user);
@@ -98,11 +77,22 @@ public class UserService {
         user.setUsername(userRequestDto.getUsername());
         user.setEmail(userRequestDto.getEmail());
         user.setPassword(userRequestDto.getPassword());
-        user.setProfilePicUrl(userRequestDto.getProfilePicUrl());
+        user.setProfilePicture(userRequestDto.getProfilePicture());
         user.setBio(userRequestDto.getBio());
         user.setCreatedAt(Instant.now());
 
         userRepository.save(user);
+
+        return map(user);
+    }
+
+    public UserResponseDto login(LoginDto loginDto){
+        User user = userRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found."));
+
+        if (!user.getPassword().equals(loginDto.getPassword())){
+            throw new RuntimeException("Invalid credentials.");
+        }
 
         return map(user);
     }

@@ -12,26 +12,32 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/itinerary/day")
+@RequestMapping("/api/itineraries/{itineraryId}/days")
 public class DayController {
 
     private final DayService dayService;
 
-    @PostMapping("/{itineraryId}")
-    public ResponseEntity<List<DayResponseDto>> addDay(
+    @PostMapping
+    public ResponseEntity<String> addDay(
             @PathVariable UUID itineraryId,
             @RequestBody DayRequestDto dayRequestDto
     ){
-        List<DayResponseDto> days = dayService.addDay(itineraryId,dayRequestDto);
-        return ResponseEntity.ok().body(days);
+        dayService.addDay(itineraryId,dayRequestDto);
+        return ResponseEntity.ok().body("Day added.");
     }
 
-    @DeleteMapping("/{itineraryId}/{dayId}")
-    public ResponseEntity<List<DayResponseDto>> removeDay(
+    @DeleteMapping("/{dayId}")
+    public ResponseEntity<String> removeDay(
             @PathVariable UUID itineraryId,
             @PathVariable UUID dayId
     ){
-        List<DayResponseDto> days = dayService.removeDay(itineraryId,dayId);
+        dayService.removeDay(itineraryId,dayId);
+        return ResponseEntity.ok().body("Day removed.");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DayResponseDto>> getDaysByItinerary(@PathVariable UUID itineraryId){
+        List<DayResponseDto> days = dayService.getDaysByItinerary(itineraryId);
         return ResponseEntity.ok().body(days);
     }
 

@@ -2,11 +2,11 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.dto.LoginDto;
+import org.travel_stories.dto.SignupDto;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
-import org.travel_stories.service.SavedItineraryService;
 import org.travel_stories.service.UserService;
 
 import java.util.List;
@@ -14,14 +14,14 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto){
-        UserResponseDto userResponseDto = userService.createUser(userRequestDto);
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponseDto> signup(@RequestBody SignupDto signupDto){
+        UserResponseDto userResponseDto = userService.signup(signupDto);
 
         return ResponseEntity.ok().body(userResponseDto);
     }
@@ -55,6 +55,11 @@ public class UserController {
         UserResponseDto userResponseDto = userService.updateUser(userRequestDto, userId);
 
         return ResponseEntity.ok().body(userResponseDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> login(@RequestBody LoginDto loginDto){
+        return ResponseEntity.ok(userService.login(loginDto));
     }
 
 }

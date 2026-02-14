@@ -10,26 +10,26 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/itinerary")
+@RequestMapping("/api/itineraries/types")
 public class ItineraryTypeController {
 
     private final ItineraryTypeService itineraryTypeService;
 
-    @PostMapping("/type")
+    @PostMapping
     public ResponseEntity<ItineraryTypeDto> addType(@RequestBody ItineraryTypeDto requestDto){
         ItineraryTypeDto itineraryTypeDto = itineraryTypeService.addType(requestDto);
         return ResponseEntity.ok().body(itineraryTypeDto);
     }
 
-    @GetMapping("/type")
+    @GetMapping
     public ResponseEntity<List<ItineraryTypeDto>> getAllTypes(){
         List<ItineraryTypeDto> types = itineraryTypeService.getAllTypes();
 
         return ResponseEntity.ok().body(types);
     }
 
-    @DeleteMapping("/type/{typeId}")
-    public ResponseEntity<String> deleteTypeByName(@PathVariable("typeId") Long typeId){
+    @DeleteMapping("/{typeId}")
+    public ResponseEntity<String> deleteType(@PathVariable("typeId") Long typeId){
         itineraryTypeService.deleteTypeById(typeId);
 
         return ResponseEntity.ok("Type Deleted.");

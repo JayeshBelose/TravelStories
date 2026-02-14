@@ -21,20 +21,29 @@ public class SavedItineraryService {
     private final UserRepository userRepository;
     private final ItineraryRepository itineraryRepository;
 
-    public void saveItinerary(UUID userId, UUID itineraryId){
+    public String saveItinerary(UUID userId, UUID itineraryId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found."));
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new RuntimeException("Itinerary not found."));
 
-        SavedItinerary savedItinerary = new SavedItinerary();
-        savedItinerary.setUser(user);
-        savedItinerary.setItinerary(itinerary);
-        savedItineraryRepository.save(savedItinerary);
+        if (savedItineraryRepository.existsByUserUserIdAndItineraryItineraryId(userId, itineraryId)){
+            savedItineraryRepository.deleteByUserUserIdAndItineraryItineraryId(userId, itineraryId);
+            itinerary.setSaveCount(savedItineraryRepository.countByItineraryItineraryId(itineraryId));
+            return "Itinerary removed.";
+        } else {
+            itinerary.setSaveCount(itinerary.getSaveCount()+1);
+            SavedItinerary savedItinerary = new SavedItinerary();
+            savedItinerary.setUser(user);
+            savedItinerary.setItinerary(itinerary);
+            savedItineraryRepository.save(savedItinerary);
+            itinerary.setSaveCount(savedItineraryRepository.countByItineraryItineraryId(itineraryId));
+            return "Itinerary saved.";
+        }
     }
 
-    public void removeItinerary(UUID userId, UUID itineraryId){
-        savedItineraryRepository.deleteByUserUserIdAndItineraryItineraryId(userId, itineraryId);
+    public Boolean checkIfSaved(UUID userId, UUID itineraryId){
+        return savedItineraryRepository.existsByUserUserIdAndItineraryItineraryId(userId, itineraryId);
     }
 
 }

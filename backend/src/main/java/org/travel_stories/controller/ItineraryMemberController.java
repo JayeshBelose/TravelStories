@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/itinerary/member")
+@RequestMapping("/api/itineraries/members")
 public class ItineraryMemberController {
 
     private final ItineraryMemberService itineraryMemberService;

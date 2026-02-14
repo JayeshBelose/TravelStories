@@ -138,4 +138,39 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
+    public List<ItineraryResponseDto> getAllItinerariesByUserId(UUID userId){
+        return itineraryRepository.findAllByCreatedByUserId(userId)
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItineraryResponseDto> getAllItinerariesByUserMembership(UUID userId){
+        return itineraryRepository.findAllByMembersUserUserId(userId)
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItineraryResponseDto> getAllSavedItinerariesByUserId(UUID userId){
+        return itineraryRepository.findAllBySavedByUserUserId(userId)
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItineraryResponseDto> getMostSavedItineraries(){
+        return itineraryRepository.findMostSavedItineraries()
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItineraryResponseDto> getMostLikedItineraries(){
+        return itineraryRepository.findMostLikedItineraries()
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
 }

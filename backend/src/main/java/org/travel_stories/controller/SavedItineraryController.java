@@ -10,23 +10,22 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user/savedItinerary")
+@RequestMapping("/api/users/{userId}/savedItineraries")
 public class SavedItineraryController {
 
     private final SavedItineraryService savedItineraryService;
 
     @Transactional
-    @PostMapping("/{userId}/{itineraryId}")
+    @PostMapping("/{itineraryId}")
     public ResponseEntity<String> saveItinerary(@PathVariable UUID userId, @PathVariable UUID itineraryId){
-        savedItineraryService.saveItinerary(userId, itineraryId);
-        return ResponseEntity.ok().body("Itinerary Saved.");
+        String msg = savedItineraryService.saveItinerary(userId, itineraryId);
+        return ResponseEntity.ok().body(msg);
     }
 
     @Transactional
-    @DeleteMapping("/{userId}/{itineraryId}")
-    public ResponseEntity<String> removeItinerary(@PathVariable UUID userId, @PathVariable UUID itineraryId){
-        savedItineraryService.removeItinerary(userId, itineraryId);
-        return ResponseEntity.ok().body("Itinerary Removed.");
+    @GetMapping("/{itineraryId}")
+    public ResponseEntity<Boolean> checkIfSaved(@PathVariable("userId") UUID userId, @PathVariable("itineraryId") UUID itineraryId){
+        return ResponseEntity.ok().body(savedItineraryService.checkIfSaved(userId, itineraryId));
     }
 
 }

@@ -1,11 +1,11 @@
 package org.travel_stories.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.travel_stories.entity.SavedItinerary;
+import org.travel_stories.entity.LikedItinerary;
 
 import java.util.UUID;
 
-public interface SavedItineraryRepository extends JpaRepository<SavedItinerary, UUID> {
+public interface LikedItineraryRepository extends JpaRepository<LikedItinerary, UUID> {
 
     void deleteByUserUserIdAndItineraryItineraryId(UUID userId, UUID itineraryId);
 

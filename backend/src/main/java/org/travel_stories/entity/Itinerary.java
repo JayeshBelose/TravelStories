@@ -142,4 +142,18 @@ public class Itinerary {
     )
     private List<ItineraryMember> members = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "itinerary",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SavedItinerary> savedBy = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "itinerary",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<LikedItinerary> likedBy = new ArrayList<>();
+
 }

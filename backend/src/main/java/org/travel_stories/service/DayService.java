@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DayService {
 
     private final DayRepository dayRepository;
@@ -30,8 +31,7 @@ public class DayService {
         return dayResponseDto;
     }
 
-    @Transactional
-    public List<DayResponseDto> addDay(UUID itineraryId, DayRequestDto dayRequestDto){
+    public void addDay(UUID itineraryId, DayRequestDto dayRequestDto){
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new RuntimeException("Itinerary not found."));
 
@@ -46,15 +46,9 @@ public class DayService {
         day.setDescription(dayRequestDto.getDescription());
         day.setItinerary(itinerary);
         dayRepository.save(day);
-
-        return dayRepository.findByItineraryItineraryIdOrderByDayNumber(itinerary.getItineraryId())
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
     }
 
-    @Transactional
-    public List<DayResponseDto> removeDay(UUID itineraryId, UUID dayId){
+    public void removeDay(UUID itineraryId, UUID dayId){
         Day day = dayRepository.findById(dayId)
                 .orElseThrow(() -> new RuntimeException("Day not found."));
 
@@ -76,11 +70,14 @@ public class DayService {
         }
 
         dayRepository.saveAll(daysToAdjust);
+    }
 
-        return dayRepository.findByItineraryItineraryIdOrderByDayNumber(itineraryId)
+    public List<DayResponseDto> getDaysByItinerary(UUID itineraryId){
+        List<DayResponseDto> days = dayRepository.findByItineraryItineraryIdOrderByDayNumber(itineraryId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
+        return days;
     }
 
 }

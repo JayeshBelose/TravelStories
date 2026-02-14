@@ -48,12 +48,13 @@ public class User {
     )
     private String password;
 
-    @Column(
-            name = "profile_pic_url",
-            nullable = true,
-            length = 500
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
-    private String profilePicUrl;
+    private ProfilePicture profilePicture;
 
     @Column(
             name = "bio",

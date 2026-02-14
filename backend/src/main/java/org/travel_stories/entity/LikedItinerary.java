@@ -14,18 +14,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(
-        name = "saved_itinerary",
+        name = "liked_itinerary",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "itinerary_id"})
 )
-public class SavedItinerary {
+public class LikedItinerary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(
-            name = "saving_id",
+            name = "like_id",
             nullable = false
     )
-    private UUID savingId;
+    private UUID likeId;
 
     @ManyToOne(
             fetch = FetchType.LAZY,
