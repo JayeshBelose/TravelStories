@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
@@ -37,6 +39,7 @@ public class Follow {
             name = "follower_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User follower;
 
     @ManyToOne(
@@ -47,6 +50,7 @@ public class Follow {
             name = "following_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User following;
 
 }

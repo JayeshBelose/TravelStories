@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -45,12 +47,13 @@ public class Itinerary {
     )
     private String title;
 
-    @Column(
-            name = "thumbnail_url",
-            length = 500,
-            nullable = false
+    @OneToOne(
+            mappedBy = "itinerary",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
-    private String thumbnailUrl;
+    private Thumbnail thumbnail;
 
     @Column(
             name = "description"
@@ -115,6 +118,7 @@ public class Itinerary {
             name = "user_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User createdBy;
 
     @ManyToOne(
@@ -125,6 +129,7 @@ public class Itinerary {
             name = "type_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ItineraryType type;
 
     @OneToMany(
@@ -133,7 +138,7 @@ public class Itinerary {
             orphanRemoval = true
     )
     @OrderBy("dayNumber ASC")
-    private List<Day> days;
+    private List<Day> days = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "itinerary",

@@ -14,19 +14,19 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
-    public void follow(UUID followerId, UUID followingId){
+    public String follow(UUID followerId, UUID followingId){
         if (followerId.equals(followingId)){
             throw new IllegalArgumentException("User cannot follow themself.");
         }
 
         if (followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId)){
-            return;
+            return "Exists.";
         }
 
         User follower = userRepository.findById(followerId)
@@ -41,6 +41,7 @@ public class FollowService {
         follow.setFollowing(following);
 
         followRepository.save(follow);
+        return "Followed.";
     }
 
     public void unfollow(UUID followerId, UUID followingId){

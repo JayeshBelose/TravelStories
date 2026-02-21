@@ -13,23 +13,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "profile_picture")
-public class ProfilePicture {
+@Table(name = "thumbnail")
+public class Thumbnail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(
-            name = "pfp_id",
+            name = "thumbnail_id",
             nullable = false,
             updatable = false
     )
-    private UUID pfpId;
+    private UUID thumbnailId;
 
     @Column(
-            name = "pfp_data",
+            name = "thumbnail_data",
             nullable = true
     )
-    private byte[] pfpData;
+    private byte[] thumbnailData;
 
     @Column(
             name = "content_type",
@@ -39,10 +39,10 @@ public class ProfilePicture {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "user_id",
+            name = "itinerary_id",
             nullable = false,
             unique = true
     )
-    private User user;
+    private Itinerary itinerary;
 
 }

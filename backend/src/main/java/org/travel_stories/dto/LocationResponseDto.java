@@ -12,6 +12,5 @@ public class LocationResponseDto {
     private Integer locationNumber;
     private String locationName;
     private String locationAddress;
-    private List<ImageResponseDto> images;
 
 }

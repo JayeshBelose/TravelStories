@@ -14,7 +14,7 @@ public class ItineraryResponseDto {
     private UUID itineraryId;
     private String place;
     private String title;
-    private String thumbnailUrl;
+    private byte[] thumbnail;
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -23,10 +23,9 @@ public class ItineraryResponseDto {
     private Integer likeCount;
     private Integer saveCount;
     private Instant createdAt;
-    private Instant lasUpdated;
+    private Instant lastUpdated;
     private UUID createdBy;
     private String type;
-    private List<DayResponseDto> days;
     private List<UUID> members;
 
 }

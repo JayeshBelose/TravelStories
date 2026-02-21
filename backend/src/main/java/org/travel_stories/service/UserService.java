@@ -3,14 +3,17 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.LoginDto;
 import org.travel_stories.dto.SignupDto;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
+import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.UserRepository;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +33,12 @@ public class UserService {
         userResponseDto.setUserId(user.getUserId());
         userResponseDto.setUsername(user.getUsername());
         userResponseDto.setEmail(user.getEmail());
-        userResponseDto.setProfilePicture(user.getProfilePicture());
+
+        byte[] image = null;
+        if(user.getProfilePicture() != null){
+            image = user.getProfilePicture().getPfpData();
+        }
+        userResponseDto.setProfilePicture(image);
         userResponseDto.setBio(user.getBio());
         userResponseDto.setCreatedAt(user.getCreatedAt());
         userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());
@@ -70,14 +78,16 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public UserResponseDto updateUser(UserRequestDto userRequestDto, UUID userId){
+    public UserResponseDto updateUser(
+            UserRequestDto userRequestDto,
+            UUID userId
+    ){
         User user = userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found."));
 
         user.setUsername(userRequestDto.getUsername());
         user.setEmail(userRequestDto.getEmail());
         user.setPassword(userRequestDto.getPassword());
-        user.setProfilePicture(userRequestDto.getProfilePicture());
         user.setBio(userRequestDto.getBio());
         user.setCreatedAt(Instant.now());
 

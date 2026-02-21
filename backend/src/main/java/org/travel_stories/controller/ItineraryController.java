@@ -1,15 +1,19 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.dto.ItineraryTypeDto;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.service.ItineraryService;
 import org.travel_stories.service.ItineraryTypeService;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +24,15 @@ public class ItineraryController {
 
     private final ItineraryService itineraryService;
 
-    @PostMapping
-    public ResponseEntity<ItineraryResponseDto> createItinerary(@RequestBody ItineraryRequestDto itineraryRequestDto){
-        ItineraryResponseDto itineraryResponseDto = itineraryService.createItinerary(itineraryRequestDto);
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<ItineraryResponseDto> createItinerary(
+            @RequestBody String data,
+            @PathVariable("userId") UUID userId
+    ){
+        ObjectMapper mapper = new ObjectMapper();
+        ItineraryRequestDto itineraryRequestDto = mapper.readValue(data, ItineraryRequestDto.class);
+
+        ItineraryResponseDto itineraryResponseDto = itineraryService.createItinerary(itineraryRequestDto, userId);
         return ResponseEntity.ok().body(itineraryResponseDto);
     }
 
@@ -34,9 +44,12 @@ public class ItineraryController {
 
     @PutMapping("/{itineraryId}")
     public ResponseEntity<ItineraryResponseDto> updateItinerary(
-            @RequestBody ItineraryRequestDto itineraryRequestDto,
+            @RequestBody String data,
             @PathVariable UUID itineraryId
     ){
+        ObjectMapper mapper = new ObjectMapper();
+        ItineraryRequestDto itineraryRequestDto = mapper.readValue(data, ItineraryRequestDto.class);
+
         ItineraryResponseDto itineraryResponseDto = itineraryService.updateItinerary(itineraryRequestDto, itineraryId);
         return ResponseEntity.ok().body(itineraryResponseDto);
     }
@@ -47,26 +60,32 @@ public class ItineraryController {
         return ResponseEntity.ok().body(itineraries);
     }
 
-    @GetMapping("/{typeId}")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByType(@PathVariable Long typeId){
+    @GetMapping("/types/{typeId}")
+    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByType(@PathVariable("typeId") Long typeId){
         List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByType(typeId);
         return ResponseEntity.ok().body(itineraries);
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserId(@PathVariable UUID userId){
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserId(@PathVariable("userId") UUID userId){
         List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByUserId(userId);
         return ResponseEntity.ok().body(itineraries);
     }
 
+    @GetMapping("/{itineraryId}")
+    public ResponseEntity<ItineraryResponseDto> getItineraryById(@PathVariable("itineraryId") UUID itineraryId){
+        ItineraryResponseDto itinerary = itineraryService.getItineraryById(itineraryId);
+        return ResponseEntity.ok().body(itinerary);
+    }
+
     @GetMapping("/{userId}/membership")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserMembership(@PathVariable UUID userId){
+    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserMembership(@PathVariable("userId") UUID userId){
         List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByUserMembership(userId);
         return ResponseEntity.ok().body(itineraries);
     }
 
     @GetMapping("/{userId}/saved")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllSavedItinerariesByUserId(@PathVariable UUID userId){
+    public ResponseEntity<List<ItineraryResponseDto>> getAllSavedItinerariesByUserId(@PathVariable("userId") UUID userId){
         List<ItineraryResponseDto> itineraries = itineraryService.getAllSavedItinerariesByUserId(userId);
         return ResponseEntity.ok().body(itineraries);
     }

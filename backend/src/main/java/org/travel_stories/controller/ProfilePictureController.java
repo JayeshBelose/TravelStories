@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user/{userId}/profilePicture")
+@RequestMapping("/api/users/{userId}/profilePicture")
 public class ProfilePictureController {
 
     private final ProfilePictureService profilePictureService;

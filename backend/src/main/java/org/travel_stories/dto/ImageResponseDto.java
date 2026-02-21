@@ -12,6 +12,6 @@ import java.util.UUID;
 public class ImageResponseDto {
 
     private UUID imageId;
-    private String imageUrl;
+    private byte[] imageData;
 
 }

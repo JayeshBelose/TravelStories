@@ -26,7 +26,7 @@ public class ImageService {
     public ImageResponseDto map(Image image){
         return new ImageResponseDto(
                 image.getImageId(),
-                "/api/itinerary/day/location/"+image.getLocation().getLocationId()+"/image/"+ image.getImageId()
+                image.getImageData()
         );
     }
 

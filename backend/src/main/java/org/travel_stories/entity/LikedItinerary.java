@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
@@ -35,6 +37,7 @@ public class LikedItinerary {
             name = "user_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne(
@@ -45,6 +48,7 @@ public class LikedItinerary {
             name = "itinerary_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Itinerary itinerary;
 
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class Location {
 
     @Column(
             name = "location_number",
-            updatable = false
+            nullable = false
     )
     private Integer locationNumber;
 
@@ -56,6 +58,7 @@ public class Location {
             name = "day_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Day day;
 
     @OneToMany(

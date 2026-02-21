@@ -1,14 +1,17 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.LoginDto;
 import org.travel_stories.dto.SignupDto;
 import org.travel_stories.dto.UserRequestDto;
 import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.service.UserService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok("User deleted.");
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(value = "/{userId}")
     public ResponseEntity<UserResponseDto> updateUser(
             @RequestBody UserRequestDto userRequestDto,
             @PathVariable("userId") UUID userId

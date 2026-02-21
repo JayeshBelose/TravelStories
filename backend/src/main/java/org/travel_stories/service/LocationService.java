@@ -31,13 +31,6 @@ public class LocationService {
         locationResponseDto.setLocationName(location.getLocationName());
         locationResponseDto.setLocationAddress(location.getLocationAddress());
 
-        List<ImageResponseDto> images = imageService.getImagesByLocation(location.getLocationId())
-                .stream().map(img -> new ImageResponseDto(
-                        img.getImageId(),
-                        "/api/itinerary/day/location/"+location.getLocationId()+"/image/"+img.getImageId()
-                ))
-                .collect(Collectors.toList());
-
         return locationResponseDto;
     }
 
@@ -59,11 +52,10 @@ public class LocationService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new RuntimeException("Location not found."));
 
-        Day day = dayRepository.findById(dayId)
+        dayRepository.findById(dayId)
                 .orElseThrow(() -> new RuntimeException("Day not found."));
 
         int deleteLocationNumber = location.getLocationNumber();
-        int counter = deleteLocationNumber;
 
         locationRepository.delete(location);
         locationRepository.flush();
@@ -72,7 +64,7 @@ public class LocationService {
 
         for (Location l : locationsToAdjust){
             if (l.getLocationNumber() > deleteLocationNumber){
-                l.setLocationNumber(counter++);
+                l.setLocationNumber(l.getLocationNumber()-1);
             }
         }
 

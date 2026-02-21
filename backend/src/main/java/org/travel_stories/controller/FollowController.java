@@ -13,15 +13,15 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/community")
 public class FollowController {
 
     private final FollowService followService;
 
     @PostMapping
-    public ResponseEntity<Void> follow(@RequestBody FollowRequestDto followRequestDto){
-        followService.follow(followRequestDto.getFollowerId(), followRequestDto.getFollowingId());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<String> follow(@RequestBody FollowRequestDto followRequestDto){
+        String msg = followService.follow(followRequestDto.getFollowerId(), followRequestDto.getFollowingId());
+        return ResponseEntity.ok().body(msg);
     }
 
     @DeleteMapping

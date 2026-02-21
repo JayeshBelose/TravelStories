@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/itineraries/types")
+@RequestMapping("/api/users/itineraries/types")
 public class ItineraryTypeController {
 
     private final ItineraryTypeService itineraryTypeService;

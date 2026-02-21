@@ -56,7 +56,6 @@ public class DayService {
                 .orElseThrow(() -> new RuntimeException("Itinerary not found."));
 
         int deleteDayNumber = day.getDayNumber();
-        int counter = deleteDayNumber;
 
         dayRepository.delete(day);
         dayRepository.flush();
@@ -65,7 +64,7 @@ public class DayService {
 
         for (Day d : daysToAdjust){
             if (d.getDayNumber() > deleteDayNumber){
-                d.setDayNumber(counter++);
+                d.setDayNumber(d.getDayNumber()-1);
             }
         }
 

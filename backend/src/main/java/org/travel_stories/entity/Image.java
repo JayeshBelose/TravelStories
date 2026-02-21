@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
@@ -51,6 +53,7 @@ public class Image {
             name = "location_id",
             nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Location location;
 
 }

@@ -1,7 +1,6 @@
 package org.travel_stories.dto;
 
 import lombok.Data;
-import org.travel_stories.entity.ProfilePicture;
 
 @Data
 public class UserRequestDto {
@@ -9,7 +8,6 @@ public class UserRequestDto {
     private String username;
     private String email;
     private String password;
-    private ProfilePicture profilePicture;
     private String bio;
 
 }
