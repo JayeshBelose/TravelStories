@@ -11,9 +11,7 @@ import org.travel_stories.entity.Day;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
-import org.travel_stories.repository.ItineraryRepository;
-import org.travel_stories.repository.ItineraryTypeRepository;
-import org.travel_stories.repository.UserRepository;
+import org.travel_stories.repository.*;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
@@ -31,6 +29,8 @@ public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
     private final UserRepository userRepository;
     private final ItineraryTypeRepository itineraryTypeRepository;
+    private final LikedItineraryRepository likedItineraryRepository;
+    private final SavedItineraryRepository savedItineraryRepository;
 
     public ItineraryResponseDto map(Itinerary itinerary){
         ItineraryResponseDto itineraryResponseDto = new ItineraryResponseDto();
@@ -97,6 +97,8 @@ public class ItineraryService {
 
     public void deleteItineraryById(UUID itineraryId){
         itineraryRepository.deleteById(itineraryId);
+        likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
+        savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
     }
 
     public ItineraryResponseDto updateItinerary(

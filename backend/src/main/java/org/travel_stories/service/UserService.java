@@ -11,6 +11,8 @@ import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.FollowRepository;
+import org.travel_stories.repository.LikedItineraryRepository;
+import org.travel_stories.repository.SavedItineraryRepository;
 import org.travel_stories.repository.UserRepository;
 
 import java.io.IOException;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LikedItineraryRepository likedItineraryRepository;
+    private final SavedItineraryRepository savedItineraryRepository;
     private final FollowRepository followRepository;
 
     public UserResponseDto map(User user){
@@ -75,6 +79,10 @@ public class UserService {
     }
 
     public void deleteUser(UUID userId){
+        likedItineraryRepository.deleteByUserUserId(userId);
+        savedItineraryRepository.deleteByUserUserId(userId);
+        followRepository.deleteByFollowerUserId(userId);
+        followRepository.deleteByFollowingUserId(userId);
         userRepository.deleteById(userId);
     }
 

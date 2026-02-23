@@ -1,0 +1,89 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
+import MainLayout from "./layouts/MainLayout";
+import AdminLayout from "./layouts/AdminLayout";
+
+// Auth pages
+import Login from "./pages/Auth/Login";
+import Signup from "./pages/Auth/Signup";
+
+// User pages
+import Explore from "./pages/User/Explore";
+import Community from "./pages/User/Community";
+import MyItineraries from "./pages/User/MyItineraries";
+import Profile from "./pages/User/Profile";
+
+// Admin pages
+import Dashboard from "./pages/Admin/Dashboard";
+import UserManagement from "./pages/Admin/UserManagement";
+import ItineraryManagement from "./pages/Admin/ItineraryManagement";
+import ImageModeration from "./pages/Admin/ImageModeration";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
+export default function App() {
+    return (
+        <AuthProvider>
+            <Router />
+        </AuthProvider>
+    );
+}
+
+function Router() {
+    const { user, loading } = useAuth();
+
+    if (loading) return null; // wait until localStorage is checked
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {/* Root route redirects based on role */}
+                <Route
+                    path="/"
+                    element={
+                        user ? (
+                            user.role === "admin" ? (
+                                <Navigate to="/admin" replace />
+                            ) : (
+                                <Navigate to="/user" replace />
+                            )
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
+
+                {/* User routes */}
+                <Route element={<ProtectedRoute role="user" />}>
+                    <Route path="/user" element={<MainLayout />}>
+                        <Route index element={<Explore />} />
+                        <Route path="community" element={<Community />} />
+                        <Route path="itineraries" element={<MyItineraries />} />
+                        <Route path="profile" element={<Profile />} />
+                    </Route>
+                </Route>
+
+                {/* Admin routes */}
+                <Route element={<ProtectedRoute role="admin" />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<Dashboard />} />
+                        <Route path="user-management" element={<UserManagement />} />
+                        <Route
+                            path="itinerary-management"
+                            element={<ItineraryManagement />}
+                        />
+                        <Route path="image-moderation" element={<ImageModeration />} />
+                    </Route>
+                </Route>
+
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </BrowserRouter>
+    );
+}

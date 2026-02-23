@@ -9,6 +9,10 @@ public interface SavedItineraryRepository extends JpaRepository<SavedItinerary, 
 
     void deleteByUserUserIdAndItineraryItineraryId(UUID userId, UUID itineraryId);
 
+    void deleteByUserUserId(UUID userId);
+
+    void deleteByItineraryItineraryId(UUID itineraryId);
+
     Boolean existsByUserUserIdAndItineraryItineraryId(UUID userId, UUID itineraryId);
 
     Integer countByItineraryItineraryId(UUID itineraryId);

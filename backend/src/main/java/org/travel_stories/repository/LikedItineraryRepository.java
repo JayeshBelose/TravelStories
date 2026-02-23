@@ -9,6 +9,10 @@ public interface LikedItineraryRepository extends JpaRepository<LikedItinerary, 
 
     void deleteByUserUserIdAndItineraryItineraryId(UUID userId, UUID itineraryId);
 
+    void deleteByUserUserId(UUID userId);
+
+    void deleteByItineraryItineraryId(UUID itineraryId);
+
     Boolean existsByUserUserIdAndItineraryItineraryId(UUID userId, UUID itineraryId);
 
     Integer countByItineraryItineraryId(UUID itineraryId);
