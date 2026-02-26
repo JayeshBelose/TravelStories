@@ -48,11 +48,15 @@ export default function Sidebar({ user, onLogout }) {
                 <Separator className="my-4 bg-white/20" />
                 <div className="flex items-center gap-3 mb-4">
                     <Avatar>
-                        <AvatarImage src={user?.image} />
-                        <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarImage src={user?.profilePicture} />
+                        <AvatarFallback>
+                            {user?.username?.charAt(0) || "U"}
+                        </AvatarFallback>
                     </Avatar>
                     <div>
-                        <p className="text-sm font-medium font-secondary">{user?.name}</p>
+                        <p className="text-sm font-medium font-secondary">
+                            {user?.username}
+                        </p>
                     </div>
                 </div>
 

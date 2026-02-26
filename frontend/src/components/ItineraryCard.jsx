@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Heart, Bookmark } from "lucide-react";
 
 export default function ItineraryCard({ itinerary, onClick }) {
-    const [likes, setLikes] = useState(itinerary.likes);
-    const [saves, setSaves] = useState(itinerary.saves);
+    const [likes, setLikes] = useState(itinerary.likeCount);
+    const [saves, setSaves] = useState(itinerary.saveCount);
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -24,7 +24,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
             onClick={() => onClick(itinerary)}
             className="relative rounded-2xl overflow-hidden cursor-pointer group shadow-md hover:shadow-xl transition duration-300">
             <img
-                src={itinerary.thumbnail}
+                src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
                 alt={itinerary.title}
                 className="w-full h-80 object-cover group-hover:scale-105 transition duration-500"
             />
@@ -36,11 +36,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
             <div className="absolute bottom-5 left-5 right-5 text-white">
                 <h3 className="text-xl font-semibold">{itinerary.title}</h3>
 
-                <p className="text-sm opacity-90">{itinerary.location}</p>
+                <p className="text-sm opacity-90">{itinerary.place}</p>
 
                 {/* Creator */}
                 <p className="text-xs mt-1 opacity-80">
-                    By {itinerary.creator || "Anonymous"}
+                    By {itinerary.createdBy || "Anonymous"}
                 </p>
 
                 {/* Like & Save Section */}

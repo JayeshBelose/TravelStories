@@ -14,12 +14,12 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/itineraries/days/locations/{locationId}/images")
+@RequestMapping("/api/itineraries/days/locations")
 public class ImageController {
 
     private final ImageService imageService;
 
-    @PostMapping
+    @PostMapping("/{locationId}/images")
     public ResponseEntity<String> uploadImage(
             @PathVariable UUID locationId,
             @RequestParam("file") MultipartFile file
@@ -28,22 +28,27 @@ public class ImageController {
         return ResponseEntity.ok().body("Image uploaded.");
     }
 
-    @DeleteMapping("/{imageId}")
+    @DeleteMapping("/{locationId}/images/{imageId}")
     public ResponseEntity<String> deleteImage(@PathVariable UUID imageId){
         imageService.deleteImage(imageId);
         return ResponseEntity.ok().body("Image deleted.");
     }
 
-    @GetMapping
+    @GetMapping("/{locationId}/images")
     public ResponseEntity<List<ImageResponseDto>> getImagesByLocation(@PathVariable UUID locationId){
         List<ImageResponseDto> images = imageService.getImagesByLocation(locationId);
         return ResponseEntity.ok().body(images);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/images")
     public ResponseEntity<List<ImageResponseDto>> getAllImages(){
         List<ImageResponseDto> images = imageService.getAllImages();
         return ResponseEntity.ok().body(images);
+    }
+
+    @GetMapping("/images/{imageId}")
+    public ResponseEntity<byte[]> getImageId(@PathVariable UUID imageId){
+        return ResponseEntity.ok().body(imageService.getImageById(imageId));
     }
 
 }

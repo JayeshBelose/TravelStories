@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/api/axiosConfig";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -13,18 +14,25 @@ export default function Login() {
     const isPasswordValid = password.length >= 8 && password.length <= 12;
     const isFormValid = email && password && isEmailValid && isPasswordValid;
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!isFormValid) return;
 
-        let user;
-        if (email === "admin@gmail.com") {
-            user = { name: "Admin", role: "admin" };
-            login(user);
-            navigate("/admin");
-        } else {
-            user = { name: "Jayesh", role: "user" };
-            login(user);
-            navigate("/user");
+        try {
+            const response = await api.post(
+                `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+                { email, password },
+            );
+
+            const { token, userId, username, role } = response.data;
+
+            localStorage.setItem("token", token);
+
+            login({ userId, username, role });
+
+            navigate(role === "ADMIN" ? "/admin" : "/user");
+        } catch (error) {
+            console.error(error);
+            alert("Invalid credentials!");
         }
     };
 

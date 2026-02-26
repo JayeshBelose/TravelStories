@@ -38,12 +38,6 @@ public class ItineraryService {
         itineraryResponseDto.setItineraryId(itinerary.getItineraryId());
         itineraryResponseDto.setPlace(itinerary.getPlace());
         itineraryResponseDto.setTitle(itinerary.getTitle());
-
-        byte[] image = null;
-        if(itinerary.getThumbnail() != null){
-            image = itinerary.getThumbnail().getThumbnailData();
-        }
-        itineraryResponseDto.setThumbnail(image);
         itineraryResponseDto.setDescription(itinerary.getDescription());
         itineraryResponseDto.setStartDate(itinerary.getStartDate());
         itineraryResponseDto.setEndDate(itinerary.getEndDate());
@@ -53,12 +47,12 @@ public class ItineraryService {
         itineraryResponseDto.setSaveCount(itinerary.getSaveCount());
         itineraryResponseDto.setCreatedAt(itinerary.getCreatedAt());
         itineraryResponseDto.setLastUpdated(itinerary.getLastUpdated());
-        itineraryResponseDto.setCreatedBy(itinerary.getCreatedBy().getUserId());
+        itineraryResponseDto.setCreatedBy(itinerary.getCreatedBy().getUsername());
         itineraryResponseDto.setType(itinerary.getType().getName());
         itineraryResponseDto.setMembers(
                 itinerary.getMembers().stream()
                         .map(i -> {
-                            return i.getUser().getUserId();
+                            return i.getUser().getUsername();
                         })
                         .collect(Collectors.toList())
         );
@@ -127,7 +121,7 @@ public class ItineraryService {
     }
 
     public List<ItineraryResponseDto> getAllItineraries(){
-        return itineraryRepository.findAll()
+        return itineraryRepository.findAllWithRelations()
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());

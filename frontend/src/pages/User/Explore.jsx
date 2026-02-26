@@ -1,11 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import ItineraryCard from "@/components/ItineraryCard";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
-import { itineraries } from "@/assets/propData";
+import axios from "axios";
+import api from "@/api/axiosConfig";
 
 export default function Explore() {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
+    const [itineraries, setItineraries] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [sortFilter, setSortFilter] = useState("random");
     const [typeFilter, setTypeFilter] = useState("all");
@@ -13,22 +16,38 @@ export default function Explore() {
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
 
+    // Fetching itineraries using API
+    useEffect(() => {
+        const fetchItineraries = async () => {
+            try {
+                const response = await api.get(
+                    `${import.meta.env.VITE_API_BASE_URL}/itineraries`,
+                );
+                setItineraries(response.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchItineraries();
+    }, []);
+
     // Get unique itinerary types dynamically
     const itineraryTypes = useMemo(() => {
-        const types = itineraries.map(i => i.type);
+        const types = itineraries.map(i => i.type).filter(Boolean);
         return ["all", ...new Set(types)];
-    }, []);
+    }, [itineraries]);
 
     // Combined filter logic
     const filteredItineraries = useMemo(() => {
         let filtered = [...itineraries];
 
-        // 🔹 Filter by type first
         if (typeFilter !== "all") {
             filtered = filtered.filter(i => i.type === typeFilter);
         }
 
-        // 🔹 Then apply sorting
         if (sortFilter === "likes") {
             filtered.sort((a, b) => b.likes - a.likes);
         } else if (sortFilter === "saves") {
@@ -40,7 +59,7 @@ export default function Explore() {
         }
 
         return filtered;
-    }, [sortFilter, typeFilter]);
+    }, [itineraries, sortFilter, typeFilter]);
 
     const getSortLabel = () => {
         if (sortFilter === "likes") return "Most Liked";
@@ -53,6 +72,8 @@ export default function Explore() {
         if (typeFilter === "all") return "All Types";
         return typeFilter;
     };
+
+    if (loading) return <p className="p-10">Loading...</p>;
 
     return (
         <div>
@@ -67,7 +88,7 @@ export default function Explore() {
 
                 {/* Filters */}
                 <div className="flex gap-4">
-                    {/* 🔹 Sort Filter */}
+                    {/* Sort Filter */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenSort(!openSort)}
@@ -117,7 +138,7 @@ export default function Explore() {
                         )}
                     </div>
 
-                    {/* 🔹 Type Filter */}
+                    {/* Type Filter */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenType(!openType)}
@@ -149,7 +170,7 @@ export default function Explore() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredItineraries.map(itinerary => (
                     <ItineraryCard
-                        key={itinerary.id}
+                        key={itinerary.itineraryId}
                         itinerary={itinerary}
                         onClick={setSelectedItinerary}
                     />

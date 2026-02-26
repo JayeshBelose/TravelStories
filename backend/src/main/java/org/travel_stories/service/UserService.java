@@ -104,15 +104,8 @@ public class UserService {
         return map(user);
     }
 
-    public UserResponseDto login(LoginDto loginDto){
-        User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found."));
-
-        if (!user.getPassword().equals(loginDto.getPassword())){
-            throw new RuntimeException("Invalid credentials.");
-        }
-
-        return map(user);
+    public User authenticate(String email, String password){
+        return userRepository.findByEmailAndPassword(email, password);
     }
 
 }

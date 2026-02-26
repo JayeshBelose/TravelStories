@@ -33,4 +33,13 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
            """)
     List<Itinerary> findMostSavedItineraries();
 
+    @Query("""
+            SELECT DISTINCT i FROM Itinerary i
+            LEFT JOIN FETCH i.createdBy
+            LEFT JOIN FETCH i.type
+            LEFT JOIN FETCH i.members m
+            LEFT JOIN FETCH m.user
+            """)
+    List<Itinerary> findAllWithRelations();
+
 }

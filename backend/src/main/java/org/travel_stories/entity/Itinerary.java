@@ -1,5 +1,6 @@
 package org.travel_stories.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,6 +54,7 @@ public class Itinerary {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
+    @JsonIgnore
     private Thumbnail thumbnail;
 
     @Column(

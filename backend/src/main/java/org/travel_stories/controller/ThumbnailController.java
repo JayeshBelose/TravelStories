@@ -20,10 +20,10 @@ public class ThumbnailController {
 
     @PostMapping
     public ResponseEntity<String> uploadOrUpdate(
-            @PathVariable("itineraryId")UUID userId,
+            @PathVariable("itineraryId")UUID itineraryId,
             @RequestParam MultipartFile file
     ) throws IOException{
-        thumbnailService.uploadOrUpdate(userId, file);
+        thumbnailService.uploadOrUpdate(itineraryId, file);
         return ResponseEntity.ok().body("Thumbnail updated.");
     }
 

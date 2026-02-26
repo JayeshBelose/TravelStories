@@ -28,6 +28,12 @@ public class User {
     private UUID userId;
 
     @Column(
+            name = "role",
+            nullable = false
+    )
+    private String role = "user";
+
+    @Column(
             name = "username",
             length = 20,
             unique = true,
