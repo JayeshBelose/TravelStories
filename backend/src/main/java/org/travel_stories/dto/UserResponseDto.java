@@ -11,7 +11,6 @@ public class UserResponseDto {
     private UUID userId;
     private String username;
     private String email;
-    private byte[] profilePicture;
     private String bio;
     private Instant createdAt;
     private Integer followersCount;

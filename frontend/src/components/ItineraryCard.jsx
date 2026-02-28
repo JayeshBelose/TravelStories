@@ -22,7 +22,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
     return (
         <div
             onClick={() => onClick(itinerary)}
-            className="relative rounded-2xl overflow-hidden cursor-pointer group shadow-md hover:shadow-xl transition duration-300">
+            className="relative rounded-2xl overflow-hidden cursor-pointer group shadow-md transition duration-300">
             <img
                 src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
                 alt={itinerary.title}
@@ -30,11 +30,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
             />
 
             {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition" />
+            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/0 transition" />
 
             {/* Text Content */}
-            <div className="absolute bottom-5 left-5 right-5 text-white">
-                <h3 className="text-xl font-semibold">{itinerary.title}</h3>
+            <div className="absolute group-hover:bg-black/10 bottom-5 left-5 right-5 text-white">
+                <h3 className="text-xl font-semibold font-primary">{itinerary.title}</h3>
 
                 <p className="text-sm opacity-90">{itinerary.place}</p>
 

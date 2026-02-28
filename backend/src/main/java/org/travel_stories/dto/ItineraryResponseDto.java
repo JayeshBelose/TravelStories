@@ -18,13 +18,13 @@ public class ItineraryResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long totalDays;
-    private Boolean isPublic;
+    private boolean isPublic;
     private Integer likeCount;
     private Integer saveCount;
     private Instant createdAt;
     private Instant lastUpdated;
     private String createdBy;
     private String type;
-    private List<String> members;
+    private List<MemberResponseDto> members;
 
 }

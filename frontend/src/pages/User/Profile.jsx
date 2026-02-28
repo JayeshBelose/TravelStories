@@ -1,24 +1,87 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Camera, Save, Trash2, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/api/axiosConfig";
 
 export default function Profile() {
-    const [username, setUsername] = useState("Demouser");
+    const { logout } = useAuth();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const [username, setUsername] = useState("");
     const [bio, setBio] = useState("");
     const [profileImage, setProfileImage] = useState(null);
+    const [previewPicture, setPreviewPicture] = useState(null);
 
+    useEffect(() => {
+        if (user) {
+            setUsername(user.username || "");
+            setBio(user.bio || "");
+        }
+    }, []);
+
+    // Image change
     const handleImageChange = e => {
         const file = e.target.files[0];
-        if (file) {
-            setProfileImage(URL.createObjectURL(file));
+        if (!file) return;
+
+        setProfileImage(file);
+        setPreviewPicture(URL.createObjectURL(file));
+    };
+
+    // Image Update
+    const handleImageUpload = async () => {
+        if (!profileImage) return;
+
+        const formData = new FormData();
+        formData.append("file", profileImage);
+
+        try {
+            await api.post(`/users/${user.userId}/profilePicture`, formData);
+            alert("Profile picture updated!");
+        } catch (error) {
+            console.error(error);
+            alert("Image upload failed");
         }
     };
 
-    const handleSave = () => {
-        console.log("Saved:", { username, bio });
+    // Update User
+    const handleSave = async () => {
+        try {
+            await api.put(`/users/${user.userId}`, {
+                username,
+                bio,
+            });
+
+            const updatedUser = {
+                ...user,
+                username,
+                bio,
+            };
+
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+
+            alert("Profile updated!");
+        } catch (error) {
+            console.log(error);
+            alert("Failed to update profile");
+        }
     };
 
-    const handleDelete = () => {
-        console.log("Account Deleted");
+    // User Deletion
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete your account?",
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            await api.delete(`/users/${user.userId}`);
+            logout();
+        } catch (error) {
+            console.error(error);
+            alert("Image upload failed");
+        }
     };
 
     return (
@@ -37,19 +100,17 @@ export default function Profile() {
                     {/* Profile Picture */}
                     <div className="flex items-center gap-8 mb-10">
                         <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                            {profileImage ? (
-                                <img
-                                    src={profileImage}
-                                    alt="Profile"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <User size={40} className="text-gray-500" />
-                            )}
+                            <img
+                                src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                            />
                         </div>
 
                         <div>
-                            <p className="font-medium mb-2">Profile Picture</p>
+                            <p className="font-medium text-2xl mb-2 font-primary">
+                                Profile Picture
+                            </p>
                             <label className="flex items-center gap-2 text-primary cursor-pointer hover:underline">
                                 <Camera size={18} />
                                 <span>Choose file</span>
@@ -59,12 +120,22 @@ export default function Profile() {
                                     className="hidden"
                                 />
                             </label>
+
+                            {profileImage && (
+                                <button
+                                    onClick={handleImageUpload}
+                                    className="mt-3 bg-primary text-white px-4 py-2 rounded-full">
+                                    Upload Image
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     {/* Username */}
                     <div className="mb-8">
-                        <label className="block mb-2 font-medium">Username</label>
+                        <label className="block mb-2 text-2xl font-medium font-primary">
+                            Username
+                        </label>
                         <input
                             type="text"
                             value={username}
@@ -75,7 +146,9 @@ export default function Profile() {
 
                     {/* Bio */}
                     <div className="mb-10">
-                        <label className="block mb-2 font-medium">Bio</label>
+                        <label className="text-2xl block mb-2 font-medium font-primary">
+                            Bio
+                        </label>
                         <textarea
                             rows={5}
                             placeholder="Tell us about yourself..."

@@ -50,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok("User deleted.");
     }
 
-    @PutMapping(value = "/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDto> updateUser(
             @RequestBody UserRequestDto userRequestDto,
             @PathVariable("userId") UUID userId

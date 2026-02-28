@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.DayResponseDto;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
+import org.travel_stories.dto.MemberResponseDto;
 import org.travel_stories.entity.Day;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
@@ -42,7 +43,7 @@ public class ItineraryService {
         itineraryResponseDto.setStartDate(itinerary.getStartDate());
         itineraryResponseDto.setEndDate(itinerary.getEndDate());
         itineraryResponseDto.setTotalDays(itinerary.getTotalDays());
-        itineraryResponseDto.setIsPublic(itinerary.getIsPublic());
+        itineraryResponseDto.setPublic(itinerary.isPublic());
         itineraryResponseDto.setLikeCount(itinerary.getLikeCount());
         itineraryResponseDto.setSaveCount(itinerary.getSaveCount());
         itineraryResponseDto.setCreatedAt(itinerary.getCreatedAt());
@@ -51,8 +52,11 @@ public class ItineraryService {
         itineraryResponseDto.setType(itinerary.getType().getName());
         itineraryResponseDto.setMembers(
                 itinerary.getMembers().stream()
-                        .map(i -> {
-                            return i.getUser().getUsername();
+                        .map(m -> {
+                            MemberResponseDto dto = new MemberResponseDto();
+                            dto.setUsername(m.getUser().getUsername());
+                            dto.setUserId(m.getUser().getUserId());
+                            return dto;
                         })
                         .collect(Collectors.toList())
         );
@@ -74,14 +78,13 @@ public class ItineraryService {
 
         Long totalDays = ChronoUnit.DAYS.between(itineraryRequestDto.getStartDate(), itineraryRequestDto.getEndDate());
         itinerary.setTotalDays(totalDays);
-        itinerary.setIsPublic(itineraryRequestDto.getIsPublic());
+        itinerary.setPublic(itineraryRequestDto.isPublic());
 
         User user = userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found."));
         itinerary.setCreatedBy(user);
 
-        ItineraryType itineraryType = itineraryTypeRepository.findById(itineraryRequestDto.getType())
-                        .orElseThrow(() -> new RuntimeException("Type not found."));
+        ItineraryType itineraryType = itineraryTypeRepository.findByName(itineraryRequestDto.getType());
         itinerary.setType(itineraryType);
 
         Itinerary newItinerary = itineraryRepository.save(itinerary);
@@ -110,10 +113,9 @@ public class ItineraryService {
 
         Long totalDays = ChronoUnit.DAYS.between(itineraryRequestDto.getStartDate(), itineraryRequestDto.getEndDate());
         itinerary.setTotalDays(totalDays);
-        itinerary.setIsPublic(itineraryRequestDto.getIsPublic());
+        itinerary.setPublic(itineraryRequestDto.isPublic());
 
-        ItineraryType itineraryType = itineraryTypeRepository.findById(itineraryRequestDto.getType())
-                .orElseThrow(() -> new RuntimeException("Type not found."));
+        ItineraryType itineraryType = itineraryTypeRepository.findByName(itineraryRequestDto.getType());
         itinerary.setType(itineraryType);
 
         Itinerary updatedItinerary = itineraryRepository.save(itinerary);

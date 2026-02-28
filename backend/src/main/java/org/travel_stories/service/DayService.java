@@ -79,4 +79,11 @@ public class DayService {
         return days;
     }
 
+    public void updateDay(UUID dayId, DayRequestDto dayRequestDto){
+        Day day = dayRepository.findById(dayId)
+                .orElseThrow(() -> new RuntimeException("Day not found."));
+        if (dayRequestDto.getDescription() != null)
+            day.setDescription(dayRequestDto.getDescription());
+    }
+
 }

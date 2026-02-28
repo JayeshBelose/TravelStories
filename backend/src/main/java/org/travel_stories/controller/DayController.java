@@ -36,9 +36,15 @@ public class DayController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DayResponseDto>> getDaysByItinerary(@PathVariable UUID itineraryId){
+    public ResponseEntity<List<DayResponseDto>> getDaysByItinerary(@PathVariable("itineraryId") UUID itineraryId){
         List<DayResponseDto> days = dayService.getDaysByItinerary(itineraryId);
         return ResponseEntity.ok().body(days);
+    }
+
+    @PutMapping("/{dayId}")
+    public ResponseEntity<String> updateDay(@PathVariable("dayId") UUID dayId, @RequestBody DayRequestDto dayRequestDto){
+        dayService.updateDay(dayId, dayRequestDto);
+        return ResponseEntity.ok().body("Updated.");
     }
 
 }

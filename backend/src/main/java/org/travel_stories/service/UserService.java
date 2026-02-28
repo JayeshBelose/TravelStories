@@ -37,12 +37,6 @@ public class UserService {
         userResponseDto.setUserId(user.getUserId());
         userResponseDto.setUsername(user.getUsername());
         userResponseDto.setEmail(user.getEmail());
-
-        byte[] image = null;
-        if(user.getProfilePicture() != null){
-            image = user.getProfilePicture().getPfpData();
-        }
-        userResponseDto.setProfilePicture(image);
         userResponseDto.setBio(user.getBio());
         userResponseDto.setCreatedAt(user.getCreatedAt());
         userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());
@@ -94,8 +88,6 @@ public class UserService {
                         .orElseThrow(() -> new RuntimeException("User not found."));
 
         user.setUsername(userRequestDto.getUsername());
-        user.setEmail(userRequestDto.getEmail());
-        user.setPassword(userRequestDto.getPassword());
         user.setBio(userRequestDto.getBio());
         user.setCreatedAt(Instant.now());
 

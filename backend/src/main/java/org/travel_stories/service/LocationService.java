@@ -79,4 +79,14 @@ public class LocationService {
         return locations;
     }
 
+    public void updateLocation(UUID locationId, LocationRequestDto locationRequestDto){
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new RuntimeException("Location not found."));
+
+        if (locationRequestDto.getLocationName() != null)
+            location.setLocationName(locationRequestDto.getLocationName());
+        if (locationRequestDto.getLocationAddress() != null)
+            location.setLocationAddress(locationRequestDto.getLocationAddress());
+    }
+
 }

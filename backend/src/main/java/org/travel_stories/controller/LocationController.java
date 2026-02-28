@@ -36,9 +36,15 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationResponseDto>> getLocationsByDay(@PathVariable UUID dayId){
+    public ResponseEntity<List<LocationResponseDto>> getLocationsByDay(@PathVariable("dayId") UUID dayId){
         List<LocationResponseDto> locations = locationService.getLocationsByDay(dayId);
         return ResponseEntity.ok().body(locations);
+    }
+
+    @PutMapping("/{locationId}")
+    public ResponseEntity<String> updateLocation(@PathVariable("locationId") UUID locationId, @RequestBody LocationRequestDto locationRequestDto){
+        locationService.updateLocation(locationId, locationRequestDto);
+        return ResponseEntity.ok().body("Updated.");
     }
 
 }

@@ -48,7 +48,9 @@ export default function Sidebar({ user, onLogout }) {
                 <Separator className="my-4 bg-white/20" />
                 <div className="flex items-center gap-3 mb-4">
                     <Avatar>
-                        <AvatarImage src={user?.profilePicture} />
+                        <AvatarImage
+                            src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
+                        />
                         <AvatarFallback>
                             {user?.username?.charAt(0) || "U"}
                         </AvatarFallback>

@@ -2,10 +2,12 @@ package org.travel_stories.dto;
 
 import lombok.Data;
 
-@Data
-public class UserRequestDto {
+import java.util.UUID;
 
+@Data
+public class MemberResponseDto {
+
+    private UUID userId;
     private String username;
-    private String bio;
 
 }

@@ -13,7 +13,7 @@ public class ItineraryRequestDto {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Boolean isPublic;
-    private Long type;
+    private boolean isPublic;
+    private String type;
 
 }

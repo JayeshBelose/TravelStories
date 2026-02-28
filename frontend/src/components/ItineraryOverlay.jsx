@@ -126,8 +126,8 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             {itinerary.title}
                         </h2>
 
-                        {/* Location */}
-                        <p className="text-gray-500 mb-2">{itinerary.location}</p>
+                        {/* PLace */}
+                        <p className="text-gray-500 mb-2">{itinerary.place}</p>
 
                         {/* Dates */}
                         <p className="text-sm text-gray-600 mb-2">
@@ -150,7 +150,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                 {days.map(day => (
                                     <div key={day.dayId} className="border-t pt-6 pb-6">
                                         {/* Day Header */}
-                                        <h4 className="text-xl font-semibold mb-2">
+                                        <h4 className="text-xl font-primary font-semibold mb-2">
                                             Day {day.dayNumber}
                                         </h4>
 
@@ -169,7 +169,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                         <div
                                                             key={location.locationId}
                                                             className="bg-gray-50 p-4 rounded-lg">
-                                                            <h5 className="font-semibold">
+                                                            <h5 className="font-semibold font-primary">
                                                                 {location.locationName}
                                                             </h5>
 

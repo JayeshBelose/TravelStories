@@ -1,462 +1,601 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Trash } from "lucide-react";
+import api from "@/api/axiosConfig";
 
-export default function CreateItineraryOverlay({ open, onClose }) {
-    const [thumbnail, setThumbnail] = useState(null);
-    const [itineraryDescription, setItineraryDescription] = useState("");
-    const [days, setDays] = useState([]);
+export default function CreateItineraryOverlay({
+    open,
+    onClose,
+    existingItinerary = null,
+    onSaved,
+}) {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const isEditMode = !!existingItinerary;
+    const isCreator = existingItinerary?.createdBy === user?.username;
+
+    const [itineraryId, setItineraryId] = useState(null);
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [thumbnailPreview, setThumbnailPreview] = useState(null);
     const [title, setTitle] = useState("");
     const [place, setPlace] = useState("");
     const [type, setType] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [dateError, setDateError] = useState("");
-
+    const [description, setDescription] = useState("");
+    const [isPublic, setIsPublic] = useState(true);
+    const [days, setDays] = useState([]);
+    const [followingList, setFollowingList] = useState([]);
+    const [members, setMembers] = useState([]);
     const [memberSearch, setMemberSearch] = useState("");
-    const [selectedMembers, setSelectedMembers] = useState([]);
+    const [types, setTypes] = useState([]);
 
-    // Dummy following list
-    const followingList = [
-        { id: 1, username: "Riya Sharma", profilePic: "https://i.pravatar.cc/150?img=1" },
-        { id: 2, username: "Aman Verma", profilePic: "https://i.pravatar.cc/150?img=2" },
-        {
-            id: 3,
-            username: "Carlos Rivera",
-            profilePic: "https://i.pravatar.cc/150?img=3",
-        },
-        { id: 4, username: "Yuki Tanaka", profilePic: "https://i.pravatar.cc/150?img=4" },
-    ];
+    /* ---------------- LOAD DATA ---------------- */
+
+    useEffect(() => {
+        if (!open) return;
+
+        const loadData = async () => {
+            try {
+                const typeRes = await api.get("/users/itineraries/types");
+                setTypes(typeRes.data);
+
+                const followingRes = await api.get(
+                    `/users/community/${user.userId}/following`,
+                );
+                setFollowingList(followingRes.data);
+
+                if (isEditMode && existingItinerary) {
+                    const id = existingItinerary.itineraryId;
+                    setItineraryId(id);
+
+                    const itineraryRes = await api.get(`/itineraries/${id}`);
+                    const itinerary = itineraryRes.data;
+
+                    setTitle(itinerary.title);
+                    setPlace(itinerary.place);
+                    setType(itinerary.type);
+                    setStartDate(itinerary.startDate);
+                    setEndDate(itinerary.endDate);
+                    setDescription(itinerary.description);
+                    setIsPublic(itinerary.public);
+                    setMembers(itinerary.members || []);
+
+                    const daysRes = await api.get(`/itineraries/${id}/days`);
+                    const loadedDays = [];
+
+                    for (let day of daysRes.data) {
+                        const locRes = await api.get(
+                            `/itineraries/days/${day.dayId}/locations`,
+                        );
+
+                        const loadedLocations = [];
+
+                        for (let loc of locRes.data) {
+                            const imgRes = await api.get(
+                                `/itineraries/days/locations/${loc.locationId}/images`,
+                            );
+
+                            loadedLocations.push({
+                                ...loc,
+                                images: imgRes.data,
+                                newImages: [],
+                            });
+                        }
+
+                        loadedDays.push({
+                            ...day,
+                            locations: loadedLocations,
+                        });
+                    }
+
+                    setDays(loadedDays);
+                } else {
+                    resetForm();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        loadData();
+    }, [open, existingItinerary]);
+
+    const resetForm = () => {
+        setItineraryId(null);
+        setTitle("");
+        setPlace("");
+        setType("");
+        setStartDate("");
+        setEndDate("");
+        setDescription("");
+        setIsPublic(true);
+        setDays([]);
+        setMembers([]);
+        setThumbnailFile(null);
+        setThumbnailPreview(null);
+    };
 
     if (!open) return null;
 
-    /* ---------------- THUMBNAIL ---------------- */
-    const handleThumbnailChange = e => {
-        const file = e.target.files[0];
-        if (file) {
-            setThumbnail(URL.createObjectURL(file));
+    /* ---------------- CREATE OR UPDATE ---------------- */
+
+    const createOrUpdateItinerary = async () => {
+        if (!title || !place || !type || !startDate || !endDate) {
+            alert("Fill all required fields");
+            return;
+        }
+
+        try {
+            let response;
+
+            if (isEditMode && isCreator) {
+                response = await api.put(`/itineraries/${itineraryId}`, {
+                    title,
+                    place,
+                    type,
+                    startDate,
+                    endDate,
+                    description,
+                    public: isPublic,
+                });
+            } else {
+                response = await api.post(`/itineraries/users/${user.userId}`, {
+                    title,
+                    place,
+                    type,
+                    startDate,
+                    endDate,
+                    description,
+                    public: isPublic,
+                });
+                setItineraryId(response.data.itineraryId);
+            }
+
+            const updatedItinerary = response.data;
+
+            if (onSaved) onSaved(updatedItinerary);
+
+            const id = response?.data?.itineraryId || itineraryId;
+
+            /* ---------- Thumbnail ---------- */
+            if (thumbnailFile) {
+                const formData = new FormData();
+                formData.append("file", thumbnailFile);
+                await api.post(`/itineraries/${id}/thumbnail`, formData);
+            }
+
+            /* ---------- Days & Locations ---------- */
+            for (let day of days) {
+                let dayId = day.dayId;
+
+                if (!dayId) {
+                    const dayRes = await api.post(`/itineraries/${id}/days`, {
+                        description: day.description,
+                    });
+                    dayId = dayRes.data.dayId;
+                } else {
+                    await api.put(`/itineraries/${id}/days/${dayId}`, {
+                        description: day.description,
+                    });
+                }
+
+                for (let loc of day.locations) {
+                    let locationId = loc.locationId;
+
+                    if (!locationId) {
+                        const locRes = await api.post(
+                            `/itineraries/days/${dayId}/locations`,
+                            {
+                                locationName: loc.name,
+                                locationAddress: loc.address,
+                            },
+                        );
+                        locationId = locRes.data.locationId;
+                    } else {
+                        await api.put(
+                            `/itineraries/days/${dayId}/locations/${locationId}`,
+                            {
+                                locationName: loc.name,
+                                locationAddress: loc.address,
+                            },
+                        );
+                    }
+
+                    if (loc.newImages) {
+                        for (let image of loc.newImages) {
+                            const imgForm = new FormData();
+                            imgForm.append("file", image);
+                            await api.post(
+                                `/itineraries/days/locations/${locationId}/images`,
+                                imgForm,
+                            );
+                        }
+                    }
+                }
+            }
+
+            /* ---------- Members ---------- */
+            const existingMembers = existingItinerary.members;
+
+            for (let m of existingMembers) {
+                if (!members.find(sel => sel.userId === m.userId)) {
+                    await api.delete(`/itineraries/members/${id}/${m.userId}`);
+                }
+            }
+
+            for (let m of members) {
+                if (!existingMembers.find(em => em.userId === m.userId)) {
+                    await api.post(`/itineraries/members/${id}/${m.userId}`);
+                }
+            }
+
+            alert(isEditMode ? "Itinerary Updated!" : "Itinerary Created!");
+            onClose();
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong");
         }
     };
 
-    /* ---------------- DAYS ---------------- */
-    const addDay = () => {
-        setDays([...days, { description: "", locations: [] }]);
-    };
+    /* ---------------- REMOVE FUNCTIONS ---------------- */
 
-    const removeDay = dayIndex => {
-        setDays(days.filter((_, i) => i !== dayIndex));
-    };
+    const removeDay = async index => {
+        const day = days[index];
 
-    const updateDayDescription = (dayIndex, value) => {
+        if (day.dayId) {
+            await api.delete(`/itineraries/${itineraryId}/days/${day.dayId}`);
+        }
+
         const updated = [...days];
-        updated[dayIndex].description = value;
+        updated.splice(index, 1);
         setDays(updated);
     };
 
-    /* ---------------- LOCATIONS ---------------- */
-    const addLocation = dayIndex => {
+    const removeLocation = async (dayIndex, locIndex) => {
+        const dayId = days[dayIndex].dayId;
+        const location = days[dayIndex].locations[locIndex];
+
+        if (location.locationId) {
+            await api.delete(
+                `/itineraries/days/${dayId}/locations/${location.locationId}`,
+            );
+        }
+
         const updated = [...days];
-        updated[dayIndex].locations.push({
-            name: "",
-            address: "",
-            images: [],
-        });
+        updated[dayIndex].locations.splice(locIndex, 1);
         setDays(updated);
     };
 
-    const removeLocation = (dayIndex, locationIndex) => {
-        const updated = [...days];
-        updated[dayIndex].locations = updated[dayIndex].locations.filter(
-            (_, i) => i !== locationIndex,
-        );
-        setDays(updated);
-    };
+    const removeImage = async (dayIndex, locIndex, imgIndex) => {
+        const location = days[dayIndex].locations[locIndex];
+        const image = location.images[imgIndex];
 
-    const updateLocationField = (dayIndex, locationIndex, field, value) => {
-        const updated = [...days];
-        updated[dayIndex].locations[locationIndex][field] = value;
-        setDays(updated);
-    };
-
-    const handleLocationImages = (e, dayIndex, locationIndex) => {
-        const files = Array.from(e.target.files);
-        const imageUrls = files.map(file => URL.createObjectURL(file));
+        if (image.imageId) {
+            await api.delete(
+                `/itineraries/days/locations/${location.locationId}/images/${image.imageId}`,
+            );
+        }
 
         const updated = [...days];
-        updated[dayIndex].locations[locationIndex].images.push(...imageUrls);
-        setDays(updated);
-    };
-
-    const removeLocationImage = (dayIndex, locationIndex, imageIndex) => {
-        const updated = [...days];
-        updated[dayIndex].locations[locationIndex].images = updated[dayIndex].locations[
-            locationIndex
-        ].images.filter((_, i) => i !== imageIndex);
+        updated[dayIndex].locations[locIndex].images.splice(imgIndex, 1);
         setDays(updated);
     };
 
     const filteredMembers = followingList.filter(
-        user =>
-            user.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
-            !selectedMembers.find(m => m.id === user.id),
+        u =>
+            u.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
+            !members.find(m => m.username === u.username),
     );
 
-    const handleSave = () => {
-        if (!title || !place || !type || !startDate || !endDate) {
-            alert("Please fill all required fields");
-            return;
-        }
-
-        if (new Date(endDate) <= new Date(startDate)) {
-            setDateError("End date must be after start date");
-            return;
-        }
-
-        console.log({
-            title,
-            place,
-            type,
-            startDate,
-            endDate,
-            thumbnail,
-            itineraryDescription,
-            members: selectedMembers,
-            days,
-        });
-
-        onClose();
-    };
-
     return (
-        <div className="fixed inset-0 bg-black/70 flex items-start justify-center overflow-y-auto p-6 z-50">
-            <div className="bg-white w-11/12 max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-y-auto relative">
-                {/* HEADER */}
-                <div className="flex justify-between items-center p-4 border-b bg-primary sticky top-0 z-10">
-                    <h2 className="text-3xl font-bold font-primary text-white">
-                        Create Itinerary
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-start p-6 z-50 overflow-y-auto">
+            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl">
+                <div className="flex justify-between items-center p-4 border-b bg-primary text-white rounded-t-2xl">
+                    <h2 className="text-2xl font-bold">
+                        {isEditMode ? "Update Itinerary" : "Create Itinerary"}
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-full bg-white hover:bg-secondary cursor-pointer transition">
-                        <X size={22} />
-                    </button>
+                    <X onClick={onClose} className="cursor-pointer" />
                 </div>
 
-                {/* BODY */}
-                <div className="flex-1 overflow-y-auto p-10 space-y-12">
-                    {/* Thumbnail */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4">Thumbnail</h3>
+                <div className="p-8 space-y-6">
+                    <div className="p-8 space-y-8">
+                        {/* ---------- Thumbnail ---------- */}
+                        <div>
+                            <h3 className="font-semibold text-xl mb-2">Thumbnail</h3>
 
-                        <label className="w-48 h-48 mb-10 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden hover:border-gray-400 transition">
-                            {thumbnail ? (
-                                <img
-                                    src={thumbnail}
-                                    alt="thumbnail"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <span className="text-gray-400 border rounded-2xl w-full p-10 text-center text-sm">
-                                    Upload Image
-                                </span>
-                            )}
                             <input
                                 type="file"
                                 accept="image/*"
-                                className="hidden"
-                                onChange={handleThumbnailChange}
-                            />
-                        </label>
-                    </div>
-
-                    {/* Basic Info */}
-                    <div className="space-y-6">
-                        <h3 className="text-xl font-semibold">Basic Information</h3>
-
-                        <input
-                            type="text"
-                            placeholder="Itinerary Title"
-                            value={title}
-                            onChange={e => setTitle(e.target.value)}
-                            className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                        />
-
-                        <input
-                            type="text"
-                            placeholder="Place (e.g., Barcelona, Spain)"
-                            value={place}
-                            onChange={e => setPlace(e.target.value)}
-                            className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                        />
-
-                        {/* Type Dropdown */}
-                        <select
-                            value={type}
-                            onChange={e => setType(e.target.value)}
-                            className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none">
-                            <option value="">Select Itinerary Type</option>
-                            <option value="Leisure">Leisure</option>
-                            <option value="Adventure">Adventure</option>
-                            <option value="Business">Business</option>
-                            <option value="Educational">Educational</option>
-                            <option value="Cultural">Cultural</option>
-                        </select>
-
-                        {/* Dates */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="date"
-                                value={startDate}
-                                onChange={e => setStartDate(e.target.value)}
-                                className="border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
+                                onChange={e => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    setThumbnailFile(file);
+                                    setThumbnailPreview(URL.createObjectURL(file));
+                                }}
                             />
 
-                            <input
-                                type="date"
-                                value={endDate}
-                                min={startDate}
-                                onChange={e => setEndDate(e.target.value)}
-                                className="border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                            />
-                        </div>
-
-                        {dateError && <p className="text-red-500 text-sm">{dateError}</p>}
-                    </div>
-
-                    {/* Itinerary Description */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-3">
-                            Itinerary Description
-                        </h3>
-                        <textarea
-                            value={itineraryDescription}
-                            onChange={e => setItineraryDescription(e.target.value)}
-                            placeholder="Describe your trip..."
-                            className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                            rows={4}
-                        />
-                    </div>
-
-                    {/* Days */}
-                    <div>
-                        <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-semibold">Day-by-Day Plan</h3>
-                            <button
-                                onClick={addDay}
-                                className="flex items-center gap-2 p-4 rounded-full hover:bg-gray-100 transition">
-                                <Plus size={16} />
-                                Add Day
-                            </button>
-                        </div>
-
-                        {days.map((day, dayIndex) => (
-                            <div
-                                key={dayIndex}
-                                className="bg-gray-50 border rounded-2xl p-8 mb-10 space-y-6">
-                                {/* Day Header */}
-                                <div className="flex mb-6 justify-between items-center">
-                                    <h4 className="text-xl font-semibold">
-                                        Day {dayIndex + 1}
-                                    </h4>
-                                    <Trash
-                                        size={18}
-                                        className="text-red-500 cursor-pointer hover:scale-110 transition"
-                                        onClick={() => removeDay(dayIndex)}
+                            {/* Existing thumbnail (Edit mode) */}
+                            {isEditMode &&
+                                !thumbnailPreview &&
+                                existingItinerary?.thumbnailUrl && (
+                                    <img
+                                        src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`}
+                                        className="w-40 mt-4 rounded-xl"
                                     />
-                                </div>
+                                )}
 
-                                {/* Day Description */}
-                                <textarea
-                                    placeholder="Describe this day..."
-                                    value={day.description}
-                                    onChange={e =>
-                                        updateDayDescription(dayIndex, e.target.value)
-                                    }
-                                    className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                                    rows={3}
+                            {/* New preview */}
+                            {thumbnailPreview && (
+                                <img
+                                    src={thumbnailPreview}
+                                    className="w-40 mt-4 rounded-xl"
                                 />
+                            )}
+                        </div>
 
-                                {/* Locations */}
-                                <div className="space-y-6">
-                                    {day.locations.map((loc, locationIndex) => (
+                        {/* ---------- Basic Info ---------- */}
+                        <div>
+                            <label className="font-semibold">Title</label>
+                            <input
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                                className="w-full border p-3 rounded-xl"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="font-semibold">Place</label>
+                            <input
+                                value={place}
+                                onChange={e => setPlace(e.target.value)}
+                                className="w-full border p-3 rounded-xl"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="font-semibold">Type</label>
+                            <select
+                                value={type}
+                                onChange={e => setType(e.target.value)}
+                                className="w-full border p-3 rounded-xl">
+                                <option value="">Select Type</option>
+                                {types.map(t => (
+                                    <option key={t.typeId} value={t.name}>
+                                        {t.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="font-semibold">Start Date</label>
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={e => setStartDate(e.target.value)}
+                                    className="w-full border p-3 rounded-xl"
+                                />
+                            </div>
+
+                            <div className="flex-1">
+                                <label className="font-semibold">End Date</label>
+                                <input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={e => setEndDate(e.target.value)}
+                                    className="w-full border p-3 rounded-xl"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-semibold">Description</label>
+                            <textarea
+                                value={description}
+                                onChange={e => setDescription(e.target.value)}
+                                className="w-full border p-3 rounded-xl"
+                            />
+                        </div>
+
+                        {/* ---------- Members ---------- */}
+                        <div>
+                            <label className="font-semibold">Add Members</label>
+
+                            <input
+                                placeholder="Search following..."
+                                value={memberSearch}
+                                onChange={e => setMemberSearch(e.target.value)}
+                                className="w-full border p-3 rounded-xl"
+                            />
+
+                            {filteredMembers.map((member, index) => (
+                                <div
+                                    key={member.userId ?? `filtered-${index}`}
+                                    onClick={() => setMembers([...members, member])}
+                                    className="cursor-pointer hover:bg-gray-100 p-2">
+                                    {member.username}
+                                </div>
+                            ))}
+
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {members.map(member => (
+                                    <div
+                                        key={member.userId}
+                                        className="flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">
+                                        <span>{member.username}</span>
+                                        <X
+                                            size={14}
+                                            className="cursor-pointer"
+                                            onClick={() =>
+                                                setMembers(
+                                                    members.filter(
+                                                        m => m.userId !== member.userId,
+                                                    ),
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* ---------- Days ---------- */}
+                        <div>
+                            <button
+                                onClick={() =>
+                                    setDays([...days, { description: "", locations: [] }])
+                                }
+                                className="text-primary flex items-center gap-2">
+                                <Plus size={16} /> Add Day
+                            </button>
+
+                            {days.map((day, dayIndex) => (
+                                <div
+                                    key={day.dayId ?? `day-${dayIndex}`}
+                                    className="border p-6 rounded-xl mt-4 space-y-4">
+                                    {/* Day Description */}
+                                    <div className="flex justify-between">
+                                        <textarea
+                                            value={day.description}
+                                            onChange={e => {
+                                                const updated = [...days];
+                                                updated[dayIndex].description =
+                                                    e.target.value;
+                                                setDays(updated);
+                                            }}
+                                            className="w-full border p-2 rounded-lg"
+                                        />
+                                        <Trash
+                                            className="ml-3 cursor-pointer text-red-500"
+                                            onClick={() => removeDay(dayIndex)}
+                                        />
+                                    </div>
+
+                                    {/* Add Location */}
+                                    <button
+                                        onClick={() => {
+                                            const updated = [...days];
+                                            updated[dayIndex].locations.push({
+                                                name: "",
+                                                address: "",
+                                                images: [],
+                                                newImages: [],
+                                            });
+                                            setDays(updated);
+                                        }}
+                                        className="text-sm text-primary">
+                                        + Add Location
+                                    </button>
+
+                                    {/* Locations */}
+                                    {day.locations?.map((loc, locIndex) => (
                                         <div
-                                            key={locationIndex}
-                                            className="bg-white border rounded-xl p-6 space-y-4 shadow-sm">
-                                            <div className="flex justify-between items-center">
-                                                <h5 className="font-medium">
-                                                    Location {locationIndex + 1}
-                                                </h5>
+                                            key={loc.locationId ?? `location-${locIndex}`}
+                                            className="border p-4 rounded-lg space-y-3">
+                                            <div className="flex gap-2">
+                                                <input
+                                                    placeholder="Location Name"
+                                                    value={
+                                                        loc.locationName || loc.name || ""
+                                                    }
+                                                    onChange={e => {
+                                                        const updated = [...days];
+                                                        updated[dayIndex].locations[
+                                                            locIndex
+                                                        ].name = e.target.value;
+                                                        setDays(updated);
+                                                    }}
+                                                    className="border p-2 w-full rounded"
+                                                />
+
+                                                <input
+                                                    placeholder="Address"
+                                                    value={
+                                                        loc.locationAddress ||
+                                                        loc.address ||
+                                                        ""
+                                                    }
+                                                    onChange={e => {
+                                                        const updated = [...days];
+                                                        updated[dayIndex].locations[
+                                                            locIndex
+                                                        ].address = e.target.value;
+                                                        setDays(updated);
+                                                    }}
+                                                    className="border p-2 w-full rounded"
+                                                />
+
                                                 <Trash
-                                                    size={16}
-                                                    className="text-red-500 cursor-pointer hover:scale-110 transition"
+                                                    className="cursor-pointer text-red-500"
                                                     onClick={() =>
-                                                        removeLocation(
-                                                            dayIndex,
-                                                            locationIndex,
-                                                        )
+                                                        removeLocation(dayIndex, locIndex)
                                                     }
                                                 />
                                             </div>
 
-                                            <input
-                                                type="text"
-                                                placeholder="Location Name"
-                                                value={loc.name}
-                                                onChange={e =>
-                                                    updateLocationField(
-                                                        dayIndex,
-                                                        locationIndex,
-                                                        "name",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                                            />
-
-                                            <input
-                                                type="text"
-                                                placeholder="Address"
-                                                value={loc.address}
-                                                onChange={e =>
-                                                    updateLocationField(
-                                                        dayIndex,
-                                                        locationIndex,
-                                                        "address",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                                            />
-
-                                            <label className="text-sm text-primary font-medium cursor-pointer hover:underline">
-                                                + Upload Images
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                    onChange={e =>
-                                                        handleLocationImages(
-                                                            e,
-                                                            dayIndex,
-                                                            locationIndex,
-                                                        )
-                                                    }
-                                                />
-                                            </label>
-
-                                            <div className="p-2 flex gap-3 flex-wrap">
-                                                {loc.images.map((img, i) => (
-                                                    <img
-                                                        key={i}
-                                                        src={img}
-                                                        alt="location"
-                                                        onClick={() =>
-                                                            removeLocationImage(
-                                                                dayIndex,
-                                                                locationIndex,
-                                                                i,
-                                                            )
+                                            {/* Existing Images */}
+                                            <div className="flex gap-3 flex-wrap">
+                                                {loc.images?.map((img, imgIndex) => (
+                                                    <div
+                                                        key={
+                                                            img.imageId ??
+                                                            `image-${imgIndex}`
                                                         }
-                                                        className="w-32 h-32 object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
-                                                    />
+                                                        className="relative">
+                                                        <img
+                                                            src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`}
+                                                            className="w-20 h-20 object-cover rounded"
+                                                        />
+                                                        <Trash
+                                                            size={14}
+                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer"
+                                                            onClick={() =>
+                                                                removeImage(
+                                                                    dayIndex,
+                                                                    locIndex,
+                                                                    imgIndex,
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
                                                 ))}
                                             </div>
+
+                                            {/* Add New Images */}
+                                            <input
+                                                type="file"
+                                                multiple
+                                                onChange={e => {
+                                                    const files = Array.from(
+                                                        e.target.files,
+                                                    );
+                                                    const updated = [...days];
+                                                    updated[dayIndex].locations[
+                                                        locIndex
+                                                    ].newImages.push(...files);
+                                                    setDays(updated);
+                                                }}
+                                            />
                                         </div>
                                     ))}
                                 </div>
-
-                                {/* Members Section */}
-                                <div>
-                                    <h3 className="text-lg font-semibold mb-4">
-                                        Add Members
-                                    </h3>
-
-                                    {/* Selected Members */}
-                                    <div className="flex flex-wrap gap-3 mb-4">
-                                        {selectedMembers.map(member => (
-                                            <div
-                                                key={member.id}
-                                                className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-full">
-                                                <img
-                                                    src={member.profilePic}
-                                                    alt=""
-                                                    className="w-6 h-6 rounded-full object-cover"
-                                                />
-                                                <span className="text-sm">
-                                                    {member.username}
-                                                </span>
-                                                <X
-                                                    size={14}
-                                                    className="cursor-pointer"
-                                                    onClick={() =>
-                                                        setSelectedMembers(
-                                                            selectedMembers.filter(
-                                                                m => m.id !== member.id,
-                                                            ),
-                                                        )
-                                                    }
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Search Input */}
-                                    <input
-                                        type="text"
-                                        placeholder="Search from following..."
-                                        value={memberSearch}
-                                        onChange={e => setMemberSearch(e.target.value)}
-                                        className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none"
-                                    />
-
-                                    {/* Search Results */}
-                                    {memberSearch && (
-                                        <div className="border rounded-xl mt-2 max-h-40 overflow-y-auto bg-white shadow">
-                                            {filteredMembers.length > 0 ? (
-                                                filteredMembers.map(user => (
-                                                    <div
-                                                        key={user.id}
-                                                        onClick={() => {
-                                                            setSelectedMembers([
-                                                                ...selectedMembers,
-                                                                user,
-                                                            ]);
-                                                            setMemberSearch("");
-                                                        }}
-                                                        className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer">
-                                                        <img
-                                                            src={user.profilePic}
-                                                            alt=""
-                                                            className="w-8 h-8 rounded-full object-cover"
-                                                        />
-                                                        <span>{user.username}</span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <p className="p-3 text-sm text-gray-500">
-                                                    No matching users
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <button
-                                    onClick={() => addLocation(dayIndex)}
-                                    className="text-primary mt-10 text-sm font-medium hover:underline">
-                                    + Add Location
-                                </button>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* FOOTER */}
-                <div className="p-10 border-t bg-white flex justify-center items-center">
+                <div className="p-6 border-t flex justify-end gap-4">
                     <button
-                        onClick={handleSave}
-                        className="bg-primary text-white px-8 py-3 rounded-full shadow-lg hover:opacity-90 transition">
-                        Save Itinerary
+                        onClick={() => setIsPublic(!isPublic)}
+                        className="border px-6 py-2 rounded-full">
+                        {isPublic ? "Set Private" : "Set Public"}
+                    </button>
+
+                    <button
+                        onClick={createOrUpdateItinerary}
+                        className="bg-primary text-white px-8 py-3 rounded-full">
+                        {isEditMode ? "Update" : "Save"}
                     </button>
                 </div>
             </div>

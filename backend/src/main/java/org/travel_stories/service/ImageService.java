@@ -78,10 +78,10 @@ public class ImageService {
                 .collect(Collectors.toList());
     }
 
-    public byte[] getImageById(UUID imageId) {
+    public Image getImageById(UUID imageId) {
         Image image = imageRepository.findById(imageId)
                 .orElseThrow(() -> new RuntimeException("Image not found."));
-        return image.getImageData();
+        return image;
     }
 
 }

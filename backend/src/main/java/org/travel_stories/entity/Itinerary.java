@@ -84,7 +84,7 @@ public class Itinerary {
             name = "is_public",
             nullable = false
     )
-    private Boolean isPublic = true;
+    private boolean isPublic = true;
 
     @Column(
             name = "like_count"
@@ -107,8 +107,7 @@ public class Itinerary {
     @UpdateTimestamp
     @Column(
             name = "last_updated",
-            nullable = false,
-            updatable = false
+            nullable = false
     )
     private Instant lastUpdated;
 

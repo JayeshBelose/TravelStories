@@ -28,7 +28,7 @@ public class ImageController {
         return ResponseEntity.ok().body("Image uploaded.");
     }
 
-    @DeleteMapping("/{locationId}/images/{imageId}")
+    @DeleteMapping("/images/{imageId}")
     public ResponseEntity<String> deleteImage(@PathVariable UUID imageId){
         imageService.deleteImage(imageId);
         return ResponseEntity.ok().body("Image deleted.");
@@ -48,7 +48,10 @@ public class ImageController {
 
     @GetMapping("/images/{imageId}")
     public ResponseEntity<byte[]> getImageId(@PathVariable UUID imageId){
-        return ResponseEntity.ok().body(imageService.getImageById(imageId));
+        Image image = imageService.getImageById(imageId);
+        return ResponseEntity.ok()
+                .header("Content-Type", image.getContentType())
+                .body(image.getImageData());
     }
 
 }
