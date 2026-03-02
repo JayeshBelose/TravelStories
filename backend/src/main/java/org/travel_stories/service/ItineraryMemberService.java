@@ -24,6 +24,9 @@ public class ItineraryMemberService {
     private final UserRepository userRepository;
 
     public void addMember(UUID itineraryId, UUID userId){
+        if (itineraryMemberRepository.existsByItineraryItineraryIdAndUserUserId(itineraryId, userId))
+            return;
+
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new RuntimeException("Itinerary not found."));
         User user = userRepository.findById(userId)

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import api from "@/api/axiosConfig";
 
 export default function Signup() {
     const navigate = useNavigate();
@@ -16,12 +18,49 @@ export default function Signup() {
     const isFormValid =
         name && email && password && isNameValid && isPasswordValid && isEmailValid;
 
-    const handleSignup = () => {
-        if (!isFormValid) return;
+    const handleSignup = async e => {
+        e.preventDefault();
 
-        const user = { name, role: "user" };
-        login(user);
-        navigate("/user");
+        if (!isFormValid) {
+            toast.warning("Please enter valid credentials.");
+            return;
+        }
+
+        const loadingToast = toast.loading("Signing up...");
+
+        try {
+            const res = await api.post(`/auth/signup`, {
+                username: name,
+                email,
+                password,
+            });
+
+            const { token, userId, username, role } = response.data;
+
+            localStorage.setItem("token", token);
+            login({ userId, username, role });
+
+            toast.update(loadingToast, {
+                render: "Signup successful!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
+            });
+
+            etTimeout(() => {
+                navigate(role === "ADMIN" ? "/admin" : "/user");
+            }, 1000);
+        } catch (error) {
+            console.log(error);
+
+            toast.update(loadingToast, {
+                render:
+                    error.response?.data?.message || "Signup failed. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
+        }
     };
 
     return (

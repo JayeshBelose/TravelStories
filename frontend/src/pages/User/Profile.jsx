@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
-import { Camera, Save, Trash2, User } from "lucide-react";
+import { Camera, Save, Trash, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function Profile() {
     const { logout } = useAuth();
@@ -11,6 +21,8 @@ export default function Profile() {
     const [bio, setBio] = useState("");
     const [profileImage, setProfileImage] = useState(null);
     const [previewPicture, setPreviewPicture] = useState(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (user) {
@@ -37,10 +49,10 @@ export default function Profile() {
 
         try {
             await api.post(`/users/${user.userId}/profilePicture`, formData);
-            alert("Profile picture updated!");
+            toast.success("Image updated!");
         } catch (error) {
             console.error(error);
-            alert("Image upload failed");
+            toast.error("Image upload failed");
         }
     };
 
@@ -60,27 +72,29 @@ export default function Profile() {
 
             localStorage.setItem("user", JSON.stringify(updatedUser));
 
-            alert("Profile updated!");
+            toast.success("Profile Updated!");
         } catch (error) {
             console.log(error);
-            alert("Failed to update profile");
+            toast.error("Failed to update profile");
         }
     };
 
     // User Deletion
     const handleDelete = async () => {
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete your account?",
-        );
-
-        if (!confirmDelete) return;
-
         try {
-            await api.delete(`/users/${user.userId}`);
-            logout();
+            await toast.promise(api.delete(`/users/${user.userId}`), {
+                loading: "Deleting profile...",
+                success: "Profile deleted successfully",
+                error: "Failed to delete profile",
+            });
+
+            logout(); // clear auth context
+            localStorage.removeItem("user");
+            navigate("/");
         } catch (error) {
             console.error(error);
-            alert("Image upload failed");
+        } finally {
+            setConfirmOpen(false);
         }
     };
 
@@ -102,7 +116,7 @@ export default function Profile() {
                         <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                             <img
                                 src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
-                                alt="Profile"
+                                alt=""
                                 className="w-full h-full object-cover"
                             />
                         </div>
@@ -124,7 +138,7 @@ export default function Profile() {
                             {profileImage && (
                                 <button
                                     onClick={handleImageUpload}
-                                    className="mt-3 bg-primary text-white px-4 py-2 rounded-full">
+                                    className="mt-3 bg-primary/90 hover:bg-primary text-white px-4 py-2 rounded-full">
                                     Upload Image
                                 </button>
                             )}
@@ -161,7 +175,7 @@ export default function Profile() {
                     {/* Save Button */}
                     <button
                         onClick={handleSave}
-                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
+                        className="flex items-center gap-2 bg-primary/90 text-white px-6 py-3 rounded-full shadow-md hover:bg-primary transition">
                         <Save size={18} />
                         Save Changes
                     </button>
@@ -180,14 +194,37 @@ export default function Profile() {
                         </p>
 
                         <button
-                            onClick={handleDelete}
+                            onClick={() => setConfirmOpen(true)}
                             className="flex items-center gap-2 bg-red-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-600 transition">
-                            <Trash2 size={18} />
+                            <Trash size={18} />
                             Delete Account
                         </button>
                     </div>
                 </div>
             </div>
+            {/* Delete Confirmation Dialog Pop-up */}
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <DialogContent className="bg-white">
+                    <DialogHeader>
+                        <DialogTitle>
+                            Are you sure you want to delete your profile?
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <p className="text-sm text-muted-foreground">
+                        This action cannot be undone.
+                    </p>
+
+                    <DialogFooter className="mt-4">
+                        <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Yes, Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

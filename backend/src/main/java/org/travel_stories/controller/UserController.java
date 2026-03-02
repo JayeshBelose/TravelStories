@@ -5,10 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.travel_stories.dto.LoginDto;
-import org.travel_stories.dto.SignupDto;
-import org.travel_stories.dto.UserRequestDto;
-import org.travel_stories.dto.UserResponseDto;
+import org.travel_stories.dto.*;
 import org.travel_stories.service.UserService;
 
 import java.io.IOException;
@@ -21,13 +18,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(@RequestBody SignupDto signupDto){
-        UserResponseDto userResponseDto = userService.signup(signupDto);
-
-        return ResponseEntity.ok().body(userResponseDto);
-    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable("userId") UUID userId){
@@ -58,6 +48,13 @@ public class UserController {
         UserResponseDto userResponseDto = userService.updateUser(userRequestDto, userId);
 
         return ResponseEntity.ok().body(userResponseDto);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FollowResponseDto>> searchUsers(
+            @RequestParam String query
+    ){
+        return ResponseEntity.ok().body(userService.searchUsers(query));
     }
 
 }

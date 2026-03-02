@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { Filter } from "lucide-react";
 import ItineraryCard from "@/components/ItineraryCard";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
-import axios from "axios";
 import api from "@/api/axiosConfig";
 
 export default function Explore() {
@@ -16,7 +15,7 @@ export default function Explore() {
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
 
-    // Fetching itineraries using API
+    // Fetching itineraries
     useEffect(() => {
         const fetchItineraries = async () => {
             try {
@@ -34,13 +33,13 @@ export default function Explore() {
         fetchItineraries();
     }, []);
 
-    // Get unique itinerary types dynamically
+    // Setting itinerary types for filter
     const itineraryTypes = useMemo(() => {
         const types = itineraries.map(i => i.type).filter(Boolean);
         return ["all", ...new Set(types)];
     }, [itineraries]);
 
-    // Combined filter logic
+    // Combined filter logic for most liked/saved/recent and type
     const filteredItineraries = useMemo(() => {
         let filtered = [...itineraries];
 
@@ -61,18 +60,21 @@ export default function Explore() {
         return filtered;
     }, [itineraries, sortFilter, typeFilter]);
 
+    // Get sort label to filter
     const getSortLabel = () => {
         if (sortFilter === "likes") return "Most Liked";
         if (sortFilter === "saves") return "Most Saved";
         if (sortFilter === "recent") return "Most Recent";
-        return "Random";
+        return "No Filter";
     };
 
+    // Get type label to filter
     const getTypeLabel = () => {
         if (typeFilter === "all") return "All Types";
         return typeFilter;
     };
 
+    // Wait for itineraries to be fetched from the database
     if (loading) return <p className="p-10">Loading...</p>;
 
     return (
@@ -88,23 +90,23 @@ export default function Explore() {
 
                 {/* Filters */}
                 <div className="flex gap-4">
-                    {/* Sort Filter */}
+                    {/* Sort Filter Dropdown */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenSort(!openSort)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-50">
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:bg-secondary/10 ${getSortLabel() === "No Filter" ? "bg-gray-50" : "bg-secondary/10"}`}>
                             {getSortLabel()}
-                            <ChevronDown size={16} />
+                            <Filter size={16} />
                         </button>
 
                         {openSort && (
-                            <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-10 overflow-hidden">
+                            <div className="absolute right-0 mt-2 w-44 bg-gray-50 rounded-lg shadow-lg z-10 overflow-hidden">
                                 <button
                                     onClick={() => {
                                         setSortFilter("recent");
                                         setOpenSort(false);
                                     }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
                                     Most Recent
                                 </button>
 
@@ -113,7 +115,7 @@ export default function Explore() {
                                         setSortFilter("likes");
                                         setOpenSort(false);
                                     }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
                                     Most Liked
                                 </button>
 
@@ -122,7 +124,7 @@ export default function Explore() {
                                         setSortFilter("saves");
                                         setOpenSort(false);
                                     }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
                                     Most Saved
                                 </button>
 
@@ -131,24 +133,24 @@ export default function Explore() {
                                         setSortFilter("random");
                                         setOpenSort(false);
                                     }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                                    Clear Sort
+                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
+                                    No Filter
                                 </button>
                             </div>
                         )}
                     </div>
 
-                    {/* Type Filter */}
+                    {/* Type Filter Dropdown */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenType(!openType)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-50">
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:bg-secondary/10 ${getTypeLabel() === "All Types" ? "bg-gray-50" : "bg-secondary/10"}`}>
                             {getTypeLabel()}
-                            <ChevronDown size={16} />
+                            <Filter size={16} />
                         </button>
 
                         {openType && (
-                            <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-10 overflow-hidden max-h-60 overflow-y-auto">
+                            <div className="absolute right-0 mt-2 w-44 bg-gray-50 rounded-lg shadow-lg z-10 overflow-hidden max-h-60 overflow-y-auto">
                                 {itineraryTypes.map(type => (
                                     <button
                                         key={type}
@@ -157,7 +159,7 @@ export default function Explore() {
                                             setOpenType(false);
                                         }}
                                         className="block w-full text-left px-4 py-2 hover:bg-gray-100 capitalize">
-                                        {type === "all" ? "Clear Type Filter" : type}
+                                        {type === "all" ? "All Types" : type}
                                     </button>
                                 ))}
                             </div>
@@ -166,7 +168,7 @@ export default function Explore() {
                 </div>
             </div>
 
-            {/* Grid */}
+            {/* Grid Display Of Itineraries */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredItineraries.map(itinerary => (
                     <ItineraryCard
@@ -177,7 +179,7 @@ export default function Explore() {
                 ))}
             </div>
 
-            {/* Overlay */}
+            {/* Overlay Component */}
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}

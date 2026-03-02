@@ -17,4 +17,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     User findByEmailAndPassword(String email, String password);
 
+    @Query("""
+        SELECT u FROM User u
+        WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
+    """)
+    List<User> searchUsers(String query);
+
 }

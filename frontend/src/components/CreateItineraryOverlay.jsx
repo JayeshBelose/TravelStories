@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Plus, Trash } from "lucide-react";
+import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
 
 export default function CreateItineraryOverlay({
@@ -29,8 +30,7 @@ export default function CreateItineraryOverlay({
     const [memberSearch, setMemberSearch] = useState("");
     const [types, setTypes] = useState([]);
 
-    /* ---------------- LOAD DATA ---------------- */
-
+    // Fetching required data
     useEffect(() => {
         if (!open) return;
 
@@ -117,11 +117,10 @@ export default function CreateItineraryOverlay({
 
     if (!open) return null;
 
-    /* ---------------- CREATE OR UPDATE ---------------- */
-
+    // Create or update
     const createOrUpdateItinerary = async () => {
         if (!title || !place || !type || !startDate || !endDate) {
-            alert("Fill all required fields");
+            toast.error("Please fill all required fields!");
             return;
         }
 
@@ -157,14 +156,14 @@ export default function CreateItineraryOverlay({
 
             const id = response?.data?.itineraryId || itineraryId;
 
-            /* ---------- Thumbnail ---------- */
+            // Thumbnail
             if (thumbnailFile) {
                 const formData = new FormData();
                 formData.append("file", thumbnailFile);
                 await api.post(`/itineraries/${id}/thumbnail`, formData);
             }
 
-            /* ---------- Days & Locations ---------- */
+            // Days & Locations
             for (let day of days) {
                 let dayId = day.dayId;
 
@@ -201,6 +200,7 @@ export default function CreateItineraryOverlay({
                         );
                     }
 
+                    // Images
                     if (loc.newImages) {
                         for (let image of loc.newImages) {
                             const imgForm = new FormData();
@@ -214,7 +214,7 @@ export default function CreateItineraryOverlay({
                 }
             }
 
-            /* ---------- Members ---------- */
+            // Members
             const existingMembers = existingItinerary.members;
 
             for (let m of existingMembers) {
@@ -229,16 +229,15 @@ export default function CreateItineraryOverlay({
                 }
             }
 
-            alert(isEditMode ? "Itinerary Updated!" : "Itinerary Created!");
+            toast.success(isEditMode ? "Itinerary Updated!" : "Itinerary Created!");
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Something went wrong");
+            toast.error("Something went wrong. Please try again.");
         }
     };
 
-    /* ---------------- REMOVE FUNCTIONS ---------------- */
-
+    // Remove functions
     const removeDay = async index => {
         const day = days[index];
 
@@ -281,17 +280,28 @@ export default function CreateItineraryOverlay({
         setDays(updated);
     };
 
-    const filteredMembers = followingList.filter(
-        u =>
-            u.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
-            !members.find(m => m.username === u.username),
-    );
+    const removeNewImage = (dayIndex, locIndex, imgIndex) => {
+        const updated = [...days];
+        updated[dayIndex].locations[locIndex].newImages.splice(imgIndex, 1);
+        setDays(updated);
+    };
+
+    // Search logic to add members
+    const filteredMembers =
+        memberSearch.trim().length === 0
+            ? []
+            : followingList.filter(
+                  u =>
+                      u.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
+                      !members.find(m => m.userId === u.userId),
+              );
 
     return (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-start p-6 z-50 overflow-y-auto">
-            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl">
+            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl ml-64">
+                {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b bg-primary text-white rounded-t-2xl">
-                    <h2 className="text-2xl font-bold">
+                    <h2 className="text-2xl font-semibold font-primary">
                         {isEditMode ? "Update Itinerary" : "Create Itinerary"}
                     </h2>
                     <X onClick={onClose} className="cursor-pointer" />
@@ -299,9 +309,11 @@ export default function CreateItineraryOverlay({
 
                 <div className="p-8 space-y-6">
                     <div className="p-8 space-y-8">
-                        {/* ---------- Thumbnail ---------- */}
+                        {/* Thumbnail */}
                         <div>
-                            <h3 className="font-semibold text-xl mb-2">Thumbnail</h3>
+                            <h3 className="font-semibold font-primary text-xl mb-2">
+                                Thumbnail
+                            </h3>
 
                             <input
                                 type="file"
@@ -333,27 +345,35 @@ export default function CreateItineraryOverlay({
                             )}
                         </div>
 
-                        {/* ---------- Basic Info ---------- */}
+                        {/* Basic Info */}
                         <div>
-                            <label className="font-semibold">Title</label>
+                            <label className="font-semibold font-primary text-xl">
+                                Title
+                            </label>
                             <input
                                 value={title}
+                                placeholder="Itinerary Title"
                                 onChange={e => setTitle(e.target.value)}
                                 className="w-full border p-3 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <label className="font-semibold">Place</label>
+                            <label className="font-semibold font-primary text-xl">
+                                Place
+                            </label>
                             <input
                                 value={place}
+                                placeholder="Itinerary Place"
                                 onChange={e => setPlace(e.target.value)}
                                 className="w-full border p-3 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <label className="font-semibold">Type</label>
+                            <label className="font-semibold font-primary text-xl">
+                                Type
+                            </label>
                             <select
                                 value={type}
                                 onChange={e => setType(e.target.value)}
@@ -369,7 +389,9 @@ export default function CreateItineraryOverlay({
 
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <label className="font-semibold">Start Date</label>
+                                <label className="font-semibold font-primary text-xl">
+                                    Start Date
+                                </label>
                                 <input
                                     type="date"
                                     value={startDate}
@@ -379,7 +401,9 @@ export default function CreateItineraryOverlay({
                             </div>
 
                             <div className="flex-1">
-                                <label className="font-semibold">End Date</label>
+                                <label className="font-semibold font-primary text-xl">
+                                    End Date
+                                </label>
                                 <input
                                     type="date"
                                     value={endDate}
@@ -390,17 +414,22 @@ export default function CreateItineraryOverlay({
                         </div>
 
                         <div>
-                            <label className="font-semibold">Description</label>
+                            <label className="font-semibold font-primary text-xl">
+                                Description
+                            </label>
                             <textarea
                                 value={description}
+                                placeholder="Itinerary Description"
                                 onChange={e => setDescription(e.target.value)}
                                 className="w-full border p-3 rounded-xl"
                             />
                         </div>
 
-                        {/* ---------- Members ---------- */}
+                        {/* Members */}
                         <div>
-                            <label className="font-semibold">Add Members</label>
+                            <label className="font-semibold font-primary text-xl">
+                                Add Members
+                            </label>
 
                             <input
                                 placeholder="Search following..."
@@ -409,14 +438,15 @@ export default function CreateItineraryOverlay({
                                 className="w-full border p-3 rounded-xl"
                             />
 
-                            {filteredMembers.map((member, index) => (
-                                <div
-                                    key={member.userId ?? `filtered-${index}`}
-                                    onClick={() => setMembers([...members, member])}
-                                    className="cursor-pointer hover:bg-gray-100 p-2">
-                                    {member.username}
-                                </div>
-                            ))}
+                            {memberSearch.trim().length > 0 &&
+                                filteredMembers.map(member => (
+                                    <div
+                                        key={member.userId}
+                                        onClick={() => setMembers([...members, member])}
+                                        className="cursor-pointer hover:bg-gray-100 p-2">
+                                        {member.username}
+                                    </div>
+                                ))}
 
                             <div className="flex flex-wrap gap-2 mt-3">
                                 {members.map(member => (
@@ -440,13 +470,13 @@ export default function CreateItineraryOverlay({
                             </div>
                         </div>
 
-                        {/* ---------- Days ---------- */}
+                        {/* Days */}
                         <div>
                             <button
                                 onClick={() =>
                                     setDays([...days, { description: "", locations: [] }])
                                 }
-                                className="text-primary flex items-center gap-2">
+                                className="text-primary font-primary hover:bg-gray-100 p-2 rounded-full flex items-center gap-2 text-xl font-semibold">
                                 <Plus size={16} /> Add Day
                             </button>
 
@@ -458,6 +488,7 @@ export default function CreateItineraryOverlay({
                                     <div className="flex justify-between">
                                         <textarea
                                             value={day.description}
+                                            placeholder="Day Description"
                                             onChange={e => {
                                                 const updated = [...days];
                                                 updated[dayIndex].description =
@@ -467,7 +498,7 @@ export default function CreateItineraryOverlay({
                                             className="w-full border p-2 rounded-lg"
                                         />
                                         <Trash
-                                            className="ml-3 cursor-pointer text-red-500"
+                                            className="ml-3 hover:scale-110 cursor-pointer text-red-500"
                                             onClick={() => removeDay(dayIndex)}
                                         />
                                     </div>
@@ -484,7 +515,7 @@ export default function CreateItineraryOverlay({
                                             });
                                             setDays(updated);
                                         }}
-                                        className="text-sm text-primary">
+                                        className="text-m font-primary text-primary hover:bg-gray-100 rounded-full p-2 font-semibold">
                                         + Add Location
                                     </button>
 
@@ -506,7 +537,7 @@ export default function CreateItineraryOverlay({
                                                         ].name = e.target.value;
                                                         setDays(updated);
                                                     }}
-                                                    className="border p-2 w-full rounded"
+                                                    className="border p-2 w-full rounded flex-6"
                                                 />
 
                                                 <input
@@ -523,33 +554,32 @@ export default function CreateItineraryOverlay({
                                                         ].address = e.target.value;
                                                         setDays(updated);
                                                     }}
-                                                    className="border p-2 w-full rounded"
+                                                    className="border p-2 w-full rounded flex-6"
                                                 />
 
                                                 <Trash
-                                                    className="cursor-pointer text-red-500"
+                                                    className="cursor-pointer text-red-500 flex-1 hover:scale-110"
                                                     onClick={() =>
                                                         removeLocation(dayIndex, locIndex)
                                                     }
                                                 />
                                             </div>
 
-                                            {/* Existing Images */}
+                                            {/* Images Preview */}
                                             <div className="flex gap-3 flex-wrap">
+                                                {/* Existing Images */}
                                                 {loc.images?.map((img, imgIndex) => (
                                                     <div
-                                                        key={
-                                                            img.imageId ??
-                                                            `image-${imgIndex}`
-                                                        }
+                                                        key={img.imageId}
                                                         className="relative">
                                                         <img
                                                             src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`}
                                                             className="w-20 h-20 object-cover rounded"
+                                                            alt=""
                                                         />
                                                         <Trash
                                                             size={14}
-                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer"
+                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer bg-white rounded hover:scale-110"
                                                             onClick={() =>
                                                                 removeImage(
                                                                     dayIndex,
@@ -560,21 +590,49 @@ export default function CreateItineraryOverlay({
                                                         />
                                                     </div>
                                                 ))}
+
+                                                {/* New Images (Preview before upload) */}
+                                                {loc.newImages?.map((file, imgIndex) => (
+                                                    <div
+                                                        key={`new-${imgIndex}`}
+                                                        className="relative">
+                                                        <img
+                                                            src={URL.createObjectURL(
+                                                                file,
+                                                            )}
+                                                            className="w-20 h-20 object-cover rounded"
+                                                            alt=""
+                                                        />
+                                                        <Trash
+                                                            size={14}
+                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer hover:scale-110"
+                                                            onClick={() =>
+                                                                removeNewImage(
+                                                                    dayIndex,
+                                                                    locIndex,
+                                                                    imgIndex,
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+                                                ))}
                                             </div>
 
-                                            {/* Add New Images */}
+                                            {/* Add Image One By One */}
                                             <input
                                                 type="file"
-                                                multiple
+                                                accept="image/*"
                                                 onChange={e => {
-                                                    const files = Array.from(
-                                                        e.target.files,
-                                                    );
+                                                    const file = e.target.files[0];
+                                                    if (!file) return;
+
                                                     const updated = [...days];
                                                     updated[dayIndex].locations[
                                                         locIndex
-                                                    ].newImages.push(...files);
+                                                    ].newImages.push(file);
                                                     setDays(updated);
+
+                                                    e.target.value = "";
                                                 }}
                                             />
                                         </div>
@@ -588,13 +646,13 @@ export default function CreateItineraryOverlay({
                 <div className="p-6 border-t flex justify-end gap-4">
                     <button
                         onClick={() => setIsPublic(!isPublic)}
-                        className="border px-6 py-2 rounded-full">
+                        className={`border-2 p-2 rounded-full text-m hover:bg-gray-100 ${isPublic ? "border-red-500 text-red-500" : "border-green-500 text-green-500"}`}>
                         {isPublic ? "Set Private" : "Set Public"}
                     </button>
 
                     <button
                         onClick={createOrUpdateItinerary}
-                        className="bg-primary text-white px-8 py-3 rounded-full">
+                        className="bg-primary/90 hover:bg-primary text-white px-8 py-3 rounded-full">
                         {isEditMode ? "Update" : "Save"}
                     </button>
                 </div>

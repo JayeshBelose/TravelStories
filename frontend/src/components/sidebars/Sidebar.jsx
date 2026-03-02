@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Separator } from "./ui/separator";
+import { Button } from "../ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Separator } from "../ui/separator";
 import { Home, Users, Map, User, LogOut } from "lucide-react";
+import { useState } from "react";
 
 export default function Sidebar({ user, onLogout }) {
     const navItems = [
@@ -11,6 +12,8 @@ export default function Sidebar({ user, onLogout }) {
         { name: "My Itineraries", path: "/user/itineraries", icon: Map },
         { name: "Profile", path: "/user/profile", icon: User },
     ];
+
+    const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`;
 
     return (
         <div className="flex flex-col w-64 bg-primary text-primary-foreground p-5 min-h-screen justify-between">
@@ -48,11 +51,10 @@ export default function Sidebar({ user, onLogout }) {
                 <Separator className="my-4 bg-white/20" />
                 <div className="flex items-center gap-3 mb-4">
                     <Avatar>
-                        <AvatarImage
-                            src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
-                        />
+                        <AvatarImage src={imageUrl} alt={user?.username} />
+
                         <AvatarFallback>
-                            {user?.username?.charAt(0) || "U"}
+                            {user?.username?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                     </Avatar>
                     <div>

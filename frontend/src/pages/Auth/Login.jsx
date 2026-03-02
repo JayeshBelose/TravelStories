@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
 
 export default function Login() {
@@ -14,25 +15,55 @@ export default function Login() {
     const isPasswordValid = password.length >= 8 && password.length <= 12;
     const isFormValid = email && password && isEmailValid && isPasswordValid;
 
-    const handleLogin = async () => {
-        if (!isFormValid) return;
+    const handleLogin = async e => {
+        e.preventDefault();
+
+        if (!isFormValid) {
+            toast.warning("Please enter valid credentials.");
+            return;
+        }
+
+        const loadingToast = toast.loading("Logging in...");
 
         try {
-            const response = await api.post(
-                `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
-                { email, password },
-            );
+            const response = await api.post(`/auth/login`, { email, password });
 
             const { token, userId, username, role } = response.data;
 
             localStorage.setItem("token", token);
-
             login({ userId, username, role });
 
-            navigate(role === "ADMIN" ? "/admin" : "/user");
-        } catch (error) {
-            console.error(error);
-            alert("Invalid credentials!");
+            toast.update(loadingToast, {
+                render: "Login successful!",
+                type: "success",
+                isLoading: false,
+                autoClose: 1000,
+            });
+
+            setTimeout(() => {
+                navigate(role === "ADMIN" ? "/admin" : "/user");
+            }, 1500);
+        } catch (err) {
+            let message = "Something went wrong. Please try again.";
+
+            if (err.response) {
+                const status = err.response.status;
+
+                if (status === 401) {
+                    message = "Invalid email or password!";
+                } else if (status === 404) {
+                    message = "User does not exist.";
+                } else if (status >= 500) {
+                    message = "Server error. Please try again later.";
+                }
+            }
+
+            toast.update(loadingToast, {
+                render: message,
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
         }
     };
 

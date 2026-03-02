@@ -1,104 +1,147 @@
-import { useState, useMemo } from "react";
-import { usersData } from "@/assets/propData";
+import { useState, useMemo, useEffect } from "react";
+
 import UserItineraryListOverlay from "@/components/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
+import api from "@/api/axiosConfig";
 
 export default function Community() {
-    const users = Array.isArray(usersData) ? usersData : [];
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+
+    const [following, setFollowing] = useState([]);
+    const [followers, setFollowers] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
 
     const [activeTab, setActiveTab] = useState("following");
     const [search, setSearch] = useState("");
-
-    // ✅ Always store FULL user objects
-    const [following, setFollowing] = useState(() =>
-        users.filter((_, index) => index === 0 || index === 1),
-    );
-
-    const followers = useMemo(() => {
-        return users.length > 2 ? [users[2]] : [];
-    }, [users]);
-
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
 
-    // ---------------- SEARCH FILTER ----------------
-    const filteredUsers =
-        search.trim() === ""
-            ? []
-            : users.filter(user =>
-                  user.username?.toLowerCase().includes(search.toLowerCase()),
-              );
+    // Fetch followers and following of current users
+    useEffect(() => {
+        if (!loggedInUser?.userId) return;
 
-    // ---------------- FOLLOW LOGIC ----------------
-    const isFollowing = userId => following.some(user => user.id === userId);
+        const fetchData = async () => {
+            try {
+                const [followingRes, followersRes] = await Promise.all([
+                    api.get(`/users/community/${loggedInUser.userId}/following`),
+                    api.get(`/users/community/${loggedInUser.userId}/followers`),
+                ]);
 
-    const toggleFollow = user => {
-        setFollowing(prev => {
-            const alreadyFollowing = prev.some(u => u.id === user.id);
-
-            if (alreadyFollowing) {
-                return prev.filter(u => u.id !== user.id);
+                setFollowing(followingRes.data);
+                setFollowers(followersRes.data);
+            } catch (error) {
+                console.error(error);
             }
+        };
 
-            // ensure full object from usersData
-            const fullUser = users.find(u => u.id === user.id);
-            if (!fullUser) return prev;
+        fetchData();
+    }, []);
 
-            return [...prev, fullUser];
-        });
+    // Dynamic searching
+    useEffect(() => {
+        if (search.trim() === "") {
+            setSearchResults([]);
+            return;
+        }
+
+        // Delay waits for user to enter something before calling the search API
+        const delayDebounce = setTimeout(async () => {
+            try {
+                const res = await api.get(`/users/search?query=${search}`);
+
+                const filteredResults = res.data.filter(
+                    user => user.userId !== loggedInUser?.userId,
+                );
+
+                setSearchResults(filteredResults);
+            } catch (error) {
+                console.error(error);
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounce);
+    }, [search]);
+
+    // Follow logic
+    const isFollowing = userId => following.some(user => user.userId === userId);
+
+    const toggleFollow = async user => {
+        try {
+            if (isFollowing(user.userId)) {
+                await api.delete("/users/community", {
+                    data: {
+                        followerId: loggedInUser.userId,
+                        followingId: user.userId,
+                    },
+                });
+
+                setFollowing(prev => prev.filter(u => u.userId !== user.userId));
+            } else {
+                await api.post("/users/community", {
+                    followerId: loggedInUser.userId,
+                    followingId: user.userId,
+                });
+
+                setFollowing(prev => [...prev, user]);
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const currentList = activeTab === "following" ? following : followers;
 
     return (
         <div>
+            {/* Header */}
             <h1 className="text-4xl font-bold font-primary text-primary">Community</h1>
             <p className="text-gray-500 mt-2 mb-8">Connect with fellow travelers</p>
 
-            {/* SEARCH */}
+            {/* Search Bar */}
             <div className="relative mb-8 w-full">
                 <input
                     type="text"
                     placeholder="Search users by username..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full border rounded-xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full bg-gray-100 border rounded-xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 />
 
-                {filteredUsers.length > 0 && (
-                    <div className="absolute w-full bg-white border rounded-xl shadow-lg mt-2 max-h-60 overflow-y-auto z-50">
-                        {filteredUsers.map(user => {
-                            const followed = isFollowing(user.id);
+                {searchResults.length > 0 && (
+                    <div className="absolute w-full bg-gray-100 rounded-xl shadow-lg mt-2 max-h-60 overflow-y-auto z-50">
+                        {searchResults.map(user => {
+                            const followed = isFollowing(user.userId);
 
                             return (
                                 <div
-                                    key={user.id}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50">
-                                    {/* USER INFO */}
+                                    key={user.userId}
+                                    className="flex items-center justify-between px-4 py-3 hover:bg-secondary/10">
+                                    {/* User Information */}
                                     <div
                                         onClick={() => {
                                             setSelectedUser(user);
-                                            setSearch(""); // close dropdown
+                                            setSearch("");
+                                            setSearchResults([]);
                                         }}
                                         className="flex items-center gap-3 cursor-pointer">
                                         <img
-                                            src={user.profilePic}
+                                            src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
                                             alt=""
                                             className="w-10 h-10 rounded-full object-cover"
                                         />
                                         <span>{user.username}</span>
                                     </div>
 
-                                    {/* FOLLOW BUTTON */}
+                                    {/* Follow/Unfollow Button */}
                                     <button
                                         onClick={e => {
-                                            e.stopPropagation(); // prevent overlay opening
+                                            e.stopPropagation();
                                             toggleFollow(user);
                                         }}
                                         className={`px-4 py-1 text-sm rounded-full transition ${
                                             followed
-                                                ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                                : "bg-primary text-white hover:opacity-90"
+                                                ? "bg-primary/60 text-white hover:bg-primary"
+                                                : "bg-primary/90 text-white hover:bg-primary"
                                         }`}>
                                         {followed ? "Followed" : "Follow"}
                                     </button>
@@ -109,7 +152,7 @@ export default function Community() {
                 )}
             </div>
 
-            {/* TABS */}
+            {/* Tabs */}
             <div className="flex gap-8 border-b mb-10">
                 <button
                     onClick={() => setActiveTab("following")}
@@ -132,17 +175,17 @@ export default function Community() {
                 </button>
             </div>
 
-            {/* TAB LIST */}
+            {/* Following/Followers List */}
             <div className="space-y-4">
                 {currentList.map(user => (
                     <div
-                        key={user.id}
-                        className="p-4 border rounded-xl flex items-center justify-between">
+                        key={user.userId}
+                        className="p-4 bg-gray-100 hover:bg-secondary/10 rounded-xl flex items-center justify-between">
                         <div
                             onClick={() => setSelectedUser(user)}
                             className="flex items-center gap-4 cursor-pointer">
                             <img
-                                src={user.profilePic}
+                                src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
                                 alt=""
                                 className="w-12 h-12 rounded-full object-cover"
                             />
@@ -155,7 +198,7 @@ export default function Community() {
                                     e.stopPropagation();
                                     toggleFollow(user);
                                 }}
-                                className="px-4 py-1 bg-gray-100 rounded-full hover:bg-gray-200">
+                                className="px-4 py-1 bg-primary/60 text-white rounded-full hover:bg-primary">
                                 Unfollow
                             </button>
                         )}
@@ -163,7 +206,7 @@ export default function Community() {
                 ))}
             </div>
 
-            {/* USER ITINERARY LIST OVERLAY */}
+            {/* User Itinerary List Overlay */}
             <UserItineraryListOverlay
                 open={!!selectedUser}
                 user={selectedUser}
@@ -173,7 +216,7 @@ export default function Community() {
                 }}
             />
 
-            {/* ITINERARY DETAIL OVERLAY */}
+            {/* Itinerary Overlay */}
             <ItineraryOverlay
                 open={!!selectedItinerary}
                 itinerary={selectedItinerary}

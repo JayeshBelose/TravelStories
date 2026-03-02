@@ -16,10 +16,12 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
 
+        setLoading(true);
+
         const fetchDays = async () => {
             try {
                 const response = await api.get(
-                    `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/days`,
+                    `/itineraries/${itinerary.itineraryId}/days`,
                 );
                 setDays(response.data);
             } catch (error) {
@@ -39,9 +41,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
         const fetchLocationsForAllDays = async () => {
             try {
                 const requests = days.map(day =>
-                    api.get(
-                        `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/${day.dayId}/locations`,
-                    ),
+                    api.get(`/itineraries/days/${day.dayId}/locations`),
                 );
                 const responses = await Promise.all(requests);
 
@@ -69,9 +69,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                 const allLocations = Object.values(locationsByDay).flat();
 
                 const requests = allLocations.map(location =>
-                    api.get(
-                        `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/${location.locationId}/images`,
-                    ),
+                    api.get(`/itineraries/days/locations/${location.locationId}/images`),
                 );
 
                 const responses = await Promise.all(requests);
@@ -104,12 +102,12 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     return (
         <div>
             <div className="fixed inset-0 bg-black/70 flex items-start justify-center overflow-y-auto p-6 z-50">
-                <div className="bg-white w-11/12 max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-y-auto relative">
+                <div className="bg-white w-11/12 max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-y-auto relative ml-64">
                     {/* Close Button */}
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 bg-white p-2 rounded-full shadow z-10">
-                        <X size={18} />
+                        <X size={18} className="hover:scale-110 hover:cursor-pointer" />
                     </button>
 
                     {/* Thumbnail */}
@@ -131,24 +129,26 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
 
                         {/* Dates */}
                         <p className="text-sm text-gray-600 mb-2">
-                            {itinerary.startDate} - {itinerary.endDate}
+                            {itinerary.startDate} To {itinerary.endDate}
                         </p>
                         {/* Itinerary Type */}
-                        <div className="text-sm text-secondary mb-2 bg-secondary/40 w-fit py-1 px-2 rounded-2xl">
+                        <div className="text-sm text-secondary mb-2 bg-secondary/20 w-fit py-1 px-2 rounded-2xl">
                             {itinerary.type}
                         </div>
 
                         {/* Creator */}
-                        <p className="text-sm text-gray-700 mb-8">
+                        <p className="text-sm text-primary/60 mb-8">
                             Created by{" "}
-                            <span className="font-semibold">{itinerary.createdBy}</span>
+                            <span className="font-semibold text-primary">
+                                {itinerary.createdBy}
+                            </span>
                         </p>
 
                         {/* Days Section */}
                         {days?.length > 0 && (
-                            <div className="space-y-8">
+                            <div className="space-y-8 mb-12">
                                 {days.map(day => (
-                                    <div key={day.dayId} className="border-t pt-6 pb-6">
+                                    <div key={day.dayId} className="border-t pt-6">
                                         {/* Day Header */}
                                         <h4 className="text-xl font-primary font-semibold mb-2">
                                             Day {day.dayNumber}
@@ -208,19 +208,18 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                         )}
 
                         {/* Members Section */}
-                        {itinerary.members?.length > 0 && (
-                            <div className="mt-10 pt-6 border-t">
-                                <h4 className="font-semibold mb-3">Members</h4>
-
-                                <div className="flex flex-wrap gap-3">
-                                    {itinerary.members.map((member, index) => (
-                                        <span
-                                            key={index}
-                                            className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm">
-                                            {member}
-                                        </span>
-                                    ))}
-                                </div>
+                        <h4 className="font-primary font-semibold text-xl border-t pt-6 pb-2">
+                            Members
+                        </h4>
+                        {itinerary.members && itinerary.members.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {itinerary.members.map(member => (
+                                    <span
+                                        key={member.userId}
+                                        className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm">
+                                        {member.username}
+                                    </span>
+                                ))}
                             </div>
                         )}
                     </div>

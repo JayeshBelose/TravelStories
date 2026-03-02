@@ -1,13 +1,12 @@
 package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.travel_stories.dto.LoginDto;
-import org.travel_stories.dto.SignupDto;
-import org.travel_stories.dto.UserRequestDto;
-import org.travel_stories.dto.UserResponseDto;
+import org.springframework.web.server.ResponseStatusException;
+import org.travel_stories.dto.*;
 import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.FollowRepository;
@@ -45,17 +44,14 @@ public class UserService {
         return userResponseDto;
     }
 
-    public UserResponseDto signup(SignupDto signupDto){
+    public User createUser(String username, String email, String password){
         User user = new User();
-
-        user.setUsername(signupDto.getUsername());
-        user.setEmail(signupDto.getEmail());
-        user.setPassword(signupDto.getPassword());
-        user.setCreatedAt(Instant.now());
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password);
 
         userRepository.save(user);
-
-        return map(user);
+        return user;
     }
 
     public UserResponseDto getUserById(UUID userId){
@@ -96,8 +92,32 @@ public class UserService {
         return map(user);
     }
 
-    public User authenticate(String email, String password){
-        return userRepository.findByEmailAndPassword(email, password);
+    public User authenticate(String email, String password) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password")
+                );
+
+        if (!user.getPassword().equals(password)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+
+        return user;
+    }
+
+    public List<FollowResponseDto> searchUsers(String query){
+        if (query == null || query.trim().isEmpty()){
+            return List.of();
+        }
+
+        List<User> users = userRepository.searchUsers(query.trim());
+
+        return users.stream()
+                .map(user -> {
+                    return new FollowResponseDto(user.getUserId(), user.getUsername());
+                })
+                .collect(Collectors.toList());
     }
 
 }

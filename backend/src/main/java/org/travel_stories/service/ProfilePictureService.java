@@ -45,7 +45,7 @@ public class ProfilePictureService {
 
     public ProfilePicture getPfpByUser(UUID userId){
         return profilePictureRepository.findByUserUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Image not found."));
+                .orElse(null);
     }
 
 }

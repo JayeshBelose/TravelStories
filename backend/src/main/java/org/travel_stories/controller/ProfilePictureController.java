@@ -30,6 +30,10 @@ public class ProfilePictureController {
     @GetMapping
     public ResponseEntity<byte[]> getPfpByUser(@PathVariable UUID userId){
         ProfilePicture pfp = profilePictureService.getPfpByUser(userId);
+        if (pfp == null){
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(pfp.getContentType()))
                 .body(pfp.getPfpData());

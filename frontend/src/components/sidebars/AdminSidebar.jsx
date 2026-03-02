@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Separator } from "./ui/separator";
+import { Button } from "../ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Separator } from "../ui/separator";
 import { LayoutDashboard, Users, Map, Image, LogOut } from "lucide-react";
 
 export default function AdminSidebar({ user, onLogout }) {
