@@ -101,7 +101,7 @@ export default function Community() {
             <div className="relative mb-8 w-full">
                 <input
                     type="text"
-                    placeholder="Search users by username..."
+                    placeholder="Search travelers to connect with..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     className="w-full bg-gray-100 border rounded-xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"

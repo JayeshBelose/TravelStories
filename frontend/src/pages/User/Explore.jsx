@@ -15,6 +15,9 @@ export default function Explore() {
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const CARDS_PER_PAGE = 15;
+
     // Fetching itineraries
     useEffect(() => {
         const fetchItineraries = async () => {
@@ -60,6 +63,16 @@ export default function Explore() {
         return filtered;
     }, [itineraries, sortFilter, typeFilter]);
 
+    // Pagination
+    const totalPages = Math.ceil(filteredItineraries.length / CARDS_PER_PAGE);
+
+    const paginatedItineraries = useMemo(() => {
+        const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
+        const endIndex = startIndex + CARDS_PER_PAGE;
+
+        return filteredItineraries.slice(startIndex, endIndex);
+    }, [filteredItineraries, currentPage]);
+
     // Get sort label to filter
     const getSortLabel = () => {
         if (sortFilter === "likes") return "Most Liked";
@@ -73,6 +86,16 @@ export default function Explore() {
         if (typeFilter === "all") return "All Types";
         return typeFilter;
     };
+
+    // Setting current page to avoid empty page rendering
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [sortFilter, typeFilter]);
+
+    // Reset screen to top
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentPage]);
 
     // Wait for itineraries to be fetched from the database
     if (loading) return <p className="p-10">Loading...</p>;
@@ -170,13 +193,46 @@ export default function Explore() {
 
             {/* Grid Display Of Itineraries */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredItineraries.map(itinerary => (
+                {paginatedItineraries.map(itinerary => (
                     <ItineraryCard
                         key={itinerary.itineraryId}
                         itinerary={itinerary}
                         onClick={setSelectedItinerary}
                     />
                 ))}
+            </div>
+
+            {/* Pagination UI */}
+            <div className="flex justify-center items-center gap-2 mt-10">
+                {/* Previous */}
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                    className="px-4 py-2 rounded bg-gray-100 disabled:opacity-40">
+                    Prev
+                </button>
+
+                {/* Page Numbers */}
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`px-4 py-2 rounded-full ${
+                            currentPage === i + 1
+                                ? "bg-primary text-white"
+                                : "bg-gray-100"
+                        }`}>
+                        {i + 1}
+                    </button>
+                ))}
+
+                {/* Next */}
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    className="px-4 py-2 rounded bg-gray-100 disabled:opacity-40">
+                    Next
+                </button>
             </div>
 
             {/* Overlay Component */}

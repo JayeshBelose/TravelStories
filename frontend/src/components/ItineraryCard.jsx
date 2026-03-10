@@ -59,6 +59,8 @@ export default function ItineraryCard({ itinerary, onClick }) {
 
         if (!loggedInUser?.userId) return;
 
+        if (loggedInUser?.username === itinerary.createdBy) return;
+
         try {
             await api.post(
                 `/users/${loggedInUser.userId}/savedItineraries/${itinerary.itineraryId}`,
@@ -97,7 +99,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
                     {/* Like */}
                     <button
                         onClick={handleLike}
-                        className="flex items-center gap-1 hover:scale-105 transition">
+                        className="flex items-center gap-1 hover:scale-105 cursor-pointer transition">
                         <Heart
                             size={16}
                             className={liked ? "fill-red-500 text-red-500" : ""}
@@ -108,7 +110,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
                     {/* Save */}
                     <button
                         onClick={handleSave}
-                        className="flex items-center gap-1 hover:scale-105 transition">
+                        className="flex items-center gap-1 hover:scale-105 cursor-pointer transition">
                         <Bookmark
                             size={16}
                             className={saved ? "fill-yellow-400 text-yellow-400" : ""}

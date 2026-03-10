@@ -39,7 +39,8 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
             LEFT JOIN FETCH i.type
             LEFT JOIN FETCH i.members m
             LEFT JOIN FETCH m.user
+            WHERE i.isPublic = true
             """)
-    List<Itinerary> findAllWithRelations();
+    List<Itinerary> findAllPublicWithRelations();
 
 }

@@ -3,21 +3,15 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.travel_stories.dto.DayResponseDto;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.dto.MemberResponseDto;
-import org.travel_stories.entity.Day;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.*;
 
-import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -123,7 +117,7 @@ public class ItineraryService {
     }
 
     public List<ItineraryResponseDto> getAllItineraries(){
-        return itineraryRepository.findAllWithRelations()
+        return itineraryRepository.findAllPublicWithRelations()
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
