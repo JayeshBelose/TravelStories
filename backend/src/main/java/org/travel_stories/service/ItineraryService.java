@@ -1,6 +1,10 @@
 package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.ItineraryRequestDto;
@@ -116,11 +120,38 @@ public class ItineraryService {
         return map(updatedItinerary);
     }
 
-    public List<ItineraryResponseDto> getAllItineraries(){
-        return itineraryRepository.findAllPublicWithRelations()
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+    public Page<ItineraryResponseDto> getItineraries(
+            String search,
+            String type,
+            String sort,
+            int page,
+            int size
+    ) {
+        Sort sorting;
+
+        switch (sort) {
+            case "likes":
+                sorting = Sort.by(Sort.Direction.DESC, "likeCount");
+                break;
+            case "saves":
+                sorting = Sort.by(Sort.Direction.DESC, "saveCount");
+                break;
+            case "recent":
+                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
+            default:
+                sorting = Sort.unsorted();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        Page<Itinerary> result = itineraryRepository.searchItineraries(
+                search.toLowerCase(),
+                type,
+                pageable
+        );
+
+        return result.map(this::map);
     }
 
     public ItineraryResponseDto getItineraryById(UUID itineraryId){

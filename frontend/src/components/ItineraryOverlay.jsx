@@ -132,8 +132,13 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             {itinerary.startDate} To {itinerary.endDate}
                         </p>
                         {/* Itinerary Type */}
-                        <div className="text-sm text-secondary mb-2 bg-secondary/20 w-fit py-1 px-2 rounded-2xl">
+                        <div className="text-sm text-secondary font-semibold mb-2 bg-secondary/20 w-fit py-1 px-2 rounded-2xl">
                             {itinerary.type}
+                        </div>
+                        {/* Itinerary Visibility */}
+                        <div
+                            className={`text-sm mb-2 py-1 px-2 rounded-2xl font-semibold w-fit ${itinerary.public ? "text-green-500 bg-green-100" : "text-red-500 bg-red-100"}`}>
+                            {itinerary.public ? "Public" : "Private"}
                         </div>
 
                         {/* Creator */}
@@ -177,26 +182,30 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                 {location.locationAddress}
                                                             </p>
 
-                                                            {/* Location Images */}
-                                                            {imagesByLocation[
-                                                                location.locationId
-                                                            ]?.map(img => {
-                                                                const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`;
+                                                            <div className="flex flex-row gap-2">
+                                                                {/* Location Images */}
+                                                                {imagesByLocation[
+                                                                    location.locationId
+                                                                ]?.map(img => {
+                                                                    const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`;
 
-                                                                return (
-                                                                    <img
-                                                                        key={img.imageId}
-                                                                        src={imageUrl}
-                                                                        alt="location"
-                                                                        onClick={() =>
-                                                                            setSelectedImage(
-                                                                                imageUrl,
-                                                                            )
-                                                                        }
-                                                                        className="w-24 h-24 object-cover rounded-lg cursor-pointer"
-                                                                    />
-                                                                );
-                                                            })}
+                                                                    return (
+                                                                        <img
+                                                                            key={
+                                                                                img.imageId
+                                                                            }
+                                                                            src={imageUrl}
+                                                                            alt="location"
+                                                                            onClick={() =>
+                                                                                setSelectedImage(
+                                                                                    imageUrl,
+                                                                                )
+                                                                            }
+                                                                            className="w-24 h-24 object-cover rounded-lg cursor-pointer"
+                                                                        />
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         </div>
                                                     ),
                                                 )}

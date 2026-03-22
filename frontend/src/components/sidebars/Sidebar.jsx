@@ -52,7 +52,6 @@ export default function Sidebar({ user, onLogout }) {
                 <div className="flex items-center gap-3 mb-4">
                     <Avatar>
                         <AvatarImage src={imageUrl} alt={user?.username} />
-
                         <AvatarFallback>
                             {user?.username?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>

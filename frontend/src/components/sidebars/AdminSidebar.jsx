@@ -9,8 +9,9 @@ export default function AdminSidebar({ user, onLogout }) {
         { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
         { name: "User Management", path: "/admin/user-management", icon: Users },
         { name: "Itinerary Management", path: "/admin/itinerary-management", icon: Map },
-        { name: "Image Moderation", path: "/admin/image-moderation", icon: Image },
     ];
+
+    const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`;
 
     return (
         <div className="flex flex-col w-64 bg-primary text-primary-foreground p-5 min-h-screen justify-between">
@@ -49,11 +50,15 @@ export default function AdminSidebar({ user, onLogout }) {
                 <Separator className="my-4 bg-white/20" />
                 <div className="flex items-center gap-3 mb-4">
                     <Avatar>
-                        <AvatarImage src={user?.image} />
-                        <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarImage src={imageUrl} alt={user?.username} />
+                        <AvatarFallback>
+                            {user?.username?.[2]?.toUpperCase() || "U"}
+                        </AvatarFallback>
                     </Avatar>
                     <div>
-                        <p className="text-sm font-medium font-secondary">{user?.name}</p>
+                        <p className="text-sm font-medium font-secondary">
+                            {user?.username}
+                        </p>
                     </div>
                 </div>
 

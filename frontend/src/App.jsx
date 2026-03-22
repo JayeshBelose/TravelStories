@@ -20,7 +20,6 @@ import Profile from "./pages/User/Profile";
 import Dashboard from "./pages/Admin/Dashboard";
 import UserManagement from "./pages/Admin/UserManagement";
 import ItineraryManagement from "./pages/Admin/ItineraryManagement";
-import ImageModeration from "./pages/Admin/ImageModeration";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -82,7 +81,6 @@ function Router() {
                             path="itinerary-management"
                             element={<ItineraryManagement />}
                         />
-                        <Route path="image-moderation" element={<ImageModeration />} />
                     </Route>
                 </Route>
 

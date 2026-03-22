@@ -18,12 +18,12 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    public ResponseEntity<String> addLocation(
+    public ResponseEntity<LocationResponseDto> addLocation(
             @PathVariable UUID dayId,
             @RequestBody LocationRequestDto locationRequestDto
     ){
-        locationService.addLocation(dayId, locationRequestDto);
-        return ResponseEntity.ok().body("Location added.");
+        LocationResponseDto locationResponseDto = locationService.addLocation(dayId, locationRequestDto);
+        return ResponseEntity.ok().body(locationResponseDto);
     }
 
     @DeleteMapping("/{locationId}")

@@ -36,6 +36,7 @@ public class UserService {
         userResponseDto.setUserId(user.getUserId());
         userResponseDto.setUsername(user.getUsername());
         userResponseDto.setEmail(user.getEmail());
+        userResponseDto.setRole(user.getRole());
         userResponseDto.setBio(user.getBio());
         userResponseDto.setCreatedAt(user.getCreatedAt());
         userResponseDto.setFollowersCount(followRepository.findFollowers(user.getUserId()).size());

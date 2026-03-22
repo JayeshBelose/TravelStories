@@ -1,6 +1,9 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "@/api/axiosConfig";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import ItineraryCard from "./ItineraryCard";
+import ItineraryOverlay from "./ItineraryOverlay";
 
 export default function UserItineraryListOverlay({
     open,
@@ -9,6 +12,9 @@ export default function UserItineraryListOverlay({
     onSelectItinerary,
 }) {
     const [itineraries, setItineraries] = useState([]);
+    const [selectedItinerary, setSelectedItinerary] = useState(null);
+
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     // Fetch selected user's itineraries
     useEffect(() => {
@@ -16,8 +22,13 @@ export default function UserItineraryListOverlay({
 
         const fetchItineraries = async () => {
             try {
-                const res = await api.get(`/itineraries/users/${user.userId}`);
-                setItineraries(res.data || []);
+                if (currentUser?.role === "admin") {
+                    const res = await api.get(`/itineraries/users/${user.userId}`);
+                    setItineraries(res.data || []);
+                } else {
+                    const res = await api.get(`/itineraries/users/${user.userId}`);
+                    setItineraries((res.data || []).filter(i => i?.public === true));
+                }
             } catch (err) {
                 console.error("Failed to fetch itineraries", err);
                 setItineraries([]);
@@ -32,16 +43,20 @@ export default function UserItineraryListOverlay({
 
     return (
         <div className="fixed inset-0 bg-black/60 z-40 flex items-center justify-center">
-            <div className="bg-white w-[900px] max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl ml-64">
+            <div className="bg-white w-[75vw] max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl ml-64">
                 <div className="flex justify-between items-center p-6 bg-primary">
                     <div className="flex items-center gap-4">
-                        <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
-                            alt=""
-                            className="w-12 h-12 rounded-full object-cover"
-                        />
+                        <Avatar>
+                            <AvatarImage
+                                src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
+                                alt={user?.username}
+                            />
+                            <AvatarFallback>
+                                {user?.username?.[0]?.toUpperCase() || "U"}
+                            </AvatarFallback>
+                        </Avatar>
                         <h2 className="text-2xl text-white font-primary font-semibold">
-                            {user.username}'s Itineraries
+                            {user.username}'s ( {itineraries.length} ) Itineraries
                         </h2>
                     </div>
 
@@ -62,25 +77,21 @@ export default function UserItineraryListOverlay({
                     <div className="grid grid-cols-3 gap-6 p-6">
                         {Array.isArray(itineraries) &&
                             itineraries.map(itinerary => (
-                                <div
+                                <ItineraryCard
                                     key={itinerary.itineraryId}
-                                    onClick={() => onSelectItinerary(itinerary)}
-                                    className="cursor-pointer rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-                                    <img
-                                        src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
-                                        alt=""
-                                        className="w-full h-40 object-cover"
-                                    />
-                                    <div className="p-4">
-                                        <h3 className="font-semibold">
-                                            {itinerary.title}
-                                        </h3>
-                                    </div>
-                                </div>
+                                    itinerary={itinerary}
+                                    onClick={setSelectedItinerary}
+                                />
                             ))}
                     </div>
                 )}
             </div>
+
+            {/* Overlay Component */}
+            <ItineraryOverlay
+                itinerary={selectedItinerary}
+                onClose={() => setSelectedItinerary(null)}
+            />
         </div>
     );
 }

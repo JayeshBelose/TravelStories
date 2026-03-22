@@ -31,7 +31,7 @@ public class DayService {
         return dayResponseDto;
     }
 
-    public void addDay(UUID itineraryId, DayRequestDto dayRequestDto){
+    public DayResponseDto addDay(UUID itineraryId, DayRequestDto dayRequestDto){
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new RuntimeException("Itinerary not found."));
 
@@ -46,6 +46,8 @@ public class DayService {
         day.setDescription(dayRequestDto.getDescription());
         day.setItinerary(itinerary);
         dayRepository.save(day);
+
+        return map(day);
     }
 
     public void removeDay(UUID itineraryId, UUID dayId){

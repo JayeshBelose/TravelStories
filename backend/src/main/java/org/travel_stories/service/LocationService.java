@@ -34,7 +34,7 @@ public class LocationService {
         return locationResponseDto;
     }
 
-    public void addLocation(UUID dayId, LocationRequestDto locationRequestDto){
+    public LocationResponseDto addLocation(UUID dayId, LocationRequestDto locationRequestDto){
         Day day = dayRepository.findById(dayId)
                 .orElseThrow(() -> new RuntimeException("Day not found."));
 
@@ -46,6 +46,8 @@ public class LocationService {
         location.setLocationAddress(locationRequestDto.getLocationAddress());
         location.setDay(day);
         locationRepository.save(location);
+
+        return map(location);
     }
 
     public void removeLocation(UUID dayId, UUID locationId){

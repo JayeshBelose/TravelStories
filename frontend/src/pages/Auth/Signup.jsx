@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
@@ -10,6 +11,7 @@ export default function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
@@ -29,7 +31,7 @@ export default function Signup() {
         const loadingToast = toast.loading("Signing up...");
 
         try {
-            const res = await api.post(`/auth/signup`, {
+            const response = await api.post(`/auth/signup`, {
                 username: name,
                 email,
                 password,
@@ -37,8 +39,7 @@ export default function Signup() {
 
             const { token, userId, username, role } = response.data;
 
-            localStorage.setItem("token", token);
-            login({ userId, username, role });
+            login({ token, userId, username, role });
 
             toast.update(loadingToast, {
                 render: "Signup successful!",
@@ -47,7 +48,7 @@ export default function Signup() {
                 autoClose: 2000,
             });
 
-            etTimeout(() => {
+            setTimeout(() => {
                 navigate(role === "ADMIN" ? "/admin" : "/user");
             }, 1000);
         } catch (error) {
@@ -92,18 +93,29 @@ export default function Signup() {
                     <p className="text-red-500 text-sm mb-2">Invalid email address</p>
                 )}
 
-                <input
-                    type="password"
-                    placeholder="Password (8-12 chars)"
-                    className="w-full p-2 mb-2 border rounded"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
-                {!isPasswordValid && password.length > 0 && (
-                    <p className="text-red-500 text-sm mb-2">
-                        Password must be 8-12 characters
-                    </p>
-                )}
+                <div className="relative mb-2">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password (8-12 chars)"
+                        className="w-full p-2 border rounded pr-10"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                    />
+
+                    {showPassword ? (
+                        <EyeOff
+                            size={20}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-primary"
+                            onClick={() => setShowPassword(false)}
+                        />
+                    ) : (
+                        <Eye
+                            size={20}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-secondary"
+                            onClick={() => setShowPassword(true)}
+                        />
+                    )}
+                </div>
 
                 <button
                     onClick={handleSignup}

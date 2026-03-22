@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Plus, Trash } from "lucide-react";
+import { X, Plus, Trash, Upload } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
 
@@ -11,8 +11,9 @@ export default function CreateItineraryOverlay({
 }) {
     const user = JSON.parse(localStorage.getItem("user"));
 
-    const isEditMode = !!existingItinerary;
-    const isCreator = existingItinerary?.createdBy === user?.username;
+    const isEditMode = !!existingItinerary || user?.role === "admin";
+    const isCreator =
+        existingItinerary?.createdBy === user?.username || user?.role === "admin";
 
     const [itineraryId, setItineraryId] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -30,7 +31,10 @@ export default function CreateItineraryOverlay({
     const [memberSearch, setMemberSearch] = useState("");
     const [types, setTypes] = useState([]);
 
-    // Fetching required data
+    const [deletedDays, setDeletedDays] = useState([]);
+    const [deletedLocations, setDeletedLocations] = useState([]);
+    const [deletedImages, setDeletedImages] = useState([]);
+
     useEffect(() => {
         if (!open) return;
 
@@ -77,8 +81,13 @@ export default function CreateItineraryOverlay({
 
                             loadedLocations.push({
                                 ...loc,
-                                images: imgRes.data,
-                                newImages: [],
+                                name: loc.locationName || "",
+                                address: loc.locationAddress || "",
+                                images: imgRes.data.map(img => ({
+                                    ...img,
+                                    isNew: false,
+                                    file: null,
+                                })),
                             });
                         }
 
@@ -113,11 +122,14 @@ export default function CreateItineraryOverlay({
         setMembers([]);
         setThumbnailFile(null);
         setThumbnailPreview(null);
+        setDeletedDays([]);
+        setDeletedLocations([]);
+        setDeletedImages([]);
     };
 
     if (!open) return null;
 
-    // Create or update
+    // Create/Update logic
     const createOrUpdateItinerary = async () => {
         if (!title || !place || !type || !startDate || !endDate) {
             toast.error("Please fill all required fields!");
@@ -150,11 +162,22 @@ export default function CreateItineraryOverlay({
                 setItineraryId(response.data.itineraryId);
             }
 
-            const updatedItinerary = response.data;
-
-            if (onSaved) onSaved(updatedItinerary);
-
             const id = response?.data?.itineraryId || itineraryId;
+
+            if (onSaved) onSaved(response.data);
+
+            // Delete
+            for (let imageId of deletedImages) {
+                await api.delete(`/itineraries/days/locations/images/${imageId}`);
+            }
+
+            for (let locationId of deletedLocations) {
+                await api.delete(`/itineraries/days/locations/${locationId}`);
+            }
+
+            for (let dayId of deletedDays) {
+                await api.delete(`/itineraries/${id}/days/${dayId}`);
+            }
 
             // Thumbnail
             if (thumbnailFile) {
@@ -201,10 +224,10 @@ export default function CreateItineraryOverlay({
                     }
 
                     // Images
-                    if (loc.newImages) {
-                        for (let image of loc.newImages) {
+                    for (let image of loc.images) {
+                        if (image.isNew && image.file) {
                             const imgForm = new FormData();
-                            imgForm.append("file", image);
+                            imgForm.append("file", image.file);
                             await api.post(
                                 `/itineraries/days/locations/${locationId}/images`,
                                 imgForm,
@@ -215,7 +238,7 @@ export default function CreateItineraryOverlay({
             }
 
             // Members
-            const existingMembers = existingItinerary.members;
+            const existingMembers = existingItinerary?.members || [];
 
             for (let m of existingMembers) {
                 if (!members.find(sel => sel.userId === m.userId)) {
@@ -230,6 +253,11 @@ export default function CreateItineraryOverlay({
             }
 
             toast.success(isEditMode ? "Itinerary Updated!" : "Itinerary Created!");
+
+            setDeletedDays([]);
+            setDeletedLocations([]);
+            setDeletedImages([]);
+
             onClose();
         } catch (err) {
             console.error(err);
@@ -238,51 +266,31 @@ export default function CreateItineraryOverlay({
     };
 
     // Remove functions
-    const removeDay = async index => {
+    const removeDay = index => {
         const day = days[index];
-
-        if (day.dayId) {
-            await api.delete(`/itineraries/${itineraryId}/days/${day.dayId}`);
-        }
+        if (day.dayId) setDeletedDays(prev => [...prev, day.dayId]);
 
         const updated = [...days];
         updated.splice(index, 1);
         setDays(updated);
     };
 
-    const removeLocation = async (dayIndex, locIndex) => {
-        const dayId = days[dayIndex].dayId;
-        const location = days[dayIndex].locations[locIndex];
-
-        if (location.locationId) {
-            await api.delete(
-                `/itineraries/days/${dayId}/locations/${location.locationId}`,
-            );
-        }
+    const removeLocation = (dayIndex, locIndex) => {
+        const loc = days[dayIndex].locations[locIndex];
+        if (loc.locationId) setDeletedLocations(prev => [...prev, loc.locationId]);
 
         const updated = [...days];
         updated[dayIndex].locations.splice(locIndex, 1);
         setDays(updated);
     };
 
-    const removeImage = async (dayIndex, locIndex, imgIndex) => {
-        const location = days[dayIndex].locations[locIndex];
-        const image = location.images[imgIndex];
-
-        if (image.imageId) {
-            await api.delete(
-                `/itineraries/days/locations/${location.locationId}/images/${image.imageId}`,
-            );
-        }
-
+    const removeImage = (dayIndex, locIndex, imgIndex) => {
         const updated = [...days];
+        const img = updated[dayIndex].locations[locIndex].images[imgIndex];
+
+        if (!img.isNew && img.imageId) setDeletedImages(prev => [...prev, img.imageId]);
+
         updated[dayIndex].locations[locIndex].images.splice(imgIndex, 1);
-        setDays(updated);
-    };
-
-    const removeNewImage = (dayIndex, locIndex, imgIndex) => {
-        const updated = [...days];
-        updated[dayIndex].locations[locIndex].newImages.splice(imgIndex, 1);
         setDays(updated);
     };
 
@@ -315,16 +323,24 @@ export default function CreateItineraryOverlay({
                                 Thumbnail
                             </h3>
 
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={e => {
-                                    const file = e.target.files[0];
-                                    if (!file) return;
-                                    setThumbnailFile(file);
-                                    setThumbnailPreview(URL.createObjectURL(file));
-                                }}
-                            />
+                            <label className="flex items-center gap-2 cursor-pointer w-fit bg-primary/10 p-3 rounded-2xl shadow-sm hover:shadow-md">
+                                <Upload size={16} />
+                                {thumbnailFile
+                                    ? `Selected: ${thumbnailFile.name}`
+                                    : "Upload Thumbnail"}
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={e => {
+                                        const file = e.target.files[0];
+                                        if (!file) return;
+                                        setThumbnailFile(file);
+                                        setThumbnailPreview(URL.createObjectURL(file));
+                                    }}
+                                />
+                            </label>
 
                             {/* Existing thumbnail (Edit mode) */}
                             {isEditMode &&
@@ -527,9 +543,7 @@ export default function CreateItineraryOverlay({
                                             <div className="flex gap-2">
                                                 <input
                                                     placeholder="Location Name"
-                                                    value={
-                                                        loc.locationName || loc.name || ""
-                                                    }
+                                                    value={loc.name || ""}
                                                     onChange={e => {
                                                         const updated = [...days];
                                                         updated[dayIndex].locations[
@@ -542,11 +556,7 @@ export default function CreateItineraryOverlay({
 
                                                 <input
                                                     placeholder="Address"
-                                                    value={
-                                                        loc.locationAddress ||
-                                                        loc.address ||
-                                                        ""
-                                                    }
+                                                    value={loc.address || ""}
                                                     onChange={e => {
                                                         const updated = [...days];
                                                         updated[dayIndex].locations[
@@ -567,47 +577,29 @@ export default function CreateItineraryOverlay({
 
                                             {/* Images Preview */}
                                             <div className="flex gap-3 flex-wrap">
-                                                {/* Existing Images */}
                                                 {loc.images?.map((img, imgIndex) => (
                                                     <div
-                                                        key={img.imageId}
+                                                        key={
+                                                            img.imageId ??
+                                                            `new-${imgIndex}`
+                                                        }
                                                         className="relative">
                                                         <img
-                                                            src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`}
+                                                            src={
+                                                                img.isNew
+                                                                    ? URL.createObjectURL(
+                                                                          img.file,
+                                                                      )
+                                                                    : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
+                                                            }
                                                             className="w-20 h-20 object-cover rounded"
                                                             alt=""
                                                         />
                                                         <Trash
-                                                            size={14}
-                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer bg-white rounded hover:scale-110"
+                                                            size={22}
+                                                            className="absolute top-1 right-1 text-red-500 bg-white p-1 rounded-full cursor-pointer hover:scale-110"
                                                             onClick={() =>
                                                                 removeImage(
-                                                                    dayIndex,
-                                                                    locIndex,
-                                                                    imgIndex,
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                ))}
-
-                                                {/* New Images (Preview before upload) */}
-                                                {loc.newImages?.map((file, imgIndex) => (
-                                                    <div
-                                                        key={`new-${imgIndex}`}
-                                                        className="relative">
-                                                        <img
-                                                            src={URL.createObjectURL(
-                                                                file,
-                                                            )}
-                                                            className="w-20 h-20 object-cover rounded"
-                                                            alt=""
-                                                        />
-                                                        <Trash
-                                                            size={14}
-                                                            className="absolute top-1 right-1 text-red-500 cursor-pointer hover:scale-110"
-                                                            onClick={() =>
-                                                                removeNewImage(
                                                                     dayIndex,
                                                                     locIndex,
                                                                     imgIndex,
@@ -619,22 +611,30 @@ export default function CreateItineraryOverlay({
                                             </div>
 
                                             {/* Add Image One By One */}
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={e => {
-                                                    const file = e.target.files[0];
-                                                    if (!file) return;
+                                            <label className="flex items-center gap-2 cursor-pointer w-fit bg-primary/10 p-3 rounded-2xl shadow-sm hover:shadow-md">
+                                                <Upload size={16} />
+                                                Upload Image
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={e => {
+                                                        const file = e.target.files[0];
+                                                        if (!file) return;
 
-                                                    const updated = [...days];
-                                                    updated[dayIndex].locations[
-                                                        locIndex
-                                                    ].newImages.push(file);
-                                                    setDays(updated);
+                                                        const updated = [...days];
+                                                        updated[dayIndex].locations[
+                                                            locIndex
+                                                        ].images.push({
+                                                            isNew: true,
+                                                            file: file,
+                                                        });
+                                                        setDays(updated);
 
-                                                    e.target.value = "";
-                                                }}
-                                            />
+                                                        e.target.value = "";
+                                                    }}
+                                                />
+                                            </label>
                                         </div>
                                     ))}
                                 </div>

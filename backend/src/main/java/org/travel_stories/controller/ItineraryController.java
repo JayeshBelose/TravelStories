@@ -1,6 +1,7 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,9 +56,14 @@ public class ItineraryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItineraries(){
-        List<ItineraryResponseDto> itineraries = itineraryService.getAllItineraries();
-        return ResponseEntity.ok().body(itineraries);
+    public Page<ItineraryResponseDto> getItineraries(
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "all") String type,
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        return itineraryService.getItineraries(search, type, sort, page, size);
     }
 
     @GetMapping("/types/{typeId}")

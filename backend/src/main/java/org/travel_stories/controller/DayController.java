@@ -18,12 +18,12 @@ public class DayController {
     private final DayService dayService;
 
     @PostMapping
-    public ResponseEntity<String> addDay(
+    public ResponseEntity<DayResponseDto> addDay(
             @PathVariable UUID itineraryId,
             @RequestBody DayRequestDto dayRequestDto
     ){
-        dayService.addDay(itineraryId,dayRequestDto);
-        return ResponseEntity.ok().body("Day added.");
+        DayResponseDto dayResponseDto = dayService.addDay(itineraryId,dayRequestDto);
+        return ResponseEntity.ok().body(dayResponseDto);
     }
 
     @DeleteMapping("/{dayId}")

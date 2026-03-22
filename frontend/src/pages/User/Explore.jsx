@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Filter } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import ItineraryCard from "@/components/ItineraryCard";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
 import api from "@/api/axiosConfig";
@@ -8,6 +8,8 @@ export default function Explore() {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [itineraries, setItineraries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [appliedSearch, setAppliedSearch] = useState("");
 
     const [sortFilter, setSortFilter] = useState("random");
     const [typeFilter, setTypeFilter] = useState("all");
@@ -15,63 +17,46 @@ export default function Explore() {
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
 
+    const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
-    const CARDS_PER_PAGE = 15;
 
     // Fetching itineraries
-    useEffect(() => {
-        const fetchItineraries = async () => {
-            try {
-                const response = await api.get(
-                    `${import.meta.env.VITE_API_BASE_URL}/itineraries`,
-                );
-                setItineraries(response.data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchItineraries = async () => {
+        setLoading(true);
+        try {
+            const response = await api.get("/itineraries", {
+                params: {
+                    search: appliedSearch,
+                    type: typeFilter,
+                    sort: sortFilter,
+                    page: currentPage - 1,
+                    size: 15,
+                },
+            });
 
-        fetchItineraries();
-    }, []);
+            setItineraries(response.data.content);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Debounced fetch
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            fetchItineraries();
+        }, 400);
+
+        return () => clearTimeout(delay);
+    }, [appliedSearch, sortFilter, typeFilter, currentPage]);
 
     // Setting itinerary types for filter
     const itineraryTypes = useMemo(() => {
         const types = itineraries.map(i => i.type).filter(Boolean);
         return ["all", ...new Set(types)];
     }, [itineraries]);
-
-    // Combined filter logic for most liked/saved/recent and type
-    const filteredItineraries = useMemo(() => {
-        let filtered = [...itineraries];
-
-        if (typeFilter !== "all") {
-            filtered = filtered.filter(i => i.type === typeFilter);
-        }
-
-        if (sortFilter === "likes") {
-            filtered.sort((a, b) => b.likes - a.likes);
-        } else if (sortFilter === "saves") {
-            filtered.sort((a, b) => b.saves - a.saves);
-        } else if (sortFilter === "recent") {
-            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        } else {
-            filtered.sort(() => Math.random() - 0.5);
-        }
-
-        return filtered;
-    }, [itineraries, sortFilter, typeFilter]);
-
-    // Pagination
-    const totalPages = Math.ceil(filteredItineraries.length / CARDS_PER_PAGE);
-
-    const paginatedItineraries = useMemo(() => {
-        const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
-        const endIndex = startIndex + CARDS_PER_PAGE;
-
-        return filteredItineraries.slice(startIndex, endIndex);
-    }, [filteredItineraries, currentPage]);
 
     // Get sort label to filter
     const getSortLabel = () => {
@@ -92,11 +77,6 @@ export default function Explore() {
         setCurrentPage(1);
     }, [sortFilter, typeFilter]);
 
-    // Reset screen to top
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [currentPage]);
-
     // Wait for itineraries to be fetched from the database
     if (loading) return <p className="p-10">Loading...</p>;
 
@@ -104,20 +84,37 @@ export default function Explore() {
         <div>
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
-                <div>
+                <div className="flex-2">
                     <h1 className="text-4xl font-bold mb-2 text-primary font-primary">
                         Explore Itineraries
                     </h1>
                     <p className="text-gray-500">Find your next adventure</p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex gap-4">
+                {/* Search + Filters */}
+                <div className="flex-4 flex gap-4">
+                    {/* Search */}
+                    <div className="flex items-center gap-3 bg-card p-3 rounded-2xl shadow-md flex-1">
+                        <Search size={18} className="text-primary" />
+                        <input
+                            type="text"
+                            placeholder="Search by title or place..."
+                            className="w-full bg-transparent outline-none text-primary"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === "Enter") {
+                                    setCurrentPage(1);
+                                    setAppliedSearch(search);
+                                }
+                            }}
+                        />
+                    </div>
                     {/* Sort Filter Dropdown */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenSort(!openSort)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:bg-secondary/10 ${getSortLabel() === "No Filter" ? "bg-gray-50" : "bg-secondary/10"}`}>
+                            className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${getSortLabel() === "No Filter" ? "bg-white" : "bg-secondary/10"}`}>
                             {getSortLabel()}
                             <Filter size={16} />
                         </button>
@@ -167,7 +164,7 @@ export default function Explore() {
                     <div className="relative">
                         <button
                             onClick={() => setOpenType(!openType)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:bg-secondary/10 ${getTypeLabel() === "All Types" ? "bg-gray-50" : "bg-secondary/10"}`}>
+                            className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${getTypeLabel() === "All Types" ? "bg-white" : "bg-secondary/10"}`}>
                             {getTypeLabel()}
                             <Filter size={16} />
                         </button>
@@ -192,23 +189,30 @@ export default function Explore() {
             </div>
 
             {/* Grid Display Of Itineraries */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paginatedItineraries.map(itinerary => (
-                    <ItineraryCard
-                        key={itinerary.itineraryId}
-                        itinerary={itinerary}
-                        onClick={setSelectedItinerary}
-                    />
-                ))}
-            </div>
+            {itineraries.length === 0 ? (
+                <div className="font-primary text-primary text-2xl text-center py-10">
+                    No itineraries matching{" "}
+                    <span className="font-bold">" {search} "</span>
+                </div>
+            ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {itineraries.map(itinerary => (
+                        <ItineraryCard
+                            key={itinerary.itineraryId}
+                            itinerary={itinerary}
+                            onClick={setSelectedItinerary}
+                        />
+                    ))}
+                </div>
+            )}
 
-            {/* Pagination UI */}
+            {/* Pagination Logic */}
             <div className="flex justify-center items-center gap-2 mt-10">
                 {/* Previous */}
                 <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(prev => prev - 1)}
-                    className="px-4 py-2 rounded bg-gray-100 disabled:opacity-40">
+                    className="px-4 py-2 rounded-2xl shadow-md bg-gray-100 not-disabled:hover:bg-secondary/10 disabled:opacity-40">
                     Prev
                 </button>
 
@@ -217,7 +221,7 @@ export default function Explore() {
                     <button
                         key={i}
                         onClick={() => setCurrentPage(i + 1)}
-                        className={`px-4 py-2 rounded-full ${
+                        className={`px-4 py-2 rounded-full shadow-md ${
                             currentPage === i + 1
                                 ? "bg-primary text-white"
                                 : "bg-gray-100"
@@ -230,7 +234,7 @@ export default function Explore() {
                 <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(prev => prev + 1)}
-                    className="px-4 py-2 rounded bg-gray-100 disabled:opacity-40">
+                    className="px-4 py-2 rounded-2xl shadow-md bg-gray-100 not-disabled:hover:bg-secondary/10 disabled:opacity-40">
                     Next
                 </button>
             </div>

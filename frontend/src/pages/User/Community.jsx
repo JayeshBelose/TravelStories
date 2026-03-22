@@ -104,7 +104,7 @@ export default function Community() {
                     placeholder="Search travelers to connect with..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full bg-gray-100 border rounded-xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="w-full bg-white shadow-md rounded-2xl px-5 py-3 focus:outline-none"
                 />
 
                 {searchResults.length > 0 && (
@@ -180,7 +180,7 @@ export default function Community() {
                 {currentList.map(user => (
                     <div
                         key={user.userId}
-                        className="p-4 bg-gray-100 hover:bg-secondary/10 rounded-xl flex items-center justify-between">
+                        className="p-4 bg-gray-50 shadow-md hover:bg-secondary/10 rounded-xl flex items-center justify-between">
                         <div
                             onClick={() => setSelectedUser(user)}
                             className="flex items-center gap-4 cursor-pointer">
