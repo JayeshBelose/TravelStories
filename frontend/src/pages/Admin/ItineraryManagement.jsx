@@ -1,12 +1,14 @@
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
-import { Search, Trash, Pencil, Filter } from "lucide-react";
+import { Search, Trash, Pencil, Filter, Plus } from "lucide-react";
 import CreateItineraryOverlay from "@/components/CreateItineraryOverlay";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
 
 export default function ItineraryManagement() {
     const [itineraries, setItineraries] = useState([]);
+    const [types, setTypes] = useState([]);
+    const [newType, setNewType] = useState("");
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("ALL");
     const [selectedItinerary, setSelectedItinerary] = useState(null);
@@ -22,6 +24,7 @@ export default function ItineraryManagement() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
+    // Confirm delete itinerary
     const confirmDelete = itineraryId => {
         toast(
             ({ closeToast }) => (
@@ -53,7 +56,39 @@ export default function ItineraryManagement() {
         );
     };
 
-    // Fetch data
+    // Confirm delete itinerary type
+    const confirmDeleteType = typeId => {
+        toast(
+            ({ closeToast }) => (
+                <div>
+                    <p className="mb-2">
+                        Are you sure you want to delete this type? This action cannot be
+                        undone.
+                    </p>
+
+                    <div className="flex gap-2">
+                        <button
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                            onClick={() => {
+                                deleteType(typeId);
+                                closeToast();
+                            }}>
+                            Delete
+                        </button>
+
+                        <button
+                            className="bg-gray-300 px-3 py-1 rounded"
+                            onClick={closeToast}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ),
+            { autoClose: false },
+        );
+    };
+
+    // Fetch itineraries
     const fetchItineraries = async () => {
         try {
             const res = await api.get("/admin/itineraries", {
@@ -74,7 +109,61 @@ export default function ItineraryManagement() {
         }
     };
 
-    // Get Itinerary Types
+    // Fetch itinerary types for management
+    const fetchTypes = async () => {
+        try {
+            const res = await api.get("/admin/itineraries/types");
+
+            setTypes(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTypes();
+    }, []);
+
+    // Add new type
+    const addType = async () => {
+        if (!newType.trim()) {
+            toast.error("Type cannot be empty");
+            return;
+        }
+
+        if (types.some(t => t.name.toLowerCase() === newType.trim().toLowerCase())) {
+            toast.error("Type already exists");
+            return;
+        }
+
+        try {
+            await api.post(`/admin/itineraries/types/${newType}`);
+
+            toast.success("Type added successfully");
+
+            setNewType("");
+            fetchTypes();
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to add type");
+        }
+    };
+
+    // Delete existing type
+    const deleteType = async typeId => {
+        try {
+            await api.delete(`/admin/itineraries/types/${typeId}`);
+
+            toast.success("Type deleted successfully");
+
+            fetchTypes();
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete type");
+        }
+    };
+
+    // Get Itinerary Types for filter
     const itineraryTypes = useMemo(() => {
         const types = itineraries.map(i => i.type).filter(Boolean);
         return ["all", ...new Set(types)];
@@ -359,6 +448,53 @@ export default function ItineraryManagement() {
                     className="px-3 py-1 bg-card rounded disabled:opacity-50">
                     Next
                 </button>
+            </div>
+
+            {/* Itinerary Type Management */}
+            <div>
+                <h1 className="text-4xl font-bold mb-2 text-primary font-primary mt-20 pt-10 border-t-2 border-primary/20">
+                    Itinerary Type Management
+                </h1>
+                <p className="text-gray-500 pb-6">
+                    Manage all itinerary types on the platform
+                </p>
+
+                <div className="grid grid-cols-6 gap-y-4 gap-x-3">
+                    {types.map(type => (
+                        <div
+                            key={type.typeId}
+                            className="flex gap-3 items-center justify-between rounded-2xl shadow-md p-3 bg-gray-50">
+                            <div className="text-center text-primary text-md">
+                                {type.name}
+                            </div>
+                            <Trash
+                                size={16}
+                                className="text-red-500 cursor-pointer hover:scale-110"
+                                onClick={e => {
+                                    confirmDeleteType(type.typeId);
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+                <div className="text-center text-md rounded-2xl shadow-md flex items-center justify-center gap-3 w-fit mt-6 pr-3 overflow-hidden">
+                    <span className="bg-primary text-white p-3">Add new type</span>
+                    <input
+                        type="text"
+                        value={newType}
+                        placeholder="New type name..."
+                        className="bg-transparent outline-none text-primary"
+                        onChange={e => setNewType(e.target.value)}
+                        onKeyDown={e => {
+                            if (e.key === "Enter") addType();
+                        }}
+                    />
+                    <Plus
+                        size={20}
+                        className="hover:scale-110 cursor-pointer text-primary"
+                        onClick={addType}
+                    />
+                </div>
             </div>
 
             {openCreate && (

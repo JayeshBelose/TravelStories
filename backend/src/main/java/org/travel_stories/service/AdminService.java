@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.*;
 import org.travel_stories.entity.Itinerary;
+import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.ImageRepository;
 import org.travel_stories.repository.ItineraryRepository;
+import org.travel_stories.repository.ItineraryTypeRepository;
 import org.travel_stories.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -30,6 +32,8 @@ public class AdminService {
     private final ItineraryService itineraryService;
     private final ItineraryRepository itineraryRepository;
     private final ImageRepository imageRepository;
+    private final ItineraryTypeService itineraryTypeService;
+    private final ItineraryTypeRepository itineraryTypeRepository;
 
 
     public AdminStatsDto getStats() {
@@ -71,13 +75,22 @@ public class AdminService {
         itineraryService.deleteItineraryById(itineraryId);
     }
 
-    public List<UserResponseDto> getAllUsers() {
-        List<UserResponseDto> users = userRepository.findAll()
-                .stream()
-                .map(user -> {return userService.map(user);})
-                .collect(Collectors.toList());
+    public Page<UserResponseDto> getAllUsers(
+            String search,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        return users;
+        Page<User> users;
+
+        if (search == null || search.isBlank()) {
+            users = userRepository.findAll(pageable);
+        } else {
+            users = userRepository.searchUsersForAdmin(search.toLowerCase(), pageable);
+        }
+
+        return users.map(userService::map);
     }
 
     public void deleteUser(UUID userId) {
@@ -122,6 +135,21 @@ public class AdminService {
         );
 
         return itineraries.map(itineraryService::map);
+    }
+
+    public List<ItineraryTypeDto> getAllTypes() {
+        return itineraryTypeService.getAllTypes();
+    }
+
+    public void addType(String name) {
+        ItineraryType type = new ItineraryType();
+        type.setName(name);
+
+        itineraryTypeRepository.save(type);
+    }
+
+    public void deleteType(Long typeId) {
+        itineraryTypeRepository.deleteById(typeId);
     }
 
 }

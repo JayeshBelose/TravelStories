@@ -9,6 +9,10 @@ import UserItineraryListOverlay from "@/components/UserItineraryListOverlay";
 export default function UserManagement() {
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
@@ -47,12 +51,20 @@ export default function UserManagement() {
     // Fetch all users
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [page, debouncedSearch]);
 
     const fetchUsers = async () => {
         try {
-            const res = await api.get("/admin/users");
-            setUsers(res.data);
+            const res = await api.get("/admin/users", {
+                params: {
+                    page,
+                    size: 10,
+                    search: debouncedSearch,
+                },
+            });
+
+            setUsers(res.data.content);
+            setTotalPages(res.data.totalPages);
         } catch (err) {
             console.error(err);
         }
@@ -69,11 +81,15 @@ export default function UserManagement() {
         }
     };
 
-    const filteredUsers = users.filter(
-        u =>
-            u.username.toLowerCase().includes(search.toLowerCase()) ||
-            u.email.toLowerCase().includes(search.toLowerCase()),
-    );
+    // Debounced search
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(0);
+        }, 400);
+
+        return () => clearTimeout(delay);
+    }, [search]);
 
     return (
         <div>
@@ -83,7 +99,7 @@ export default function UserManagement() {
             <p className="text-gray-500 pb-6">Manage platform users</p>
 
             {/* Search */}
-            <div className="bg-card rounded-2xl shadow-md p-4 mb-6 flex items-center gap-3">
+            <div className="bg-card rounded-2xl shadow-md p-3 mb-6 flex items-center gap-3">
                 <Search size={18} className="text-primary" />
                 <input
                     type="text"
@@ -112,7 +128,7 @@ export default function UserManagement() {
 
                     {/* Table Data */}
                     <tbody className="text-center items-center">
-                        {filteredUsers.map(user => (
+                        {users.map(user => (
                             <tr
                                 key={user.userId}
                                 className="border-b border-primary/20 hover:bg-secondary/10">
@@ -175,6 +191,27 @@ export default function UserManagement() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination UI */}
+            <div className="flex justify-center gap-3 mt-6">
+                <button
+                    disabled={page === 0}
+                    onClick={() => setPage(p => p - 1)}
+                    className="px-3 py-1 bg-card rounded disabled:opacity-50">
+                    Prev
+                </button>
+
+                <span className="px-3 py-1 text-primary">
+                    {page + 1} / {totalPages}
+                </span>
+
+                <button
+                    disabled={page === totalPages - 1}
+                    onClick={() => setPage(p => p + 1)}
+                    className="px-3 py-1 bg-card rounded disabled:opacity-50">
+                    Next
+                </button>
             </div>
 
             {/* User Itinerary List Overlay */}

@@ -54,14 +54,35 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        List<UserResponseDto> users = adminService.getAllUsers();
-        return ResponseEntity.ok().body(users);
+    public Page<UserResponseDto> getAllUsers(
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return adminService.getAllUsers(search, page, size);
     }
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId")UUID userId) {
         adminService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/itineraries/types")
+    public ResponseEntity<List<ItineraryTypeDto>> getAllTypes() {
+        List<ItineraryTypeDto> types = adminService.getAllTypes();
+        return ResponseEntity.ok().body(types);
+    }
+
+    @PostMapping("/itineraries/types/{name}")
+    public ResponseEntity<Void> addType(@PathVariable("name") String name) {
+        adminService.addType(name);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/itineraries/types/{typeId}")
+    public ResponseEntity<Void> deleteType(@PathVariable("typeId") Long typeId) {
+        adminService.deleteType(typeId);
         return ResponseEntity.noContent().build();
     }
 
