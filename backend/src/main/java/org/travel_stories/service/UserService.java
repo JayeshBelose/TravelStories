@@ -62,6 +62,11 @@ public class UserService {
         return map(user);
     }
 
+    public UserResponseDto getUserByName(String username){
+        User user = userRepository.findByUsername(username);
+        return map(user);
+    }
+
     public List<UserResponseDto> getAllUsers(){
         return userRepository.findAll()
                 .stream()

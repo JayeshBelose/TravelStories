@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, Bookmark } from "lucide-react";
+import { Heart, Bookmark, MapPin, User } from "lucide-react";
 import api from "@/api/axiosConfig";
 
 export default function ItineraryCard({ itinerary, onClick }) {
@@ -10,7 +10,6 @@ export default function ItineraryCard({ itinerary, onClick }) {
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
-    // Check initial like & save status
     useEffect(() => {
         if (!loggedInUser?.userId) return;
 
@@ -24,7 +23,6 @@ export default function ItineraryCard({ itinerary, onClick }) {
                         `/users/${loggedInUser.userId}/savedItineraries/${itinerary.itineraryId}`,
                     ),
                 ]);
-
                 setLiked(likeRes.data);
                 setSaved(saveRes.data);
             } catch (error) {
@@ -35,17 +33,13 @@ export default function ItineraryCard({ itinerary, onClick }) {
         fetchStatus();
     }, [itinerary.itineraryId, loggedInUser?.userId]);
 
-    // Like
     const handleLike = async e => {
         e.stopPropagation();
-
         if (!loggedInUser?.userId) return;
-
         try {
             await api.post(
                 `/users/${loggedInUser.userId}/likedItineraries/${itinerary.itineraryId}`,
             );
-
             setLiked(prev => !prev);
             setLikes(prev => (liked ? prev - 1 : prev + 1));
         } catch (error) {
@@ -53,19 +47,14 @@ export default function ItineraryCard({ itinerary, onClick }) {
         }
     };
 
-    // Save
     const handleSave = async e => {
         e.stopPropagation();
-
         if (!loggedInUser?.userId) return;
-
         if (loggedInUser?.username === itinerary.createdBy) return;
-
         try {
             await api.post(
                 `/users/${loggedInUser.userId}/savedItineraries/${itinerary.itineraryId}`,
             );
-
             setSaved(prev => !prev);
             setSaves(prev => (saved ? prev - 1 : prev + 1));
         } catch (error) {
@@ -73,50 +62,101 @@ export default function ItineraryCard({ itinerary, onClick }) {
         }
     };
 
+    const isOwner = loggedInUser?.username === itinerary.createdBy;
+
     return (
         <div
             onClick={() => onClick(itinerary)}
-            className="relative rounded-2xl overflow-hidden cursor-pointer group shadow-md transition duration-300">
+            className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 flex flex-col">
             {/* Thumbnail */}
-            <img
-                src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
-                alt={itinerary.title}
-                className="w-full h-80 object-cover group-hover:scale-105 transition duration-500"
-            />
+            <div className="relative h-48 overflow-hidden flex-shrink-0">
+                <img
+                    src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
+                    alt={itinerary.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
 
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/0 transition" />
-            {/* Itinerary Basic Details */}
-            <div className="absolute bottom-5 left-5 right-5 text-white">
-                <h3 className="text-xl font-semibold font-primary">{itinerary.title}</h3>
+                {/* Visibility */}
+                <div className="absolute top-3 left-3">
+                    <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full
+                            ${
+                                itinerary.public
+                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 backdrop-blur-sm"
+                                    : "bg-red-500/15 text-red-400 border border-red-400/25 backdrop-blur-sm"
+                            }`}>
+                        {itinerary.public ? "Public" : "Private"}
+                    </span>
+                </div>
 
-                <p className="text-sm opacity-90">{itinerary.place}</p>
+                {/* Type */}
+                {itinerary.type && (
+                    <div className="absolute top-3 right-3">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/25 backdrop-blur-sm">
+                            {itinerary.type}
+                        </span>
+                    </div>
+                )}
+            </div>
 
-                <p className="text-xs mt-1 opacity-80">
-                    By {itinerary.createdBy || "Anonymous"}
+            {/* Card Body */}
+            <div className="flex flex-col flex-1 p-4 gap-2">
+                {/* Title */}
+                <h3 className="text-sm font-semibold text-gray-900 font-primary leading-snug line-clamp-2">
+                    {itinerary.title}
+                </h3>
+
+                {/* Place */}
+                <p className="inline-flex items-center gap-1 text-xs text-gray-400">
+                    <MapPin size={11} className="flex-shrink-0" />
+                    <span className="truncate">{itinerary.place}</span>
                 </p>
 
-                <div className="flex items-center gap-6 mt-3 text-sm">
-                    {/* Like */}
-                    <button
-                        onClick={handleLike}
-                        className="flex items-center gap-1 hover:scale-105 cursor-pointer transition">
-                        <Heart
-                            size={16}
-                            className={liked ? "fill-red-500 text-red-500" : ""}
-                        />
-                        {likes}
-                    </button>
+                {/* Creator */}
+                <p className="inline-flex items-center gap-1 text-xs text-gray-400">
+                    <User size={11} className="flex-shrink-0" />
+                    <span className="truncate">{itinerary.createdBy || "Anonymous"}</span>
+                </p>
 
-                    {/* Save */}
-                    <button
-                        onClick={handleSave}
-                        className="flex items-center gap-1 hover:scale-105 cursor-pointer transition">
-                        <Bookmark
-                            size={16}
-                            className={saved ? "fill-yellow-400 text-yellow-400" : ""}
-                        />
-                        {saves}
-                    </button>
+                {/* Divider + Actions */}
+                <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                    {/* Dates */}
+                    {itinerary.startDate && (
+                        <span className="text-[10px] text-gray-300 font-medium">
+                            {itinerary.startDate} — {itinerary.endDate}
+                        </span>
+                    )}
+
+                    {/* Like & Save */}
+                    <div className="flex items-center gap-3 ml-auto">
+                        <button
+                            onClick={handleLike}
+                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
+                            <Heart
+                                size={14}
+                                className={`transition-colors ${liked ? "fill-red-500 text-red-500" : ""}`}
+                            />
+                            <span className={liked ? "text-red-500" : ""}>{likes}</span>
+                        </button>
+
+                        <button
+                            onClick={handleSave}
+                            disabled={isOwner}
+                            className={`flex items-center gap-1 text-xs transition-colors
+                                ${
+                                    isOwner
+                                        ? "text-gray-200 cursor-default"
+                                        : "text-gray-400 hover:text-yellow-500 cursor-pointer"
+                                }`}>
+                            <Bookmark
+                                size={14}
+                                className={`transition-colors ${saved ? "fill-yellow-400 text-yellow-400" : ""}`}
+                            />
+                            <span className={saved ? "text-yellow-400" : ""}>
+                                {saves}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,9 +1,49 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
-import { Search, Trash, Pencil, Filter, Plus } from "lucide-react";
+import {
+    Search,
+    Trash,
+    Pencil,
+    Filter,
+    Plus,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    ChevronDown,
+    Globe,
+    Lock,
+    Tag,
+} from "lucide-react";
 import CreateItineraryOverlay from "@/components/CreateItineraryOverlay";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
+
+const SORT_OPTIONS = [
+    { value: "none", label: "No Filter" },
+    { value: "recent", label: "Most Recent" },
+    { value: "likes", label: "Most Liked" },
+    { value: "saves", label: "Most Saved" },
+];
+
+function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
+    return (
+        <div>
+            <p className="text-sm text-gray-700 mb-3">{message}</p>
+            <div className="flex gap-2">
+                <button
+                    onClick={onConfirm}
+                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                    {confirmLabel}
+                </button>
+                <button
+                    onClick={onCancel}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+}
 
 export default function ItineraryManagement() {
     const [itineraries, setItineraries] = useState([]);
@@ -14,81 +54,61 @@ export default function ItineraryManagement() {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [openCreate, setOpenCreate] = useState(false);
     const [openView, setOpenView] = useState(false);
-
     const [typeFilter, setTypeFilter] = useState("all");
     const [sortFilter, setSortFilter] = useState("none");
-
     const [openType, setOpenType] = useState(false);
     const [openSort, setOpenSort] = useState(false);
-
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    // Confirm delete itinerary
+    const sortRef = useRef(null);
+    const typeRef = useRef(null);
+
+    useEffect(() => {
+        const handler = e => {
+            if (sortRef.current && !sortRef.current.contains(e.target))
+                setOpenSort(false);
+            if (typeRef.current && !typeRef.current.contains(e.target))
+                setOpenType(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
     const confirmDelete = itineraryId => {
         toast(
             ({ closeToast }) => (
-                <div>
-                    <p className="mb-2">
-                        Are you sure you want to delete this itinerary? This action cannot
-                        be undone.
-                    </p>
-
-                    <div className="flex gap-2">
-                        <button
-                            className="bg-red-500 text-white px-3 py-1 rounded"
-                            onClick={() => {
-                                handleDelete(itineraryId);
-                                closeToast();
-                            }}>
-                            Delete
-                        </button>
-
-                        <button
-                            className="bg-gray-300 px-3 py-1 rounded"
-                            onClick={closeToast}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <ConfirmToast
+                    message="Delete this itinerary? This cannot be undone."
+                    confirmLabel="Delete"
+                    onConfirm={() => {
+                        handleDelete(itineraryId);
+                        closeToast();
+                    }}
+                    onCancel={closeToast}
+                />
             ),
             { autoClose: false },
         );
     };
 
-    // Confirm delete itinerary type
     const confirmDeleteType = typeId => {
         toast(
             ({ closeToast }) => (
-                <div>
-                    <p className="mb-2">
-                        Are you sure you want to delete this type? This action cannot be
-                        undone.
-                    </p>
-
-                    <div className="flex gap-2">
-                        <button
-                            className="bg-red-500 text-white px-3 py-1 rounded"
-                            onClick={() => {
-                                deleteType(typeId);
-                                closeToast();
-                            }}>
-                            Delete
-                        </button>
-
-                        <button
-                            className="bg-gray-300 px-3 py-1 rounded"
-                            onClick={closeToast}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <ConfirmToast
+                    message="Delete this itinerary type? This cannot be undone."
+                    confirmLabel="Delete"
+                    onConfirm={() => {
+                        deleteType(typeId);
+                        closeToast();
+                    }}
+                    onCancel={closeToast}
+                />
             ),
             { autoClose: false },
         );
     };
 
-    // Fetch itineraries
     const fetchItineraries = async () => {
         try {
             const res = await api.get("/admin/itineraries", {
@@ -101,7 +121,6 @@ export default function ItineraryManagement() {
                     sort: sortFilter,
                 },
             });
-
             setItineraries(res.data.content || []);
             setTotalPages(res.data.totalPages || 0);
         } catch (err) {
@@ -109,11 +128,9 @@ export default function ItineraryManagement() {
         }
     };
 
-    // Fetch itinerary types for management
     const fetchTypes = async () => {
         try {
             const res = await api.get("/admin/itineraries/types");
-
             setTypes(res.data);
         } catch (error) {
             console.log(error);
@@ -124,23 +141,18 @@ export default function ItineraryManagement() {
         fetchTypes();
     }, []);
 
-    // Add new type
     const addType = async () => {
         if (!newType.trim()) {
-            toast.error("Type cannot be empty");
+            toast.error("Type name cannot be empty");
             return;
         }
-
         if (types.some(t => t.name.toLowerCase() === newType.trim().toLowerCase())) {
             toast.error("Type already exists");
             return;
         }
-
         try {
             await api.post(`/admin/itineraries/types/${newType}`);
-
-            toast.success("Type added successfully");
-
+            toast.success("Type added.");
             setNewType("");
             fetchTypes();
         } catch (err) {
@@ -149,13 +161,10 @@ export default function ItineraryManagement() {
         }
     };
 
-    // Delete existing type
     const deleteType = async typeId => {
         try {
             await api.delete(`/admin/itineraries/types/${typeId}`);
-
-            toast.success("Type deleted successfully");
-
+            toast.success("Type deleted.");
             fetchTypes();
         } catch (err) {
             console.error(err);
@@ -163,45 +172,30 @@ export default function ItineraryManagement() {
         }
     };
 
-    // Get Itinerary Types for filter
     const itineraryTypes = useMemo(() => {
-        const types = itineraries.map(i => i.type).filter(Boolean);
-        return ["all", ...new Set(types)];
+        const t = itineraries.map(i => i.type).filter(Boolean);
+        return ["all", ...new Set(t)];
     }, [itineraries]);
 
-    // Debounced fetch
     useEffect(() => {
-        const delay = setTimeout(() => {
-            fetchItineraries();
-        }, 400);
-
+        const delay = setTimeout(() => fetchItineraries(), 400);
         return () => clearTimeout(delay);
     }, [search, filter, typeFilter, sortFilter, page]);
 
-    // Delete
     const handleDelete = async id => {
         try {
             await api.delete(`/admin/itineraries/${id}`);
-            setItineraries(prev => prev.filter(i => i.id !== id));
-            toast.success("Itinerary deleted successfully.");
+            setItineraries(prev => prev.filter(i => i.itineraryId !== id));
+            toast.success("Itinerary deleted.");
         } catch (error) {
             console.error(error);
             toast.error("Failed to delete itinerary.");
         }
     };
 
-    // Labels
-    const getSortLabel = () => {
-        if (sortFilter === "likes") return "Most Liked";
-        if (sortFilter === "saves") return "Most Saved";
-        if (sortFilter === "recent") return "Most Recent";
-        return "No Filter";
-    };
-
-    const getTypeLabel = () => {
-        if (typeFilter === "all") return "All Types";
-        return typeFilter;
-    };
+    const getSortLabel = () =>
+        SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
+    const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
 
     const handleItinerarySaved = updatedItinerary => {
         setItineraries(prev =>
@@ -213,7 +207,6 @@ export default function ItineraryManagement() {
 
     const handleEdit = (e, itinerary) => {
         e.stopPropagation();
-
         setSelectedItinerary(itinerary);
         setOpenView(false);
         setOpenCreate(true);
@@ -221,110 +214,115 @@ export default function ItineraryManagement() {
 
     const handleView = (e, itinerary) => {
         e.stopPropagation();
-
         setSelectedItinerary(itinerary);
         setOpenView(true);
         setOpenCreate(false);
     };
 
+    const sortActive = sortFilter !== "none";
+    const typeActive = typeFilter !== "all";
+    const visActive = filter !== "ALL";
+
     return (
         <div>
-            <h1 className="text-4xl font-bold mb-2 text-primary font-primary">
-                Itinerary Management
-            </h1>
-            <p className="text-gray-500 pb-6">Manage all itineraries on the platform</p>
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 font-primary tracking-tight mb-1">
+                    Itinerary Management
+                </h1>
+                <p className="text-sm text-gray-400">
+                    Manage all itineraries on the platform
+                </p>
+            </div>
 
-            {/* Search + Filters */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* Filters Row */}
+            <div className="flex flex-wrap gap-3 mb-5">
                 {/* Search */}
-                <div className="flex items-center gap-3 bg-card p-3 rounded-2xl shadow-md flex-1">
-                    <Search size={18} className="text-primary" />
+                <div className="flex-1 min-w-52 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                    <Search size={15} className="text-gray-400 flex-shrink-0" />
                     <input
                         type="text"
-                        placeholder="Search by title, place or creator..."
-                        className="w-full bg-transparent outline-none text-primary"
+                        placeholder="Search by title, place or creator…"
+                        className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                         value={search}
                         onChange={e => {
                             setPage(0);
                             setSearch(e.target.value);
                         }}
                     />
+                    {search && (
+                        <button
+                            onClick={() => setSearch("")}
+                            className="text-gray-300 hover:text-gray-500 cursor-pointer">
+                            <X size={14} />
+                        </button>
+                    )}
                 </div>
 
-                {/* Visibility Filter */}
-                <div className="flex items-center gap-1 bg-white p-3 rounded-2xl shadow-md hover:bg-secondary/10">
-                    <select
-                        value={filter}
-                        onChange={e => {
-                            setPage(0);
-                            setFilter(e.target.value);
-                        }}
-                        className="text-primary outline-none">
-                        <option value="ALL">All</option>
-                        <option value="PUBLIC">Public</option>
-                        <option value="PRIVATE">Private</option>
-                    </select>
-                    <Filter size={16} className="text-primary" />
+                {/* Visibility */}
+                <div className="relative">
+                    <div className="flex items-center gap-1.5">
+                        <select
+                            value={filter}
+                            onChange={e => {
+                                setPage(0);
+                                setFilter(e.target.value);
+                            }}
+                            className={`appearance-none pl-3 pr-7 py-2.5 text-sm font-medium border rounded-xl shadow-sm focus:outline-none transition-colors cursor-pointer
+                                ${visActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                            <option value="ALL">All</option>
+                            <option value="PUBLIC">Public</option>
+                            <option value="PRIVATE">Private</option>
+                        </select>
+                        <ChevronDown
+                            size={13}
+                            className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${visActive ? "text-white" : "text-gray-400"}`}
+                        />
+                    </div>
                 </div>
 
-                {/* Sort Filter */}
-                <div className="relative bg-white">
+                {/* Sort dropdown */}
+                <div ref={sortRef} className="relative">
                     <button
-                        onClick={() => setOpenSort(!openSort)}
-                        className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${getSortLabel() === "No Filter" ? "" : "bg-secondary/10"}`}>
-                        {getSortLabel()}
-                        <Filter size={16} />
+                        onClick={() => {
+                            setOpenSort(v => !v);
+                            setOpenType(false);
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
+                            ${sortActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                        <Filter size={13} /> {getSortLabel()}
                     </button>
-
                     {openSort && (
-                        <div className="absolute overflow-hidden right-0 mt-2 w-44 bg-white rounded-2xl shadow-lg z-10">
-                            <button
-                                onClick={() => {
-                                    setSortFilter("none");
-                                    setOpenSort(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                No Filter
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setSortFilter("recent");
-                                    setOpenSort(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                Most Recent
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setSortFilter("likes");
-                                    setOpenSort(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                Most Liked
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setSortFilter("saves");
-                                    setOpenSort(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                Most Saved
-                            </button>
+                        <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1">
+                            {SORT_OPTIONS.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                        setSortFilter(opt.value);
+                                        setOpenSort(false);
+                                    }}
+                                    className={`block w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer
+                                        ${sortFilter === opt.value ? "bg-gray-50 text-gray-900 font-medium" : "text-gray-600 hover:bg-gray-50"}`}>
+                                    {opt.label}
+                                </button>
+                            ))}
                         </div>
                     )}
                 </div>
 
-                {/* Type Filter */}
-                <div className="relative bg-white">
+                {/* Type dropdown */}
+                <div ref={typeRef} className="relative">
                     <button
-                        onClick={() => setOpenType(!openType)}
-                        className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${typeFilter === "all" ? "" : "bg-secondary/10"}`}>
-                        {getTypeLabel()}
-                        <Filter size={16} />
+                        onClick={() => {
+                            setOpenType(v => !v);
+                            setOpenSort(false);
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
+                            ${typeActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                        <Filter size={13} /> {getTypeLabel()}
                     </button>
-
                     {openType && (
-                        <div className="absolute overflow-hidden right-0 mt-2 w-44 bg-white rounded-2xl shadow-lg z-10 max-h-60 overflow-y-auto">
+                        <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1 max-h-56 overflow-y-auto">
                             {itineraryTypes.map(type => (
                                 <button
                                     key={type}
@@ -332,7 +330,8 @@ export default function ItineraryManagement() {
                                         setTypeFilter(type);
                                         setOpenType(false);
                                     }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10 capitalize">
+                                    className={`block w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer
+                                        ${typeFilter === type ? "bg-gray-50 text-gray-900 font-medium" : "text-gray-600 hover:bg-gray-50"}`}>
                                     {type === "all" ? "All Types" : type}
                                 </button>
                             ))}
@@ -342,59 +341,83 @@ export default function ItineraryManagement() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden mb-5">
                 <table className="w-full text-sm">
-                    {/* Column Names */}
-                    <thead className="text-white items-center bg-primary font-primary">
-                        <tr>
-                            <th className="p-4">Title</th>
-                            <th>Location</th>
-                            <th>Creator</th>
-                            <th>Type</th>
-                            <th>Visibility</th>
-                            <th>Created</th>
-                            <th>Likes</th>
-                            <th>Saves</th>
-                            <th className="text-right pr-6">Actions</th>
+                    <thead>
+                        <tr className="border-b border-gray-100 text-left">
+                            {[
+                                "Title",
+                                "Location",
+                                "Creator",
+                                "Type",
+                                "Visibility",
+                                "Created",
+                                "Likes",
+                                "Saves",
+                                "Actions",
+                            ].map(h => (
+                                <th
+                                    key={h}
+                                    className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${h === "Actions" ? "text-right" : ""}`}>
+                                    {h}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
-
-                    {/* Table Data */}
-                    <tbody className="text-center">
+                    <tbody>
                         {itineraries.map(item => (
                             <tr
                                 key={item.itineraryId}
-                                className="border-b border-primary/20 hover:bg-secondary/10">
-                                <td
-                                    onClick={e => handleView(e, item)}
-                                    className="p-4 text-primary font-medium cursor-pointer">
-                                    {item.title}
+                                className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                                {/* Title */}
+                                <td className="px-4 py-3">
+                                    <button
+                                        onClick={e => handleView(e, item)}
+                                        className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
+                                        {item.title}
+                                    </button>
                                 </td>
 
-                                <td className="text-primary">{item.place}</td>
+                                {/* Place */}
+                                <td className="px-4 py-3 text-sm text-gray-500">
+                                    {item.place}
+                                </td>
 
-                                <td className="text-primary capitalize">
+                                {/* Creator */}
+                                <td className="px-4 py-3 text-sm text-gray-600 capitalize">
                                     {item.createdBy}
                                 </td>
 
-                                <td>
-                                    <span className="text-secondary bg-secondary/20 px-2 py-1 rounded-2xl">
-                                        {item.type || "-"}
+                                {/* Type */}
+                                <td className="px-4 py-3">
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
+                                        <Tag size={9} /> {item.type || "—"}
                                     </span>
                                 </td>
 
-                                <td>
+                                {/* Visibility */}
+                                <td className="px-4 py-3">
                                     <span
-                                        className={`px-2 py-1 rounded-2xl ${
+                                        className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
+                                        ${
                                             item.public
-                                                ? "bg-green-100 text-green-500"
-                                                : "bg-red-100 text-red-500"
+                                                ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                                                : "bg-red-50 border-red-200 text-red-500"
                                         }`}>
-                                        {item.public ? "Public" : "Private"}
+                                        {item.public ? (
+                                            <>
+                                                <Globe size={9} /> Public
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Lock size={9} /> Private
+                                            </>
+                                        )}
                                     </span>
                                 </td>
 
-                                <td className="text-primary">
+                                {/* Date */}
+                                <td className="px-4 py-3 text-sm text-gray-400">
                                     {new Date(item.createdAt).toLocaleDateString(
                                         "en-GB",
                                         {
@@ -405,95 +428,121 @@ export default function ItineraryManagement() {
                                     )}
                                 </td>
 
-                                <td>{item.likeCount}</td>
+                                {/* Likes */}
+                                <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                    {item.likeCount}
+                                </td>
 
-                                <td>{item.saveCount}</td>
+                                {/* Saves */}
+                                <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                    {item.saveCount}
+                                </td>
 
-                                <td>
-                                    <button
-                                        onClick={e => handleEdit(e, item)}
-                                        className="text-blue-500 rounded-full bg-white p-1 mr-2 cursor-pointer hover:scale-110 hover:shadow-md">
-                                        <Pencil size={18} />
-                                    </button>
-                                    <button
-                                        onClick={e => {
-                                            confirmDelete(item.itineraryId);
-                                        }}
-                                        className="text-red-500 rounded-full bg-white p-1 cursor-pointer hover:scale-110 hover:shadow-md">
-                                        <Trash size={18} />
-                                    </button>
+                                {/* Actions */}
+                                <td className="px-4 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1">
+                                        <button
+                                            onClick={e => handleEdit(e, item)}
+                                            className="w-7 h-7 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+                                            <Pencil size={13} />
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                confirmDelete(item.itineraryId)
+                                            }
+                                            className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
+                                            <Trash size={13} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                {itineraries.length === 0 && (
+                    <div className="py-16 text-center text-sm text-gray-400">
+                        No itineraries found.
+                    </div>
+                )}
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center gap-3 mt-6">
+            <div className="flex items-center justify-center gap-3 mb-12">
                 <button
                     disabled={page === 0}
                     onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1 bg-card rounded disabled:opacity-50">
-                    Prev
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                    <ChevronLeft size={15} />
                 </button>
-
-                <span className="px-3 py-1 text-primary">
-                    {page + 1} / {totalPages}
+                <span className="text-sm text-gray-500">
+                    Page <span className="font-semibold text-gray-900">{page + 1}</span>{" "}
+                    of {totalPages}
                 </span>
-
                 <button
-                    disabled={page === totalPages - 1}
+                    disabled={page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1 bg-card rounded disabled:opacity-50">
-                    Next
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                    <ChevronRight size={15} />
                 </button>
             </div>
 
-            {/* Itinerary Type Management */}
-            <div>
-                <h1 className="text-4xl font-bold mb-2 text-primary font-primary mt-20 pt-10 border-t-2 border-primary/20">
-                    Itinerary Type Management
-                </h1>
-                <p className="text-gray-500 pb-6">
-                    Manage all itinerary types on the platform
-                </p>
-
-                <div className="grid grid-cols-6 gap-y-4 gap-x-3">
-                    {types.map(type => (
-                        <div
-                            key={type.typeId}
-                            className="flex gap-3 items-center justify-between rounded-2xl shadow-md p-3 bg-gray-50">
-                            <div className="text-center text-primary text-md">
-                                {type.name}
-                            </div>
-                            <Trash
-                                size={16}
-                                className="text-red-500 cursor-pointer hover:scale-110"
-                                onClick={e => {
-                                    confirmDeleteType(type.typeId);
-                                }}
-                            />
-                        </div>
-                    ))}
+            {/* Type Management */}
+            <div className="border-t border-gray-100 pt-10">
+                <div className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-900 font-primary tracking-tight mb-1">
+                        Itinerary Types
+                    </h2>
+                    <p className="text-sm text-gray-400">
+                        Add or remove itinerary categories
+                    </p>
                 </div>
-                <div className="text-center text-md rounded-2xl shadow-md flex items-center justify-center gap-3 w-fit mt-6 pr-3 overflow-hidden">
-                    <span className="bg-primary text-white p-3">Add new type</span>
-                    <input
-                        type="text"
-                        value={newType}
-                        placeholder="New type name..."
-                        className="bg-transparent outline-none text-primary"
-                        onChange={e => setNewType(e.target.value)}
-                        onKeyDown={e => {
-                            if (e.key === "Enter") addType();
-                        }}
-                    />
-                    <Plus
-                        size={20}
-                        className="hover:scale-110 cursor-pointer text-primary"
+
+                {/* Type chips */}
+                <div className="flex flex-wrap gap-2 mb-5">
+                    {[...types]
+                        .sort((a, b) =>
+                            a.name
+                                .trim()
+                                .toLowerCase()
+                                .localeCompare(b.name.trim().toLowerCase(), undefined, {
+                                    sensitivity: "base",
+                                }),
+                        )
+                        .map(type => (
+                            <div
+                                key={type.typeId}
+                                className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors">
+                                <Tag size={12} className="text-gray-400" />
+                                {type.name}
+                                <button
+                                    onClick={() => confirmDeleteType(type.typeId)}
+                                    className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
+                                    <X size={12} />
+                                </button>
+                            </div>
+                        ))}
+                </div>
+
+                {/* Add type input */}
+                <div className="flex items-center gap-2 max-w-sm">
+                    <div className="flex-1 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                        <Tag size={14} className="text-gray-300 flex-shrink-0" />
+                        <input
+                            type="text"
+                            value={newType}
+                            placeholder="New type name…"
+                            className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
+                            onChange={e => setNewType(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === "Enter") addType();
+                            }}
+                        />
+                    </div>
+                    <button
                         onClick={addType}
-                    />
+                        className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0">
+                        <Plus size={14} /> Add
+                    </button>
                 </div>
             </div>
 

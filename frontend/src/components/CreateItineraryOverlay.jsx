@@ -1,7 +1,40 @@
 import { useState, useEffect } from "react";
-import { X, Plus, Trash, Upload } from "lucide-react";
+import {
+    X,
+    Plus,
+    Trash,
+    Upload,
+    Globe,
+    Lock,
+    MapPin,
+    Calendar,
+    FileText,
+    Users,
+    ImageIcon,
+    ChevronDown,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
+
+function SectionLabel({ children }) {
+    return (
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+            {children}
+        </p>
+    );
+}
+
+function FieldLabel({ children, required }) {
+    return (
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            {children}
+            {required && <span className="text-red-400 ml-0.5">*</span>}
+        </label>
+    );
+}
+
+const inputClass =
+    "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors";
 
 export default function CreateItineraryOverlay({
     open,
@@ -30,6 +63,7 @@ export default function CreateItineraryOverlay({
     const [members, setMembers] = useState([]);
     const [memberSearch, setMemberSearch] = useState("");
     const [types, setTypes] = useState([]);
+    const [saving, setSaving] = useState(false);
 
     const [deletedDays, setDeletedDays] = useState([]);
     const [deletedLocations, setDeletedLocations] = useState([]);
@@ -37,15 +71,13 @@ export default function CreateItineraryOverlay({
 
     useEffect(() => {
         if (!open) return;
-
         const loadData = async () => {
             try {
-                const typeRes = await api.get("/users/itineraries/types");
+                const [typeRes, followingRes] = await Promise.all([
+                    api.get("/users/itineraries/types"),
+                    api.get(`/users/community/${user.userId}/following`),
+                ]);
                 setTypes(typeRes.data);
-
-                const followingRes = await api.get(
-                    `/users/community/${user.userId}/following`,
-                );
                 setFollowingList(followingRes.data);
 
                 if (isEditMode && existingItinerary) {
@@ -71,14 +103,12 @@ export default function CreateItineraryOverlay({
                         const locRes = await api.get(
                             `/itineraries/days/${day.dayId}/locations`,
                         );
-
                         const loadedLocations = [];
 
                         for (let loc of locRes.data) {
                             const imgRes = await api.get(
                                 `/itineraries/days/locations/${loc.locationId}/images`,
                             );
-
                             loadedLocations.push({
                                 ...loc,
                                 name: loc.locationName || "",
@@ -91,10 +121,7 @@ export default function CreateItineraryOverlay({
                             });
                         }
 
-                        loadedDays.push({
-                            ...day,
-                            locations: loadedLocations,
-                        });
+                        loadedDays.push({ ...day, locations: loadedLocations });
                     }
 
                     setDays(loadedDays);
@@ -105,7 +132,6 @@ export default function CreateItineraryOverlay({
                 console.error(err);
             }
         };
-
         loadData();
     }, [open, existingItinerary]);
 
@@ -129,16 +155,14 @@ export default function CreateItineraryOverlay({
 
     if (!open) return null;
 
-    // Create/Update logic
     const createOrUpdateItinerary = async () => {
         if (!title || !place || !type || !startDate || !endDate) {
-            toast.error("Please fill all required fields!");
+            toast.error("Please fill all required fields.");
             return;
         }
-
+        setSaving(true);
         try {
             let response;
-
             if (isEditMode && isCreator) {
                 response = await api.put(`/itineraries/${itineraryId}`, {
                     title,
@@ -163,33 +187,23 @@ export default function CreateItineraryOverlay({
             }
 
             const id = response?.data?.itineraryId || itineraryId;
-
             if (onSaved) onSaved(response.data);
 
-            // Delete
-            for (let imageId of deletedImages) {
+            for (let imageId of deletedImages)
                 await api.delete(`/itineraries/days/locations/images/${imageId}`);
-            }
-
-            for (let locationId of deletedLocations) {
+            for (let locationId of deletedLocations)
                 await api.delete(`/itineraries/days/locations/${locationId}`);
-            }
-
-            for (let dayId of deletedDays) {
+            for (let dayId of deletedDays)
                 await api.delete(`/itineraries/${id}/days/${dayId}`);
-            }
 
-            // Thumbnail
             if (thumbnailFile) {
                 const formData = new FormData();
                 formData.append("file", thumbnailFile);
                 await api.post(`/itineraries/${id}/thumbnail`, formData);
             }
 
-            // Days & Locations
             for (let day of days) {
                 let dayId = day.dayId;
-
                 if (!dayId) {
                     const dayRes = await api.post(`/itineraries/${id}/days`, {
                         description: day.description,
@@ -203,7 +217,6 @@ export default function CreateItineraryOverlay({
 
                 for (let loc of day.locations) {
                     let locationId = loc.locationId;
-
                     if (!locationId) {
                         const locRes = await api.post(
                             `/itineraries/days/${dayId}/locations`,
@@ -223,7 +236,6 @@ export default function CreateItineraryOverlay({
                         );
                     }
 
-                    // Images
                     for (let image of loc.images) {
                         if (image.isNew && image.file) {
                             const imgForm = new FormData();
@@ -237,48 +249,36 @@ export default function CreateItineraryOverlay({
                 }
             }
 
-            // Members
             const existingMembers = existingItinerary?.members || [];
-
-            for (let m of existingMembers) {
-                if (!members.find(sel => sel.userId === m.userId)) {
+            for (let m of existingMembers)
+                if (!members.find(sel => sel.userId === m.userId))
                     await api.delete(`/itineraries/members/${id}/${m.userId}`);
-                }
-            }
-
-            for (let m of members) {
-                if (!existingMembers.find(em => em.userId === m.userId)) {
+            for (let m of members)
+                if (!existingMembers.find(em => em.userId === m.userId))
                     await api.post(`/itineraries/members/${id}/${m.userId}`);
-                }
-            }
 
-            toast.success(isEditMode ? "Itinerary Updated!" : "Itinerary Created!");
-
+            toast.success(isEditMode ? "Itinerary updated!" : "Itinerary created!");
             setDeletedDays([]);
             setDeletedLocations([]);
             setDeletedImages([]);
-
             onClose();
         } catch (err) {
             console.error(err);
             toast.error("Something went wrong. Please try again.");
+        } finally {
+            setSaving(false);
         }
     };
 
-    // Remove functions
     const removeDay = index => {
         const day = days[index];
         if (day.dayId) setDeletedDays(prev => [...prev, day.dayId]);
-
-        const updated = [...days];
-        updated.splice(index, 1);
-        setDays(updated);
+        setDays(prev => prev.filter((_, i) => i !== index));
     };
 
     const removeLocation = (dayIndex, locIndex) => {
         const loc = days[dayIndex].locations[locIndex];
         if (loc.locationId) setDeletedLocations(prev => [...prev, loc.locationId]);
-
         const updated = [...days];
         updated[dayIndex].locations.splice(locIndex, 1);
         setDays(updated);
@@ -287,14 +287,11 @@ export default function CreateItineraryOverlay({
     const removeImage = (dayIndex, locIndex, imgIndex) => {
         const updated = [...days];
         const img = updated[dayIndex].locations[locIndex].images[imgIndex];
-
         if (!img.isNew && img.imageId) setDeletedImages(prev => [...prev, img.imageId]);
-
         updated[dayIndex].locations[locIndex].images.splice(imgIndex, 1);
         setDays(updated);
     };
 
-    // Search logic to add members
     const filteredMembers =
         memberSearch.trim().length === 0
             ? []
@@ -305,174 +302,205 @@ export default function CreateItineraryOverlay({
               );
 
     return (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-start p-6 z-50 overflow-y-auto">
-            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl ml-64">
+        <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-end z-50"
+            onClick={onClose}>
+            <div
+                className="bg-white w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden"
+                onClick={e => e.stopPropagation()}>
                 {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b bg-primary text-white rounded-t-2xl">
-                    <h2 className="text-2xl font-semibold font-primary">
-                        {isEditMode ? "Update Itinerary" : "Create Itinerary"}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+                    <h2 className="text-base font-semibold text-gray-900 font-primary">
+                        {isEditMode ? "Edit Itinerary" : "New Itinerary"}
                     </h2>
-                    <X onClick={onClose} className="cursor-pointer" />
+                    <button
+                        onClick={onClose}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+                        <X size={16} />
+                    </button>
                 </div>
 
-                <div className="p-8 space-y-6">
-                    <div className="p-8 space-y-8">
-                        {/* Thumbnail */}
-                        <div>
-                            <h3 className="font-semibold font-primary text-xl mb-2">
-                                Thumbnail
-                            </h3>
-
-                            <label className="flex items-center gap-2 cursor-pointer w-fit bg-primary/10 p-3 rounded-2xl shadow-sm hover:shadow-md">
-                                <Upload size={16} />
-                                {thumbnailFile
-                                    ? `Selected: ${thumbnailFile.name}`
-                                    : "Upload Thumbnail"}
-
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={e => {
-                                        const file = e.target.files[0];
-                                        if (!file) return;
-                                        setThumbnailFile(file);
-                                        setThumbnailPreview(URL.createObjectURL(file));
-                                    }}
-                                />
-                            </label>
-
-                            {/* Existing thumbnail (Edit mode) */}
-                            {isEditMode &&
-                                !thumbnailPreview &&
-                                existingItinerary?.thumbnailUrl && (
-                                    <img
-                                        src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`}
-                                        className="w-40 mt-4 rounded-xl"
-                                    />
-                                )}
-
-                            {/* New preview */}
-                            {thumbnailPreview && (
+                {/* Scrollable Body */}
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+                    {/* Thumbnail */}
+                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden">
+                        {(thumbnailPreview || (isEditMode && existingItinerary)) && (
+                            <div className="relative h-36 w-full">
                                 <img
-                                    src={thumbnailPreview}
-                                    className="w-40 mt-4 rounded-xl"
+                                    src={
+                                        thumbnailPreview ||
+                                        `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`
+                                    }
+                                    alt="thumbnail"
+                                    className="w-full h-full object-cover"
                                 />
-                            )}
-                        </div>
+                                <div className="absolute inset-0 bg-black/20" />
+                            </div>
+                        )}
+                        <label className="flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors">
+                            <Upload size={14} className="text-gray-400" />
+                            <span className="text-sm text-gray-500">
+                                {thumbnailFile ? thumbnailFile.name : "Upload thumbnail"}
+                            </span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={e => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    setThumbnailFile(file);
+                                    setThumbnailPreview(URL.createObjectURL(file));
+                                }}
+                            />
+                        </label>
+                    </div>
 
-                        {/* Basic Info */}
+                    {/* Basic Info */}
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
+                        <SectionLabel>Basic Info</SectionLabel>
+
                         <div>
-                            <label className="font-semibold font-primary text-xl">
-                                Title
-                            </label>
+                            <FieldLabel required>Title</FieldLabel>
                             <input
                                 value={title}
-                                placeholder="Itinerary Title"
                                 onChange={e => setTitle(e.target.value)}
-                                className="w-full border p-3 rounded-xl"
+                                placeholder="e.g. Summer in Tokyo"
+                                className={inputClass}
                             />
                         </div>
 
                         <div>
-                            <label className="font-semibold font-primary text-xl">
-                                Place
-                            </label>
-                            <input
-                                value={place}
-                                placeholder="Itinerary Place"
-                                onChange={e => setPlace(e.target.value)}
-                                className="w-full border p-3 rounded-xl"
-                            />
+                            <FieldLabel required>Place</FieldLabel>
+                            <div className="relative">
+                                <MapPin
+                                    size={14}
+                                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
+                                />
+                                <input
+                                    value={place}
+                                    onChange={e => setPlace(e.target.value)}
+                                    placeholder="City, Country"
+                                    className={`${inputClass} pl-9`}
+                                />
+                            </div>
                         </div>
 
                         <div>
-                            <label className="font-semibold font-primary text-xl">
-                                Type
-                            </label>
-                            <select
-                                value={type}
-                                onChange={e => setType(e.target.value)}
-                                className="w-full border p-3 rounded-xl">
-                                <option value="">Select Type</option>
-                                {types.map(t => (
-                                    <option key={t.typeId} value={t.name}>
-                                        {t.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <FieldLabel required>Type</FieldLabel>
+                            <div className="relative">
+                                <select
+                                    value={type}
+                                    onChange={e => setType(e.target.value)}
+                                    className={`${inputClass} appearance-none pr-8`}>
+                                    <option value="">Select a type</option>
+                                    {[...types]
+                                        .sort((a, b) =>
+                                            a.name
+                                                .trim()
+                                                .toLowerCase()
+                                                .localeCompare(
+                                                    b.name.trim().toLowerCase(),
+                                                    undefined,
+                                                    {
+                                                        sensitivity: "base",
+                                                    },
+                                                ),
+                                        )
+                                        .map(t => (
+                                            <option key={t.typeId} value={t.name}>
+                                                {t.name}
+                                            </option>
+                                        ))}
+                                </select>
+                                <ChevronDown
+                                    size={14}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <label className="font-semibold font-primary text-xl">
-                                    Start Date
-                                </label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <FieldLabel required>Start Date</FieldLabel>
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={e => setStartDate(e.target.value)}
-                                    className="w-full border p-3 rounded-xl"
+                                    className={inputClass}
                                 />
                             </div>
-
-                            <div className="flex-1">
-                                <label className="font-semibold font-primary text-xl">
-                                    End Date
-                                </label>
+                            <div>
+                                <FieldLabel required>End Date</FieldLabel>
                                 <input
                                     type="date"
                                     value={endDate}
                                     onChange={e => setEndDate(e.target.value)}
-                                    className="w-full border p-3 rounded-xl"
+                                    className={inputClass}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="font-semibold font-primary text-xl">
-                                Description
-                            </label>
+                            <FieldLabel>Description</FieldLabel>
                             <textarea
                                 value={description}
-                                placeholder="Itinerary Description"
+                                rows={3}
+                                placeholder="What's this trip about?"
                                 onChange={e => setDescription(e.target.value)}
-                                className="w-full border p-3 rounded-xl"
+                                className={`${inputClass} resize-none`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Members */}
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                        <SectionLabel>Members</SectionLabel>
+
+                        <div className="relative">
+                            <Users
+                                size={14}
+                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
+                            />
+                            <input
+                                placeholder="Search people you follow…"
+                                value={memberSearch}
+                                onChange={e => setMemberSearch(e.target.value)}
+                                className={`${inputClass} pl-9`}
                             />
                         </div>
 
-                        {/* Members */}
-                        <div>
-                            <label className="font-semibold font-primary text-xl">
-                                Add Members
-                            </label>
-
-                            <input
-                                placeholder="Search following..."
-                                value={memberSearch}
-                                onChange={e => setMemberSearch(e.target.value)}
-                                className="w-full border p-3 rounded-xl"
-                            />
-
-                            {memberSearch.trim().length > 0 &&
-                                filteredMembers.map(member => (
-                                    <div
+                        {filteredMembers.length > 0 && (
+                            <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden">
+                                {filteredMembers.map(member => (
+                                    <button
                                         key={member.userId}
-                                        onClick={() => setMembers([...members, member])}
-                                        className="cursor-pointer hover:bg-gray-100 p-2">
+                                        onClick={() => {
+                                            setMembers([...members, member]);
+                                            setMemberSearch("");
+                                        }}
+                                        className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left">
+                                        <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                                            <img
+                                                src={`${import.meta.env.VITE_API_BASE_URL}/users/${member.userId}/profilePicture`}
+                                                alt={member.username}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
                                         {member.username}
-                                    </div>
+                                    </button>
                                 ))}
+                            </div>
+                        )}
 
+                        {members.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3">
                                 {members.map(member => (
-                                    <div
+                                    <span
                                         key={member.userId}
-                                        className="flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">
-                                        <span>{member.username}</span>
-                                        <X
-                                            size={14}
-                                            className="cursor-pointer"
+                                        className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                        {member.username}
+                                        <button
                                             onClick={() =>
                                                 setMembers(
                                                     members.filter(
@@ -480,181 +508,240 @@ export default function CreateItineraryOverlay({
                                                     ),
                                                 )
                                             }
-                                        />
-                                    </div>
+                                            className="text-gray-400 hover:text-gray-700 cursor-pointer">
+                                            <X size={11} />
+                                        </button>
+                                    </span>
                                 ))}
                             </div>
-                        </div>
+                        )}
+                    </div>
 
-                        {/* Days */}
-                        <div>
+                    {/* Days */}
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <SectionLabel>Itinerary Days</SectionLabel>
                             <button
                                 onClick={() =>
                                     setDays([...days, { description: "", locations: [] }])
                                 }
-                                className="text-primary font-primary hover:bg-gray-100 p-2 rounded-full flex items-center gap-2 text-xl font-semibold">
-                                <Plus size={16} /> Add Day
+                                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                                <Plus size={12} /> Add Day
                             </button>
+                        </div>
 
+                        <div className="space-y-3">
                             {days.map((day, dayIndex) => (
                                 <div
                                     key={day.dayId ?? `day-${dayIndex}`}
-                                    className="border p-6 rounded-xl mt-4 space-y-4">
-                                    {/* Day Description */}
-                                    <div className="flex justify-between">
+                                    className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                                    {/* Day header */}
+                                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
+                                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                                            Day {dayIndex + 1}
+                                        </span>
+                                        <button
+                                            onClick={() => removeDay(dayIndex)}
+                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer">
+                                            <Trash size={12} />
+                                        </button>
+                                    </div>
+
+                                    <div className="p-4 space-y-3">
                                         <textarea
                                             value={day.description}
-                                            placeholder="Day Description"
+                                            placeholder="Notes for this day…"
+                                            rows={2}
                                             onChange={e => {
                                                 const updated = [...days];
                                                 updated[dayIndex].description =
                                                     e.target.value;
                                                 setDays(updated);
                                             }}
-                                            className="w-full border p-2 rounded-lg"
+                                            className={`${inputClass} resize-none`}
                                         />
-                                        <Trash
-                                            className="ml-3 hover:scale-110 cursor-pointer text-red-500"
-                                            onClick={() => removeDay(dayIndex)}
-                                        />
-                                    </div>
 
-                                    {/* Add Location */}
-                                    <button
-                                        onClick={() => {
-                                            const updated = [...days];
-                                            updated[dayIndex].locations.push({
-                                                name: "",
-                                                address: "",
-                                                images: [],
-                                                newImages: [],
-                                            });
-                                            setDays(updated);
-                                        }}
-                                        className="text-m font-primary text-primary hover:bg-gray-100 rounded-full p-2 font-semibold">
-                                        + Add Location
-                                    </button>
-
-                                    {/* Locations */}
-                                    {day.locations?.map((loc, locIndex) => (
-                                        <div
-                                            key={loc.locationId ?? `location-${locIndex}`}
-                                            className="border p-4 rounded-lg space-y-3">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    placeholder="Location Name"
-                                                    value={loc.name || ""}
-                                                    onChange={e => {
-                                                        const updated = [...days];
-                                                        updated[dayIndex].locations[
-                                                            locIndex
-                                                        ].name = e.target.value;
-                                                        setDays(updated);
-                                                    }}
-                                                    className="border p-2 w-full rounded flex-6"
-                                                />
-
-                                                <input
-                                                    placeholder="Address"
-                                                    value={loc.address || ""}
-                                                    onChange={e => {
-                                                        const updated = [...days];
-                                                        updated[dayIndex].locations[
-                                                            locIndex
-                                                        ].address = e.target.value;
-                                                        setDays(updated);
-                                                    }}
-                                                    className="border p-2 w-full rounded flex-6"
-                                                />
-
-                                                <Trash
-                                                    className="cursor-pointer text-red-500 flex-1 hover:scale-110"
-                                                    onClick={() =>
-                                                        removeLocation(dayIndex, locIndex)
+                                        {/* Locations */}
+                                        <div className="space-y-2">
+                                            {day.locations?.map((loc, locIndex) => (
+                                                <div
+                                                    key={
+                                                        loc.locationId ??
+                                                        `loc-${locIndex}`
                                                     }
-                                                />
-                                            </div>
-
-                                            {/* Images Preview */}
-                                            <div className="flex gap-3 flex-wrap">
-                                                {loc.images?.map((img, imgIndex) => (
-                                                    <div
-                                                        key={
-                                                            img.imageId ??
-                                                            `new-${imgIndex}`
-                                                        }
-                                                        className="relative">
-                                                        <img
-                                                            src={
-                                                                img.isNew
-                                                                    ? URL.createObjectURL(
-                                                                          img.file,
-                                                                      )
-                                                                    : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
-                                                            }
-                                                            className="w-20 h-20 object-cover rounded"
-                                                            alt=""
+                                                    className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                                                            {locIndex + 1}
+                                                        </span>
+                                                        <input
+                                                            placeholder="Location name"
+                                                            value={loc.name || ""}
+                                                            onChange={e => {
+                                                                const updated = [...days];
+                                                                updated[
+                                                                    dayIndex
+                                                                ].locations[
+                                                                    locIndex
+                                                                ].name = e.target.value;
+                                                                setDays(updated);
+                                                            }}
+                                                            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
                                                         />
-                                                        <Trash
-                                                            size={22}
-                                                            className="absolute top-1 right-1 text-red-500 bg-white p-1 rounded-full cursor-pointer hover:scale-110"
+                                                        <input
+                                                            placeholder="Address"
+                                                            value={loc.address || ""}
+                                                            onChange={e => {
+                                                                const updated = [...days];
+                                                                updated[
+                                                                    dayIndex
+                                                                ].locations[
+                                                                    locIndex
+                                                                ].address =
+                                                                    e.target.value;
+                                                                setDays(updated);
+                                                            }}
+                                                            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
+                                                        />
+                                                        <button
                                                             onClick={() =>
-                                                                removeImage(
+                                                                removeLocation(
                                                                     dayIndex,
                                                                     locIndex,
-                                                                    imgIndex,
                                                                 )
                                                             }
-                                                        />
+                                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer">
+                                                            <Trash size={11} />
+                                                        </button>
                                                     </div>
-                                                ))}
-                                            </div>
 
-                                            {/* Add Image One By One */}
-                                            <label className="flex items-center gap-2 cursor-pointer w-fit bg-primary/10 p-3 rounded-2xl shadow-sm hover:shadow-md">
-                                                <Upload size={16} />
-                                                Upload Image
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                    onChange={e => {
-                                                        const file = e.target.files[0];
-                                                        if (!file) return;
+                                                    {/* Image previews */}
+                                                    {loc.images?.length > 0 && (
+                                                        <div className="flex gap-2 flex-wrap pt-1">
+                                                            {loc.images.map(
+                                                                (img, imgIndex) => (
+                                                                    <div
+                                                                        key={
+                                                                            img.imageId ??
+                                                                            `new-${imgIndex}`
+                                                                        }
+                                                                        className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group">
+                                                                        <img
+                                                                            src={
+                                                                                img.isNew
+                                                                                    ? URL.createObjectURL(
+                                                                                          img.file,
+                                                                                      )
+                                                                                    : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
+                                                                            }
+                                                                            alt=""
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                removeImage(
+                                                                                    dayIndex,
+                                                                                    locIndex,
+                                                                                    imgIndex,
+                                                                                )
+                                                                            }
+                                                                            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                                            <Trash
+                                                                                size={12}
+                                                                                className="text-white"
+                                                                            />
+                                                                        </button>
+                                                                    </div>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    )}
 
-                                                        const updated = [...days];
-                                                        updated[dayIndex].locations[
-                                                            locIndex
-                                                        ].images.push({
-                                                            isNew: true,
-                                                            file: file,
-                                                        });
-                                                        setDays(updated);
-
-                                                        e.target.value = "";
-                                                    }}
-                                                />
-                                            </label>
+                                                    {/* Upload image */}
+                                                    <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer transition-colors">
+                                                        <ImageIcon size={12} />
+                                                        Add photo
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={e => {
+                                                                const file =
+                                                                    e.target.files[0];
+                                                                if (!file) return;
+                                                                const updated = [...days];
+                                                                updated[
+                                                                    dayIndex
+                                                                ].locations[
+                                                                    locIndex
+                                                                ].images.push({
+                                                                    isNew: true,
+                                                                    file,
+                                                                });
+                                                                setDays(updated);
+                                                                e.target.value = "";
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
+
+                                        <button
+                                            onClick={() => {
+                                                const updated = [...days];
+                                                updated[dayIndex].locations.push({
+                                                    name: "",
+                                                    address: "",
+                                                    images: [],
+                                                });
+                                                setDays(updated);
+                                            }}
+                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1">
+                                            <Plus size={11} /> Add location
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                <div className="p-6 border-t flex justify-end gap-4">
+                {/* Footer */}
+                <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white">
+                    {/* Visibility toggle */}
                     <button
                         onClick={() => setIsPublic(!isPublic)}
-                        className={`border-2 p-2 rounded-full text-m hover:bg-gray-100 ${isPublic ? "border-red-500 text-red-500" : "border-green-500 text-green-500"}`}>
-                        {isPublic ? "Set Private" : "Set Public"}
+                        className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-xl border transition-colors cursor-pointer
+                            ${
+                                isPublic
+                                    ? "bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100"
+                                    : "bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200"
+                            }`}>
+                        {isPublic ? (
+                            <>
+                                <Globe size={12} /> Public
+                            </>
+                        ) : (
+                            <>
+                                <Lock size={12} /> Private
+                            </>
+                        )}
                     </button>
 
-                    <button
-                        onClick={createOrUpdateItinerary}
-                        className="bg-primary/90 hover:bg-primary text-white px-8 py-3 rounded-full">
-                        {isEditMode ? "Update" : "Save"}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer">
+                            Cancel
+                        </button>
+                        <button
+                            onClick={createOrUpdateItinerary}
+                            disabled={saving}
+                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50">
+                            {saving ? "Saving…" : isEditMode ? "Update" : "Create"}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

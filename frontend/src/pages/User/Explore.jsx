@@ -1,8 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
-import { Filter, Search } from "lucide-react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
 import ItineraryCard from "@/components/ItineraryCard";
 import ItineraryOverlay from "@/components/ItineraryOverlay";
 import api from "@/api/axiosConfig";
+
+const SORT_OPTIONS = [
+    { value: "recent", label: "Most Recent" },
+    { value: "likes", label: "Most Liked" },
+    { value: "saves", label: "Most Saved" },
+    { value: "random", label: "No Filter" },
+];
 
 export default function Explore() {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
@@ -10,17 +17,28 @@ export default function Explore() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
-
     const [sortFilter, setSortFilter] = useState("random");
     const [typeFilter, setTypeFilter] = useState("all");
-
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
-
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Fetching itineraries
+    const sortRef = useRef(null);
+    const typeRef = useRef(null);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handler = e => {
+            if (sortRef.current && !sortRef.current.contains(e.target))
+                setOpenSort(false);
+            if (typeRef.current && !typeRef.current.contains(e.target))
+                setOpenType(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
     const fetchItineraries = async () => {
         setLoading(true);
         try {
@@ -33,7 +51,6 @@ export default function Explore() {
                     size: 15,
                 },
             });
-
             setItineraries(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (error) {
@@ -43,63 +60,66 @@ export default function Explore() {
         }
     };
 
-    // Debounced fetch
     useEffect(() => {
-        const delay = setTimeout(() => {
-            fetchItineraries();
-        }, 400);
-
+        const delay = setTimeout(() => fetchItineraries(), 400);
         return () => clearTimeout(delay);
     }, [appliedSearch, sortFilter, typeFilter, currentPage]);
 
-    // Setting itinerary types for filter
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [sortFilter, typeFilter]);
+
     const itineraryTypes = useMemo(() => {
         const types = itineraries.map(i => i.type).filter(Boolean);
         return ["all", ...new Set(types)];
     }, [itineraries]);
 
-    // Get sort label to filter
-    const getSortLabel = () => {
-        if (sortFilter === "likes") return "Most Liked";
-        if (sortFilter === "saves") return "Most Saved";
-        if (sortFilter === "recent") return "Most Recent";
-        return "No Filter";
-    };
+    const getSortLabel = () =>
+        SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
 
-    // Get type label to filter
-    const getTypeLabel = () => {
-        if (typeFilter === "all") return "All Types";
-        return typeFilter;
-    };
+    const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
 
-    // Setting current page to avoid empty page rendering
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [sortFilter, typeFilter]);
+    const sortActive = sortFilter !== "random";
+    const typeActive = typeFilter !== "all";
+    const searchActive = appliedSearch.trim().length > 0;
 
-    // Wait for itineraries to be fetched from the database
-    if (loading) return <p className="p-10">Loading...</p>;
+    // Page numbers with ellipsis
+    const pageNumbers = useMemo(() => {
+        if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+        const pages = new Set([
+            1,
+            totalPages,
+            currentPage,
+            currentPage - 1,
+            currentPage + 1,
+        ]);
+        return [...pages].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    }, [totalPages, currentPage]);
 
     return (
-        <div>
+        <div className="min-h-screen">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <div className="flex-2">
-                    <h1 className="text-4xl font-bold mb-2 text-primary font-primary">
-                        Explore Itineraries
-                    </h1>
-                    <p className="text-gray-500">Find your next adventure</p>
+            <div className="mb-8">
+                <div className="flex items-start justify-between gap-6 mb-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 font-primary tracking-tight mb-1">
+                            Explore
+                        </h1>
+                        <p className="text-sm text-gray-400">
+                            Discover trips shared by the community
+                        </p>
+                    </div>
                 </div>
 
-                {/* Search + Filters */}
-                <div className="flex-4 flex gap-4">
+                {/* Search + Filters row */}
+                <div className="flex flex-wrap gap-3">
                     {/* Search */}
-                    <div className="flex items-center gap-3 bg-card p-3 rounded-2xl shadow-md flex-1">
-                        <Search size={18} className="text-primary" />
+                    <div className="flex-1 min-w-56 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                        <Search size={15} className="text-gray-400 flex-shrink-0" />
                         <input
                             type="text"
-                            placeholder="Search by title or place..."
-                            className="w-full bg-transparent outline-none text-primary"
+                            placeholder="Search by title or place…"
+                            className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyDown={e => {
@@ -109,68 +129,74 @@ export default function Explore() {
                                 }
                             }}
                         />
+                        {search && (
+                            <button
+                                onClick={() => {
+                                    setSearch("");
+                                    setAppliedSearch("");
+                                }}
+                                className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
-                    {/* Sort Filter Dropdown */}
-                    <div className="relative">
+
+                    {/* Sort dropdown */}
+                    <div ref={sortRef} className="relative">
                         <button
-                            onClick={() => setOpenSort(!openSort)}
-                            className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${getSortLabel() === "No Filter" ? "bg-white" : "bg-secondary/10"}`}>
+                            onClick={() => {
+                                setOpenSort(v => !v);
+                                setOpenType(false);
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
+                                ${
+                                    sortActive
+                                        ? "bg-gray-900 text-white border-gray-900"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                }`}>
+                            <Filter size={13} />
                             {getSortLabel()}
-                            <Filter size={16} />
                         </button>
-
                         {openSort && (
-                            <div className="absolute right-0 mt-2 w-44 bg-gray-50 rounded-lg shadow-lg z-10 overflow-hidden">
-                                <button
-                                    onClick={() => {
-                                        setSortFilter("recent");
-                                        setOpenSort(false);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                    Most Recent
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        setSortFilter("likes");
-                                        setOpenSort(false);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                    Most Liked
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        setSortFilter("saves");
-                                        setOpenSort(false);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                    Most Saved
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        setSortFilter("random");
-                                        setOpenSort(false);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 hover:bg-secondary/10">
-                                    No Filter
-                                </button>
+                            <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1">
+                                {SORT_OPTIONS.map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        onClick={() => {
+                                            setSortFilter(opt.value);
+                                            setOpenSort(false);
+                                        }}
+                                        className={`block w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer
+                                            ${
+                                                sortFilter === opt.value
+                                                    ? "bg-gray-50 text-gray-900 font-medium"
+                                                    : "text-gray-600 hover:bg-gray-50"
+                                            }`}>
+                                        {opt.label}
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
 
-                    {/* Type Filter Dropdown */}
-                    <div className="relative">
+                    {/* Type dropdown */}
+                    <div ref={typeRef} className="relative">
                         <button
-                            onClick={() => setOpenType(!openType)}
-                            className={`flex items-center gap-2 p-3 rounded-2xl shadow-md hover:bg-secondary/10 ${getTypeLabel() === "All Types" ? "bg-white" : "bg-secondary/10"}`}>
+                            onClick={() => {
+                                setOpenType(v => !v);
+                                setOpenSort(false);
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
+                                ${
+                                    typeActive
+                                        ? "bg-gray-900 text-white border-gray-900"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                }`}>
+                            <Filter size={13} />
                             {getTypeLabel()}
-                            <Filter size={16} />
                         </button>
-
                         {openType && (
-                            <div className="absolute right-0 mt-2 w-44 bg-gray-50 rounded-lg shadow-lg z-10 overflow-hidden max-h-60 overflow-y-auto">
+                            <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1 max-h-56 overflow-y-auto">
                                 {itineraryTypes.map(type => (
                                     <button
                                         key={type}
@@ -178,7 +204,12 @@ export default function Explore() {
                                             setTypeFilter(type);
                                             setOpenType(false);
                                         }}
-                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 capitalize">
+                                        className={`block w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer
+                                            ${
+                                                typeFilter === type
+                                                    ? "bg-gray-50 text-gray-900 font-medium"
+                                                    : "text-gray-600 hover:bg-gray-50"
+                                            }`}>
                                         {type === "all" ? "All Types" : type}
                                     </button>
                                 ))}
@@ -186,15 +217,95 @@ export default function Explore() {
                         )}
                     </div>
                 </div>
+
+                {/* Active filter chips */}
+                {(sortActive || typeActive || searchActive) && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                        {searchActive && (
+                            <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                                "{appliedSearch}"
+                                <button
+                                    onClick={() => {
+                                        setSearch("");
+                                        setAppliedSearch("");
+                                    }}
+                                    className="hover:text-gray-900 cursor-pointer">
+                                    <X size={11} />
+                                </button>
+                            </span>
+                        )}
+                        {sortActive && (
+                            <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                                {getSortLabel()}
+                                <button
+                                    onClick={() => setSortFilter("random")}
+                                    className="hover:text-gray-900 cursor-pointer">
+                                    <X size={11} />
+                                </button>
+                            </span>
+                        )}
+                        {typeActive && (
+                            <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full capitalize">
+                                {typeFilter}
+                                <button
+                                    onClick={() => setTypeFilter("all")}
+                                    className="hover:text-gray-900 cursor-pointer">
+                                    <X size={11} />
+                                </button>
+                            </span>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Grid Display Of Itineraries */}
-            {itineraries.length === 0 ? (
-                <div className="font-primary text-primary text-2xl text-center py-10">
-                    No itineraries matching{" "}
-                    <span className="font-bold">" {search} "</span>
+            {/* Loading Skeleton */}
+            {loading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                            <div className="h-48 bg-gray-100 animate-pulse" />
+                            <div className="p-4 space-y-2">
+                                <div className="h-3.5 bg-gray-100 rounded animate-pulse w-3/4" />
+                                <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+                                <div className="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : itineraries.length === 0 ? (
+                // Empty state
+                <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
+                    <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+                        <Compass size={26} className="text-gray-300" />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                            No itineraries found
+                        </p>
+                        {appliedSearch && (
+                            <p className="text-xs text-gray-400">
+                                Nothing matched{" "}
+                                <span className="font-semibold text-gray-600">
+                                    "{appliedSearch}"
+                                </span>
+                            </p>
+                        )}
+                    </div>
+                    <button
+                        onClick={() => {
+                            setSearch("");
+                            setAppliedSearch("");
+                            setSortFilter("random");
+                            setTypeFilter("all");
+                        }}
+                        className="text-xs text-gray-500 underline underline-offset-2 hover:text-gray-800 transition-colors cursor-pointer">
+                        Clear all filters
+                    </button>
                 </div>
             ) : (
+                // Grid
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {itineraries.map(itinerary => (
                         <ItineraryCard
@@ -206,40 +317,48 @@ export default function Explore() {
                 </div>
             )}
 
-            {/* Pagination Logic */}
-            <div className="flex justify-center items-center gap-2 mt-10">
-                {/* Previous */}
-                <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                    className="px-4 py-2 rounded-2xl shadow-md bg-gray-100 not-disabled:hover:bg-secondary/10 disabled:opacity-40">
-                    Prev
-                </button>
-
-                {/* Page Numbers */}
-                {Array.from({ length: totalPages }, (_, i) => (
+            {/* Pagination */}
+            {!loading && totalPages > 1 && (
+                <div className="flex justify-center items-center gap-1.5 mt-12">
                     <button
-                        key={i}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-4 py-2 rounded-full shadow-md ${
-                            currentPage === i + 1
-                                ? "bg-primary text-white"
-                                : "bg-gray-100"
-                        }`}>
-                        {i + 1}
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(p => p - 1)}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                        <ChevronLeft size={15} />
                     </button>
-                ))}
 
-                {/* Next */}
-                <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                    className="px-4 py-2 rounded-2xl shadow-md bg-gray-100 not-disabled:hover:bg-secondary/10 disabled:opacity-40">
-                    Next
-                </button>
-            </div>
+                    {pageNumbers.map((page, idx) => {
+                        const prev = pageNumbers[idx - 1];
+                        const showEllipsis = prev && page - prev > 1;
+                        return (
+                            <span key={page} className="flex items-center gap-1.5">
+                                {showEllipsis && (
+                                    <span className="text-gray-300 text-sm px-1">…</span>
+                                )}
+                                <button
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer
+                                        ${
+                                            currentPage === page
+                                                ? "bg-gray-900 text-white"
+                                                : "text-gray-500 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+                                        }`}>
+                                    {page}
+                                </button>
+                            </span>
+                        );
+                    })}
 
-            {/* Overlay Component */}
+                    <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(p => p + 1)}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                        <ChevronRight size={15} />
+                    </button>
+                </div>
+            )}
+
+            {/* Itinerary detail overlay */}
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}

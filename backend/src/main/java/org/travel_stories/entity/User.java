@@ -65,7 +65,7 @@ public class User {
     @Column(
             name = "bio",
             nullable = true,
-            length = 255
+            length = 300
     )
     private String bio;
 
