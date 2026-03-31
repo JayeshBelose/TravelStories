@@ -21,6 +21,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [itineraryCreator, setItineraryCreator] = useState([]);
 
+    // Fetching user info the itinerary creator
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
         setLoading(true);
@@ -37,6 +38,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
         fetchCreator();
     }, [itinerary]);
 
+    // Fetching itinerary days, locations and images
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
         setLoading(true);
@@ -114,7 +116,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                 <div
                     className="bg-white w-full max-w-lg h-[calc(100vh-2rem)] rounded-2xl overflow-hidden flex flex-col shadow-2xl"
                     onClick={e => e.stopPropagation()}>
-                    {/* Hero */}
+                    {/* Thumbnail */}
                     <div className="relative h-56 flex-shrink-0">
                         <img
                             src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
@@ -153,7 +155,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             <X size={15} />
                         </button>
 
-                        {/* Title & meta */}
+                        {/* Title, Place and Duration */}
                         <div className="absolute bottom-4 left-4 right-4">
                             <h2 className="text-xl font-bold text-white mb-1.5 leading-tight font-primary">
                                 {itinerary.title}

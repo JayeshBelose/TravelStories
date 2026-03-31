@@ -13,4 +13,5 @@ api.interceptors.request.use(config => {
     return config;
 });
 
+// Provides REST APIs with the base URL of database
 export default api;

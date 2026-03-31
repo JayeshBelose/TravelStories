@@ -2,19 +2,13 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
-import org.travel_stories.dto.ItineraryTypeDto;
-import org.travel_stories.entity.Itinerary;
 import org.travel_stories.service.ItineraryService;
-import org.travel_stories.service.ItineraryTypeService;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 

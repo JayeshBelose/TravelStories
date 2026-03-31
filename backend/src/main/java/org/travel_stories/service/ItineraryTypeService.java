@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.ItineraryTypeDto;
 import org.travel_stories.entity.ItineraryType;
-import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ItineraryTypeRepository;
 
 import java.util.List;

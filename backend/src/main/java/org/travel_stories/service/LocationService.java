@@ -3,7 +3,6 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.travel_stories.dto.ImageResponseDto;
 import org.travel_stories.dto.LocationRequestDto;
 import org.travel_stories.dto.LocationResponseDto;
 import org.travel_stories.entity.Day;

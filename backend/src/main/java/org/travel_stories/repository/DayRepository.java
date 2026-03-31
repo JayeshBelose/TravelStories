@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public interface DayRepository extends JpaRepository<Day, UUID> {
 
-    int countByItineraryItineraryId(UUID itineraryId);
-
     List<Day> findByItineraryItineraryIdOrderByDayNumber(UUID itineraryId);
 
     @Query("""

@@ -58,3 +58,5 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
+// Authorization of API paths

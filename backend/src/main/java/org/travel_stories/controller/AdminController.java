@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.dto.*;
-import org.travel_stories.entity.User;
 import org.travel_stories.service.AdminService;
 
 import java.util.List;

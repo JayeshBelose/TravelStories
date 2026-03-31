@@ -11,6 +11,7 @@ export default function MainLayout() {
         navigate("/login");
     };
 
+    // Content structure of user pages
     return (
         <div className="flex min-h-screen bg-background">
             <div className="w-64 sticky top-0 self-start">

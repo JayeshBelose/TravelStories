@@ -13,6 +13,7 @@ import {
 import ItineraryOverlay from "@/components/ItineraryOverlay";
 import { useAuth } from "@/context/AuthContext";
 
+// Confirmation window
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (
         <div>
@@ -33,6 +34,7 @@ function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     );
 }
 
+// Stat card
 function StatCard({ title, value, icon: Icon, color }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm">
@@ -61,6 +63,7 @@ export default function Dashboard() {
     const [recentItineraries, setRecentItineraries] = useState([]);
     const [activity, setActivity] = useState([]);
 
+    // itinerary deletion confirmation
     const confirmDelete = itineraryId => {
         toast(
             ({ closeToast }) => (
@@ -78,6 +81,7 @@ export default function Dashboard() {
         );
     };
 
+    // Fetching required information for dashboard
     useEffect(() => {
         if (!loading && user) fetchDashboard();
     }, [loading, user]);
@@ -97,6 +101,7 @@ export default function Dashboard() {
         }
     };
 
+    // Itinerary delete function
     const handleDelete = async id => {
         try {
             await api.delete(`/admin/itineraries/${id}`);
@@ -110,7 +115,7 @@ export default function Dashboard() {
 
     return (
         <div>
-            {/* ── Header ── */}
+            {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 font-primary tracking-tight mb-1">
                     Dashboard
@@ -120,7 +125,7 @@ export default function Dashboard() {
                 </p>
             </div>
 
-            {/* ── Stat Cards ── */}
+            {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <StatCard
                     title="Total Users"
@@ -143,7 +148,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* ── Weekly Activity ── */}
+                {/* Weekly Activity */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         <TrendingUp size={14} className="text-gray-400" />
@@ -178,7 +183,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* ── Recent Itineraries ── */}
+                {/* Recent Itineraries */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         <Map size={14} className="text-gray-400" />
@@ -239,6 +244,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            {/* Itinerary Details Overlay */}
             {openView && (
                 <ItineraryOverlay
                     itinerary={selectedItinerary}

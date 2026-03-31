@@ -3,7 +3,6 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryMember;
 import org.travel_stories.entity.User;
@@ -11,7 +10,6 @@ import org.travel_stories.repository.ItineraryMemberRepository;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.UserRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

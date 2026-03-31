@@ -25,6 +25,7 @@ const SORT_OPTIONS = [
     { value: "saves", label: "Most Saved" },
 ];
 
+// Confirmation window
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (
         <div>
@@ -75,6 +76,7 @@ export default function ItineraryManagement() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
+    // Itinerary deletion confirmation
     const confirmDelete = itineraryId => {
         toast(
             ({ closeToast }) => (
@@ -92,6 +94,7 @@ export default function ItineraryManagement() {
         );
     };
 
+    // Itinerary type deletion confirmation
     const confirmDeleteType = typeId => {
         toast(
             ({ closeToast }) => (
@@ -109,6 +112,7 @@ export default function ItineraryManagement() {
         );
     };
 
+    // Fetching itineraries
     const fetchItineraries = async () => {
         try {
             const res = await api.get("/admin/itineraries", {
@@ -128,6 +132,7 @@ export default function ItineraryManagement() {
         }
     };
 
+    // Fetching itinerary types
     const fetchTypes = async () => {
         try {
             const res = await api.get("/admin/itineraries/types");
@@ -141,6 +146,7 @@ export default function ItineraryManagement() {
         fetchTypes();
     }, []);
 
+    // Add and delete fucntoins for itinerary types
     const addType = async () => {
         if (!newType.trim()) {
             toast.error("Type name cannot be empty");
@@ -177,11 +183,13 @@ export default function ItineraryManagement() {
         return ["all", ...new Set(t)];
     }, [itineraries]);
 
+    // Fetching itineraries after filters or searching
     useEffect(() => {
         const delay = setTimeout(() => fetchItineraries(), 400);
         return () => clearTimeout(delay);
     }, [search, filter, typeFilter, sortFilter, page]);
 
+    // Itinerary delete function
     const handleDelete = async id => {
         try {
             await api.delete(`/admin/itineraries/${id}`);
@@ -197,6 +205,7 @@ export default function ItineraryManagement() {
         SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
     const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
 
+    // Handling itineray saving after edit or viewing
     const handleItinerarySaved = updatedItinerary => {
         setItineraries(prev =>
             prev.map(it =>

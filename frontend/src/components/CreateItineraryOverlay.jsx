@@ -16,6 +16,7 @@ import {
 import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
 
+// Custom Tailwind CSS tags
 function SectionLabel({ children }) {
     return (
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
@@ -44,6 +45,7 @@ export default function CreateItineraryOverlay({
 }) {
     const user = JSON.parse(localStorage.getItem("user"));
 
+    // Allowing edit mode to both creator and the Admin
     const isEditMode = !!existingItinerary || user?.role === "admin";
     const isCreator =
         existingItinerary?.createdBy === user?.username || user?.role === "admin";
@@ -69,6 +71,7 @@ export default function CreateItineraryOverlay({
     const [deletedLocations, setDeletedLocations] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
 
+    // Fetch itinerary data if in edit mode
     useEffect(() => {
         if (!open) return;
         const loadData = async () => {
@@ -270,6 +273,7 @@ export default function CreateItineraryOverlay({
         }
     };
 
+    // Remove functions
     const removeDay = index => {
         const day = days[index];
         if (day.dayId) setDeletedDays(prev => [...prev, day.dayId]);
@@ -292,6 +296,7 @@ export default function CreateItineraryOverlay({
         setDays(updated);
     };
 
+    // Searching for members
     const filteredMembers =
         memberSearch.trim().length === 0
             ? []
@@ -356,7 +361,7 @@ export default function CreateItineraryOverlay({
                         </label>
                     </div>
 
-                    {/* Basic Info */}
+                    {/* Itinerary Info */}
                     <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
                         <SectionLabel>Basic Info</SectionLabel>
 

@@ -16,6 +16,7 @@ export default function UserItineraryListOverlay({
 
     const currentUser = JSON.parse(localStorage.getItem("user"));
 
+    // Fetching all user itineraries
     useEffect(() => {
         if (!open || !user?.userId) return;
 
@@ -62,7 +63,7 @@ export default function UserItineraryListOverlay({
                                 </AvatarFallback>
                             </Avatar>
 
-                            {/* Name + Count */}
+                            {/* Name + Itinerary Count */}
                             <div>
                                 <h2 className="text-base font-semibold text-gray-900 font-primary leading-tight">
                                     {user.username}
@@ -113,7 +114,7 @@ export default function UserItineraryListOverlay({
                 </div>
             </div>
 
-            {/* Itinerary detail overlay */}
+            {/* Itinerary Detail Overlay */}
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}

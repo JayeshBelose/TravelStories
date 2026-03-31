@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.entity.Itinerary;
-import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.entity.Thumbnail;
-import org.travel_stories.entity.User;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ThumbnailRepository;
 

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.travel_stories.entity.Follow;
 import org.travel_stories.entity.User;
 
 import java.time.LocalDate;
@@ -20,8 +19,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Boolean existsByEmail(String email);
 
     User findByUsername(String username);
-
-    User findByEmailAndPassword(String email, String password);
 
     @Query("""
         SELECT u FROM User u

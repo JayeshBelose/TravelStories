@@ -10,6 +10,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
+    // Fetching itinerary likes and saves
     useEffect(() => {
         if (!loggedInUser?.userId) return;
 
@@ -33,6 +34,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
         fetchStatus();
     }, [itinerary.itineraryId, loggedInUser?.userId]);
 
+    // Like and save functions
     const handleLike = async e => {
         e.stopPropagation();
         if (!loggedInUser?.userId) return;
