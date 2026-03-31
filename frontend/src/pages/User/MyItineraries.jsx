@@ -388,7 +388,7 @@ export default function MyItineraries() {
                                             </span>
 
                                             {/* Member badge */}
-                                            {!isCreator && (
+                                            {!isCreator && activeTab === "created" && (
                                                 <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-blue-200 text-blue-500 bg-blue-50">
                                                     Member
                                                 </span>

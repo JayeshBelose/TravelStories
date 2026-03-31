@@ -108,7 +108,7 @@ export default function Signup() {
                         </div>
                         {nameError && (
                             <p className="text-xs text-red-400 mt-1">
-                                Username must be at least 8 characters
+                                Username must be at least 4 characters
                             </p>
                         )}
                     </div>
