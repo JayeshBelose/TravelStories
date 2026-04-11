@@ -74,8 +74,15 @@ public class ItineraryService {
         itinerary.setStartDate(itineraryRequestDto.getStartDate());
         itinerary.setEndDate(itineraryRequestDto.getEndDate());
 
-        Long totalDays = ChronoUnit.DAYS.between(itineraryRequestDto.getStartDate(), itineraryRequestDto.getEndDate());
+        if (itineraryRequestDto.getEndDate().isBefore(itineraryRequestDto.getStartDate())) {
+            throw new RuntimeException("End date cannot be before start date");
+        }
+        Long totalDays = ChronoUnit.DAYS.between(
+                itineraryRequestDto.getStartDate(),
+                itineraryRequestDto.getEndDate()
+        ) + 1;
         itinerary.setTotalDays(totalDays);
+
         itinerary.setPublic(itineraryRequestDto.isPublic());
 
         User user = userRepository.findById(userId)
@@ -109,8 +116,15 @@ public class ItineraryService {
         itinerary.setStartDate(itineraryRequestDto.getStartDate());
         itinerary.setEndDate(itineraryRequestDto.getEndDate());
 
-        Long totalDays = ChronoUnit.DAYS.between(itineraryRequestDto.getStartDate(), itineraryRequestDto.getEndDate());
+        if (itineraryRequestDto.getEndDate().isBefore(itineraryRequestDto.getStartDate())) {
+            throw new RuntimeException("End date cannot be before start date");
+        }
+        Long totalDays = ChronoUnit.DAYS.between(
+                itineraryRequestDto.getStartDate(),
+                itineraryRequestDto.getEndDate()
+        ) + 1;
         itinerary.setTotalDays(totalDays);
+
         itinerary.setPublic(itineraryRequestDto.isPublic());
 
         ItineraryType itineraryType = itineraryTypeRepository.findByName(itineraryRequestDto.getType());

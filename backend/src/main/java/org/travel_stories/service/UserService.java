@@ -11,6 +11,7 @@ import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
 import org.travel_stories.repository.SavedItineraryRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.JwtUtil;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,6 +27,7 @@ public class UserService {
     private final LikedItineraryRepository likedItineraryRepository;
     private final SavedItineraryRepository savedItineraryRepository;
     private final FollowRepository followRepository;
+    private final JwtUtil jwtUtil;
 
     public UserResponseDto map(User user){
         UserResponseDto userResponseDto = new UserResponseDto();
@@ -121,6 +123,31 @@ public class UserService {
                     return new FollowResponseDto(user.getUserId(), user.getUsername());
                 })
                 .collect(Collectors.toList());
+    }
+
+    public String forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return jwtUtil.generateResetToken(user.getUsername());
+    }
+
+    public void resetPassword(String token, String newPassword) {
+
+        if (!jwtUtil.validateToken(token) || !jwtUtil.isResetToken(token)) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+
+        String username = jwtUtil.extractUsernameFromResetToken(token);
+
+        User user = userRepository.findByUsername(username);
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
     }
 
 }

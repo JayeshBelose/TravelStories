@@ -9,6 +9,7 @@ import AdminLayout from "./layouts/AdminLayout";
 // Auth pages
 import Login from "./pages/Auth/Login";
 import Signup from "./pages/Auth/Signup";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 // User pages
 import Explore from "./pages/User/Explore";
@@ -45,6 +46,7 @@ function Router() {
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Root route redirects based on role */}
                 <Route

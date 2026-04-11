@@ -62,6 +62,25 @@ export default function Login() {
         }
     };
 
+    const handleForgotPassword = async () => {
+        if (!email) {
+            toast.warning("Enter your email first.");
+            return;
+        }
+
+        try {
+            const res = await api.post(`/auth/forgotPassword?email=${email}`);
+            const token = res.data.token;
+
+            toast.success("Reset link generated");
+
+            // Redirect to reset page with token
+            navigate(`/reset-password?token=${token}`);
+        } catch (err) {
+            toast.error("Failed to generate reset token");
+        }
+    };
+
     const inputBase =
         "w-full border rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors";
     const inputIdle = "border-gray-200 focus:border-gray-400";
@@ -139,6 +158,16 @@ export default function Login() {
                                 Password must be 8–12 characters
                             </p>
                         )}
+                    </div>
+
+                    {/* Forgot Password */}
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            onClick={handleForgotPassword}
+                            className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                            Forgot Password?
+                        </button>
                     </div>
 
                     {/* Submit */}

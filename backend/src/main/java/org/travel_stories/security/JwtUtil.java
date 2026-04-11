@@ -25,6 +25,16 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateResetToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("type", "PASSWORD_RESET")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public String extractEmail(String token) {
         return getClaims(token).getSubject();
     }
@@ -40,6 +50,19 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean isResetToken(String token) {
+        try {
+            Claims claims = getClaims(token);
+            return "PASSWORD_RESET".equals(claims.get("type"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String extractUsernameFromResetToken(String token) {
+        return getClaims(token).getSubject();
     }
 
     private Claims getClaims(String token) {

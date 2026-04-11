@@ -176,7 +176,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                     <div className="flex items-center bg-gray-50 border-b border-gray-100 px-5 py-3 flex-shrink-0">
                         <div className="flex-1 flex flex-col items-center gap-0.5">
                             <span className="text-sm font-bold text-gray-900">
-                                {days.length}
+                                {itinerary.totalDays}
                             </span>
                             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">
                                 Days

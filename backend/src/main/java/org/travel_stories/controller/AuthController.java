@@ -2,10 +2,7 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.travel_stories.dto.AuthResponseDto;
 import org.travel_stories.dto.LoginDto;
 import org.travel_stories.dto.SignupDto;
@@ -13,6 +10,8 @@ import org.travel_stories.entity.User;
 import org.travel_stories.repository.UserRepository;
 import org.travel_stories.security.JwtUtil;
 import org.travel_stories.service.UserService;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,6 +58,27 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         return ResponseEntity.ok().body(new AuthResponseDto(token, user.getUserId(), user.getUsername(), user.getRole(), null));
+    }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+
+        String token = userService.forgotPassword(email);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Use this token to reset password",
+                "token", token
+        ));
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) {
+
+        userService.resetPassword(token, newPassword);
+
+        return ResponseEntity.ok("Password updated successfully");
     }
 
 }
