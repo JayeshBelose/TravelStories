@@ -3,8 +3,8 @@ import { toast } from "react-toastify";
 import api from "@/api/axiosConfig";
 import { Search, Trash, X, ChevronLeft, ChevronRight, Shield, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
-import UserItineraryListOverlay from "@/components/UserItineraryListOverlay";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (

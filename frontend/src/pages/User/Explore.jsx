@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
-import ItineraryCard from "@/components/ItineraryCard";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
+import ItineraryCard from "@/components/itinerary/ItineraryCard";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import api from "@/api/axiosConfig";
 
 const SORT_OPTIONS = [

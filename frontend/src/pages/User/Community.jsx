@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, Users, UserCheck, UserPlus, UserMinus, MapIcon } from "lucide-react";
-import UserItineraryListOverlay from "@/components/UserItineraryListOverlay";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
+import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import api from "@/api/axiosConfig";
 
 function UserAvatar({ userId, username, size = "md" }) {

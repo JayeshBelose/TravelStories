@@ -10,8 +10,8 @@ import {
     BookMarked,
     LayoutList,
 } from "lucide-react";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
-import CreateItineraryOverlay from "@/components/CreateItineraryOverlay";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import api from "@/api/axiosConfig";
 import { toast } from "react-toastify";
 

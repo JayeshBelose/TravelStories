@@ -10,7 +10,7 @@ import {
     CalendarDays,
     MapPin,
 } from "lucide-react";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { useAuth } from "@/context/AuthContext";
 
 // Confirmation window

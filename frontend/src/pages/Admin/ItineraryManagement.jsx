@@ -15,8 +15,8 @@ import {
     Lock,
     Tag,
 } from "lucide-react";
-import CreateItineraryOverlay from "@/components/CreateItineraryOverlay";
-import ItineraryOverlay from "@/components/ItineraryOverlay";
+import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
+import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 
 const SORT_OPTIONS = [
     { value: "none", label: "No Filter" },
