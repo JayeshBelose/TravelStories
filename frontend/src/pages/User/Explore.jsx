@@ -18,11 +18,12 @@ export default function Explore() {
     const [search, setSearch] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [sortFilter, setSortFilter] = useState("random");
-    const [typeFilter, setTypeFilter] = useState("all");
+    const [typeFilter, setTypeFilter] = useState(null); // null = "all"
     const [openSort, setOpenSort] = useState(false);
     const [openType, setOpenType] = useState(false);
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
+    const [itineraryTypes, setItineraryTypes] = useState([]);
 
     const sortRef = useRef(null);
     const typeRef = useRef(null);
@@ -39,16 +40,29 @@ export default function Explore() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
+    // Fetch itinerary types from API
+    useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const response = await api.get("/users/itineraries/types");
+                setItineraryTypes(response.data);
+            } catch (error) {
+                console.error("Failed to fetch itinerary types:", error);
+            }
+        };
+        fetchTypes();
+    }, []);
+
     const fetchItineraries = async () => {
         setLoading(true);
         try {
             const response = await api.get("/itineraries", {
                 params: {
                     search: appliedSearch,
-                    type: typeFilter,
+                    type: typeFilter ?? undefined,
                     sort: sortFilter,
                     page: currentPage - 1,
-                    size: 15,
+                    size: 9,
                 },
             });
             setItineraries(response.data.content);
@@ -69,18 +83,16 @@ export default function Explore() {
         setCurrentPage(1);
     }, [sortFilter, typeFilter]);
 
-    const itineraryTypes = useMemo(() => {
-        const types = itineraries.map(i => i.type).filter(Boolean);
-        return ["all", ...new Set(types)];
-    }, [itineraries]);
-
     const getSortLabel = () =>
         SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
 
-    const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
+    const getTypeLabel = () =>
+        typeFilter === null
+            ? "All Types"
+            : (itineraryTypes.find(t => t.name === typeFilter)?.name ?? "All Types");
 
     const sortActive = sortFilter !== "random";
-    const typeActive = typeFilter !== "all";
+    const typeActive = typeFilter !== null;
     const searchActive = appliedSearch.trim().length > 0;
 
     // Page numbers with ellipsis
@@ -197,20 +209,35 @@ export default function Explore() {
                         </button>
                         {openType && (
                             <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1 max-h-56 overflow-y-auto">
+                                {/* "All Types" option */}
+                                <button
+                                    onClick={() => {
+                                        setTypeFilter(null);
+                                        setOpenType(false);
+                                    }}
+                                    className={`block w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer
+                                        ${
+                                            typeFilter === null
+                                                ? "bg-gray-50 text-gray-900 font-medium"
+                                                : "text-gray-600 hover:bg-gray-50"
+                                        }`}>
+                                    All Types
+                                </button>
+
                                 {itineraryTypes.map(type => (
                                     <button
-                                        key={type}
+                                        key={type.typeId}
                                         onClick={() => {
-                                            setTypeFilter(type);
+                                            setTypeFilter(type.name);
                                             setOpenType(false);
                                         }}
                                         className={`block w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer
                                             ${
-                                                typeFilter === type
+                                                typeFilter === type.name
                                                     ? "bg-gray-50 text-gray-900 font-medium"
                                                     : "text-gray-600 hover:bg-gray-50"
                                             }`}>
-                                        {type === "all" ? "All Types" : type}
+                                        {type.name}
                                     </button>
                                 ))}
                             </div>
@@ -246,9 +273,9 @@ export default function Explore() {
                         )}
                         {typeActive && (
                             <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full capitalize">
-                                {typeFilter}
+                                {getTypeLabel()}
                                 <button
-                                    onClick={() => setTypeFilter("all")}
+                                    onClick={() => setTypeFilter(null)}
                                     className="hover:text-gray-900 cursor-pointer">
                                     <X size={11} />
                                 </button>
@@ -275,7 +302,6 @@ export default function Explore() {
                     ))}
                 </div>
             ) : itineraries.length === 0 ? (
-                // Empty state
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
                     <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
                         <Compass size={26} className="text-gray-300" />
@@ -298,14 +324,13 @@ export default function Explore() {
                             setSearch("");
                             setAppliedSearch("");
                             setSortFilter("random");
-                            setTypeFilter("all");
+                            setTypeFilter(null);
                         }}
                         className="text-xs text-gray-500 underline underline-offset-2 hover:text-gray-800 transition-colors cursor-pointer">
                         Clear all filters
                     </button>
                 </div>
             ) : (
-                // Grid
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {itineraries.map(itinerary => (
                         <ItineraryCard
@@ -358,7 +383,6 @@ export default function Explore() {
                 </div>
             )}
 
-            {/* Itinerary detail overlay */}
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}
