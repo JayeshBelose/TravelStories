@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import {
     Users,
     Map,

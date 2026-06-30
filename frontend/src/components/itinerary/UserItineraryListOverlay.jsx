@@ -1,6 +1,6 @@
 import { X, MapIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryOverlay from "./ItineraryOverlay";

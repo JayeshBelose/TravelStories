@@ -3,7 +3,8 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import { forgotPasswordApi } from "@/api/authApi";
+import { loginService, forgotPasswordService } from "@/services/authService";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -21,17 +22,20 @@ export default function Login() {
 
     const handleLogin = async e => {
         e.preventDefault();
+
         if (!isFormValid) {
             toast.warning("Please enter valid credentials.");
             return;
         }
 
         setLoading(true);
-        const loadingToast = toast.loading("Logging in…");
 
-        try {
-            const response = await api.post("/auth/login", { email, password });
-            const { token, userId, username, role } = response.data;
+        const loadingToast = toast.loading("Logging in...");
+
+        const result = await loginService({ email, password });
+
+        if (result.success) {
+            const { token, userId, username, role } = result.data;
 
             login({ token, userId, username, role });
 
@@ -42,24 +46,19 @@ export default function Login() {
                 autoClose: 1000,
             });
 
-            setTimeout(() => navigate(role === "admin" ? "/admin" : "/user"), 1500);
-        } catch (err) {
-            let message = "Something went wrong. Please try again.";
-            if (err.response) {
-                const status = err.response.status;
-                if (status === 401) message = "Invalid email or password.";
-                else if (status === 404) message = "No account found with this email.";
-                else if (status >= 500) message = "Server error. Please try again later.";
-            }
+            setTimeout(() => {
+                navigate(role === "admin" ? "/admin" : "/user");
+            }, 1500);
+        } else {
             toast.update(loadingToast, {
-                render: message,
+                render: result.message,
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
             });
-        } finally {
-            setLoading(false);
         }
+
+        setLoading(false);
     };
 
     const handleForgotPassword = async () => {
@@ -69,15 +68,30 @@ export default function Login() {
         }
 
         try {
-            const res = await api.post(`/auth/forgotPassword?email=${email}`);
-            const token = res.data.token;
+            const { token } = await forgotPasswordService({ email });
 
             toast.success("Reset link generated");
 
-            // Redirect to reset page with token
             navigate(`/reset-password?token=${token}`);
         } catch (err) {
-            toast.error("Failed to generate reset token");
+            let message = "Failed to generate reset token";
+
+            if (err.response) {
+                switch (err.response.status) {
+                    case 404:
+                        message = "No account found with this email.";
+                        break;
+                    case 400:
+                        message = "Invalid email address.";
+                        break;
+                    default:
+                        if (err.response.status >= 500) {
+                            message = "Server error. Please try again later.";
+                        }
+                }
+            }
+
+            toast.error(message);
         }
     };
 

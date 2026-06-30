@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import { Search, Trash, X, ChevronLeft, ChevronRight, Shield, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";

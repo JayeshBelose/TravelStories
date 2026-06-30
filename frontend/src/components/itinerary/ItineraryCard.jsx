@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 
 export default function ItineraryCard({ itinerary, onClick }) {
     const loggedInUser = JSON.parse(localStorage.getItem("user"));

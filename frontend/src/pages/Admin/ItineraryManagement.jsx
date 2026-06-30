@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import {
     Search,
     Trash,

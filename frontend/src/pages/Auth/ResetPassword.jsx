@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();

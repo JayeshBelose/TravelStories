@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import { toast } from "react-toastify";
 
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {

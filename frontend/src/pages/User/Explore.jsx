@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 
 const SORT_OPTIONS = [
     { value: "recent", label: "Most Recent" },

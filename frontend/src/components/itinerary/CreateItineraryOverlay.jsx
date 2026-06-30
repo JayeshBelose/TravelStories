@@ -14,7 +14,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 
 // Custom Tailwind CSS tags
 function SectionLabel({ children }) {

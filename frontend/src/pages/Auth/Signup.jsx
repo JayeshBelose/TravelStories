@@ -3,7 +3,7 @@ import { Eye, EyeOff, User, Mail, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 
 export default function Signup() {
     const navigate = useNavigate();

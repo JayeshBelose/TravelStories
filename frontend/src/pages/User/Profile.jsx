@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Camera, Save, Trash, X, AlertTriangle, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import api from "@/api/axiosConfig";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import {
     Dialog,
