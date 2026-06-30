@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Home, Users, Map, User, LogOut, Compass } from "lucide-react";
-import logo from "@/assets/travel_stories_icon.svg";
+import logo from "@/assets/icons/travel_stories_icon.svg";
 
 const navItems = [
     { name: "Explore", path: "/user", icon: Home },
