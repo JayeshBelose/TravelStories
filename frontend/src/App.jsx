@@ -22,7 +22,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import UserManagement from "./pages/Admin/UserManagement";
 import ItineraryManagement from "./pages/Admin/ItineraryManagement";
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 export default function App() {
     return (
