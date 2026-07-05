@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
+import { resetPasswordService } from "@/services/authService";
 
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
@@ -24,20 +24,21 @@ export default function ResetPassword() {
 
     const handleSubmit = async e => {
         e.preventDefault();
+
         if (!isFormValid) return;
 
         setLoading(true);
-        try {
-            await api.post("/auth/resetPassword", null, {
-                params: { token, newPassword },
-            });
-            toast.success("Password updated successfully!");
+
+        const result = await resetPasswordService({ token, newPassword });
+
+        if (result.success) {
+            toast.success(result.message);
             setTimeout(() => navigate("/login"), 1500);
-        } catch (err) {
-            toast.error("Invalid or expired reset link. Please try again.");
-        } finally {
-            setLoading(false);
+        } else {
+            toast.error(result.message);
         }
+
+        setLoading(false);
     };
 
     const inputBase =

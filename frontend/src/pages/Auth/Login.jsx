@@ -3,7 +3,6 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import { forgotPasswordApi } from "@/api/authApi";
 import { loginService, forgotPasswordService } from "@/services/authService";
 
 export default function Login() {
@@ -67,32 +66,35 @@ export default function Login() {
             return;
         }
 
-        try {
-            const { token } = await forgotPasswordService({ email });
+        setLoading(true);
 
-            toast.success("Reset link generated");
+        const loadingToast = toast.loading("Generating link...");
 
-            navigate(`/reset-password?token=${token}`);
-        } catch (err) {
-            let message = "Failed to generate reset token";
+        const result = await forgotPasswordService({ email });
 
-            if (err.response) {
-                switch (err.response.status) {
-                    case 404:
-                        message = "No account found with this email.";
-                        break;
-                    case 400:
-                        message = "Invalid email address.";
-                        break;
-                    default:
-                        if (err.response.status >= 500) {
-                            message = "Server error. Please try again later.";
-                        }
-                }
-            }
+        if (result.success) {
+            const { token } = result.data;
 
-            toast.error(message);
+            toast.update(loadingToast, {
+                render: "Reset link generated!",
+                type: "success",
+                isLoading: false,
+                autoClose: 1000,
+            });
+
+            setTimeout(() => {
+                navigate(`/reset-password?token=${token}`);
+            }, 1500);
+        } else {
+            toast.update(loadingToast, {
+                render: result.message,
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
         }
+
+        setLoading(false);
     };
 
     const inputBase =
