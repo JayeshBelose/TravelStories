@@ -127,13 +127,12 @@ public class UserService {
 
     public String forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found..."));
 
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        String token = jwtUtil.generateResetToken(user.getUsername());
 
-        return jwtUtil.generateResetToken(user.getUsername());
+        return token;
     }
 
     public void resetPassword(String token, String newPassword) {

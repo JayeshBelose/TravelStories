@@ -12,8 +12,14 @@ import {
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
-import api from "@/api/axios";
 import { toast } from "react-toastify";
+import {
+    deleteItineraryService,
+    getSavedItinerariesService,
+    getSharedItinerariesService,
+    getUserCreatedItinerariesService,
+    toggleSavedItineraryService,
+} from "@/services/itineraryService";
 
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (
@@ -103,69 +109,92 @@ export default function MyItineraries() {
     };
 
     const handleDelete = async itineraryId => {
-        try {
-            await api.delete(`/itineraries/${itineraryId}`);
+        const result = await deleteItineraryService({
+            itineraryId,
+        });
+
+        if (result.success) {
             setCreatedItineraries(prev =>
                 prev.filter(it => it.itineraryId !== itineraryId),
             );
+
             toast.success("Itinerary deleted successfully.");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to delete itinerary.");
+        } else {
+            toast.error(result.message);
         }
     };
 
     const handleUnsave = async itineraryId => {
-        try {
-            await api.post(`/users/${user.userId}/savedItineraries/${itineraryId}`);
+        const result = await toggleSavedItineraryService({
+            userId: user.userId,
+            itineraryId,
+        });
+
+        if (result.success) {
             setSavedItineraries(prev =>
                 prev.filter(it => it.itineraryId !== itineraryId),
             );
+
             toast.success("Itinerary removed successfully.");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to remove itinerary.");
+        } else {
+            toast.error(result.message);
         }
     };
 
     // Fetch created & shared itineraries
     useEffect(() => {
         if (!user?.userId) return;
+
         setLoadingCreated(true);
+
         const fetchCreated = async () => {
-            try {
-                const [createdRes, sharedRes] = await Promise.all([
-                    api.get(`/itineraries/users/${user.userId}`),
-                    api.get(`/itineraries/${user.userId}/membership`),
-                ]);
-                const combined = [...createdRes.data, ...sharedRes.data];
+            const [createdResult, sharedResult] = await Promise.all([
+                getUserCreatedItinerariesService({
+                    userId: user.userId,
+                }),
+                getSharedItinerariesService({
+                    userId: user.userId,
+                }),
+            ]);
+
+            if (createdResult.success && sharedResult.success) {
+                const combined = [...createdResult.data, ...sharedResult.data];
+
                 const unique = Array.from(
                     new Map(combined.map(item => [item.itineraryId, item])).values(),
                 );
+
                 setCreatedItineraries(unique);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoadingCreated(false);
+            } else {
+                console.error(createdResult.message || sharedResult.message);
             }
+
+            setLoadingCreated(false);
         };
+
         fetchCreated();
     }, [user?.userId]);
 
     // Fetch saved itineraries
     useEffect(() => {
         if (!user?.userId) return;
+
         setLoadingSaved(true);
+
         const fetchSaved = async () => {
-            try {
-                const res = await api.get(`/itineraries/${user.userId}/saved`);
-                setSavedItineraries(res.data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoadingSaved(false);
+            const result = await getSavedItinerariesService({
+                userId: user.userId,
+            });
+
+            if (result.success) {
+                setSavedItineraries(result.data);
+            } else {
+                console.error(result.message);
             }
+
+            setLoadingSaved(false);
         };
+
         fetchSaved();
     }, [user?.userId]);
 

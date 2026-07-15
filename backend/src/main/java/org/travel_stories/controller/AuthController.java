@@ -62,7 +62,6 @@ public class AuthController {
 
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-
         String token = userService.forgotPassword(email);
 
         return ResponseEntity.ok(Map.of(

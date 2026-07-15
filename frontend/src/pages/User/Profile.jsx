@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Camera, Save, Trash, X, AlertTriangle, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import {
     Dialog,
@@ -12,6 +11,11 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+    deleteUserAccountService,
+    updateUserProfileService,
+    uploadProfilePictureService,
+} from "@/services/userService";
 
 export default function Profile() {
     const { logout } = useAuth();
@@ -42,50 +46,82 @@ export default function Profile() {
 
     const handleImageUpload = async () => {
         if (!profileImage) return;
+
         setUploadingImage(true);
+
         const formData = new FormData();
         formData.append("file", profileImage);
-        try {
-            await api.post(`/users/${user.userId}/profilePicture`, formData);
+
+        const result = await uploadProfilePictureService({
+            userId: user.userId,
+            formData,
+        });
+
+        if (result.success) {
             toast.success("Profile picture updated!");
             setProfileImage(null);
-        } catch (error) {
-            console.error(error);
-            toast.error("Image upload failed");
-        } finally {
-            setUploadingImage(false);
+        } else {
+            toast.error(result.message);
         }
+
+        setUploadingImage(false);
     };
 
     const handleSave = async () => {
         setSavingProfile(true);
-        try {
-            await api.put(`/users/${user.userId}`, { username, bio });
-            localStorage.setItem("user", JSON.stringify({ ...user, username, bio }));
+
+        const result = await updateUserProfileService({
+            userId: user.userId,
+            username,
+            bio,
+        });
+
+        if (result.success) {
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    ...user,
+                    username,
+                    bio,
+                }),
+            );
+
             toast.success("Profile updated!");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to update profile");
-        } finally {
-            setSavingProfile(false);
+        } else {
+            toast.error(result.message);
         }
+
+        setSavingProfile(false);
     };
 
     const handleDelete = async () => {
-        try {
-            await toast.promise(api.delete(`/users/${user.userId}`), {
-                loading: "Deleting account…",
-                success: "Account deleted successfully",
-                error: "Failed to delete account",
+        const loadingToast = toast.loading("Deleting account...");
+
+        const result = await deleteUserAccountService({
+            userId: user.userId,
+        });
+
+        if (result.success) {
+            toast.update(loadingToast, {
+                render: "Account deleted successfully",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
             });
+
             logout();
             localStorage.removeItem("user");
             navigate("/");
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setConfirmOpen(false);
+        } else {
+            toast.update(loadingToast, {
+                render: result.message,
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
         }
+
+        setConfirmOpen(false);
     };
 
     const avatarSrc =

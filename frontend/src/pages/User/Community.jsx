@@ -2,7 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, Users, UserCheck, UserPlus, UserMinus, MapIcon } from "lucide-react";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
-import api from "@/api/axios";
+import {
+    followUserService,
+    getFollowersService,
+    getFollowingService,
+    searchUsersService,
+    unfollowUserService,
+} from "@/services/userService";
 
 function UserAvatar({ userId, username, size = "md" }) {
     const sizeClass = size === "sm" ? "w-8 h-8 text-xs" : "w-11 h-11 text-sm";
@@ -49,18 +55,26 @@ export default function Community() {
 
     useEffect(() => {
         if (!loggedInUser?.userId) return;
+
         const fetchData = async () => {
-            try {
-                const [followingRes, followersRes] = await Promise.all([
-                    api.get(`/users/community/${loggedInUser.userId}/following`),
-                    api.get(`/users/community/${loggedInUser.userId}/followers`),
-                ]);
-                setFollowing(followingRes.data);
-                setFollowers(followersRes.data);
-            } catch (error) {
-                console.error(error);
+            const [followingResult, followersResult] = await Promise.all([
+                getFollowingService({ userId: loggedInUser.userId }),
+                getFollowersService({ userId: loggedInUser.userId }),
+            ]);
+
+            if (followingResult.success) {
+                setFollowing(followingResult.data);
+            } else {
+                console.error(followingResult.message);
+            }
+
+            if (followersResult.success) {
+                setFollowers(followersResult.data);
+            } else {
+                console.error(followersResult.message);
             }
         };
+
         fetchData();
     }, []);
 
@@ -70,37 +84,54 @@ export default function Community() {
             setSearchOpen(false);
             return;
         }
+
         const delay = setTimeout(async () => {
-            try {
-                const res = await api.get(`/users/search?query=${search}`);
-                const filtered = res.data.filter(u => u.userId !== loggedInUser?.userId);
+            const result = await searchUsersService({
+                query: search,
+            });
+
+            if (result.success) {
+                const filtered = result.data.filter(
+                    u => u.userId !== loggedInUser?.userId,
+                );
+
                 setSearchResults(filtered);
                 setSearchOpen(filtered.length > 0);
-            } catch (error) {
-                console.error(error);
+            } else {
+                console.error(result.message);
             }
         }, 300);
+
         return () => clearTimeout(delay);
     }, [search]);
 
     const isFollowing = userId => following.some(u => u.userId === userId);
 
     const toggleFollow = async user => {
-        try {
-            if (isFollowing(user.userId)) {
-                await api.delete("/users/community", {
-                    data: { followerId: loggedInUser.userId, followingId: user.userId },
-                });
+        let result;
+
+        if (isFollowing(user.userId)) {
+            result = await unfollowUserService({
+                followerId: loggedInUser.userId,
+                followingId: user.userId,
+            });
+
+            if (result.success) {
                 setFollowing(prev => prev.filter(u => u.userId !== user.userId));
             } else {
-                await api.post("/users/community", {
-                    followerId: loggedInUser.userId,
-                    followingId: user.userId,
-                });
-                setFollowing(prev => [...prev, user]);
+                console.error(result.message);
             }
-        } catch (error) {
-            console.error(error);
+        } else {
+            result = await followUserService({
+                followerId: loggedInUser.userId,
+                followingId: user.userId,
+            });
+
+            if (result.success) {
+                setFollowing(prev => [...prev, user]);
+            } else {
+                console.error(result.message);
+            }
         }
     };
 

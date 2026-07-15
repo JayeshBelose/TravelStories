@@ -3,7 +3,7 @@ import { Eye, EyeOff, User, Mail, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
+import { signupService } from "@/services/authService";
 
 export default function Signup() {
     const navigate = useNavigate();
@@ -28,23 +28,31 @@ export default function Signup() {
 
     const handleSignup = async e => {
         e.preventDefault();
+
         if (!isFormValid) {
             toast.warning("Please fill all fields correctly.");
             return;
         }
 
         setLoading(true);
-        const loadingToast = toast.loading("Creating your account…");
 
-        try {
-            const response = await api.post("/auth/signup", {
-                username: name,
-                email,
-                password,
+        const loadingToast = toast.loading("Creating your account...");
+
+        const result = await signupService({
+            username: name,
+            email,
+            password,
+        });
+
+        if (result.success) {
+            const { token, userId, username, role } = result.data;
+
+            login({
+                token,
+                userId,
+                username,
+                role,
             });
-
-            const { token, userId, username, role } = response.data;
-            login({ token, userId, username, role });
 
             toast.update(loadingToast, {
                 render: "Account created! Welcome aboard.",
@@ -53,19 +61,19 @@ export default function Signup() {
                 autoClose: 2000,
             });
 
-            setTimeout(() => navigate(role === "ADMIN" ? "/admin" : "/user"), 1000);
-        } catch (error) {
-            console.error(error);
+            setTimeout(() => {
+                navigate(role === "ADMIN" ? "/admin" : "/user");
+            }, 1000);
+        } else {
             toast.update(loadingToast, {
-                render:
-                    error.response?.data?.message || "Signup failed. Please try again.",
+                render: result.message,
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
             });
-        } finally {
-            setLoading(false);
         }
+
+        setLoading(false);
     };
 
     const inputBase =

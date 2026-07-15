@@ -2,7 +2,10 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
-import api from "@/api/axios";
+import {
+    getItinerariesService,
+    getItineraryTypesService,
+} from "@/services/itineraryService";
 
 const SORT_OPTIONS = [
     { value: "recent", label: "Most Recent" },
@@ -40,38 +43,40 @@ export default function Explore() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    // Fetch itinerary types from API
+    // Fetch itinerary types from Service
     useEffect(() => {
         const fetchTypes = async () => {
-            try {
-                const response = await api.get("/users/itineraries/types");
-                setItineraryTypes(response.data);
-            } catch (error) {
-                console.error("Failed to fetch itinerary types:", error);
+            const result = await getItineraryTypesService();
+
+            if (result.success) {
+                setItineraryTypes(result.data);
+            } else {
+                console.error(result.message);
             }
         };
+
         fetchTypes();
     }, []);
 
     const fetchItineraries = async () => {
         setLoading(true);
-        try {
-            const response = await api.get("/itineraries", {
-                params: {
-                    search: appliedSearch,
-                    type: typeFilter ?? undefined,
-                    sort: sortFilter,
-                    page: currentPage - 1,
-                    size: 9,
-                },
-            });
-            setItineraries(response.data.content);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+
+        const result = await getItinerariesService({
+            search: appliedSearch,
+            type: typeFilter ?? undefined,
+            sort: sortFilter,
+            page: currentPage - 1,
+            size: 9,
+        });
+
+        if (result.success) {
+            setItineraries(result.data.content);
+            setTotalPages(result.data.totalPages);
+        } else {
+            console.error(result.message);
         }
+
+        setLoading(false);
     };
 
     useEffect(() => {

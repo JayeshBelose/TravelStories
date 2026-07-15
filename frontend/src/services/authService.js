@@ -1,4 +1,4 @@
-import { loginApi, forgotPasswordApi, resetPasswordApi } from "@/api/authApi";
+import { loginApi, signupApi, forgotPasswordApi, resetPasswordApi } from "@/api/authApi";
 
 export const loginService = async ({ email, password }) => {
     try {
@@ -19,6 +19,45 @@ export const loginService = async ({ email, password }) => {
                 case 404:
                     message = "No account found with this email.";
                     break;
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const signupService = async ({ username, email, password }) => {
+    try {
+        const response = await signupApi({
+            username,
+            email,
+            password,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Signup failed. Please try again.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 400:
+                    message = "Please enter valid details.";
+                    break;
+
+                case 409:
+                    message = "An account with this email or username already exists.";
+                    break;
+
                 default:
                     if (err.response.status >= 500) {
                         message = "Server error. Please try again later.";
