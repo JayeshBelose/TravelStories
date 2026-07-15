@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
 import {
     Users,
     Map,
@@ -12,6 +11,12 @@ import {
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { useAuth } from "@/context/AuthContext";
+import {
+    deleteItineraryByAdminService,
+    getDashboardStatsService,
+    getRecentItinerariesService,
+    getWeeklyActivityService,
+} from "@/services/adminService";
 
 // Confirmation window
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
@@ -87,29 +92,45 @@ export default function Dashboard() {
     }, [loading, user]);
 
     const fetchDashboard = async () => {
-        try {
-            const [statsRes, itineraryRes, activityRes] = await Promise.all([
-                api.get("/admin/stats"),
-                api.get("/admin/itineraries/recent"),
-                api.get("/admin/activity/weekly"),
-            ]);
-            setStats(statsRes.data);
-            setRecentItineraries(itineraryRes.data);
-            setActivity(activityRes.data);
-        } catch (err) {
-            console.error(err);
+        const [statsResult, itinerariesResult, activityResult] = await Promise.all([
+            getDashboardStatsService(),
+            getRecentItinerariesService(),
+            getWeeklyActivityService(),
+        ]);
+
+        if (statsResult.success) {
+            setStats(statsResult.data);
+        } else {
+            console.error(statsResult.message);
+        }
+
+        if (itinerariesResult.success) {
+            setRecentItineraries(itinerariesResult.data);
+        } else {
+            console.error(itinerariesResult.message);
+        }
+
+        if (activityResult.success) {
+            setActivity(activityResult.data);
+        } else {
+            console.error(activityResult.message);
         }
     };
 
     // Itinerary delete function
-    const handleDelete = async id => {
-        try {
-            await api.delete(`/admin/itineraries/${id}`);
-            setRecentItineraries(prev => prev.filter(i => i.itineraryId !== id));
+    const handleDelete = async itineraryId => {
+        const result = await deleteItineraryByAdminService({
+            itineraryId,
+        });
+
+        if (result.success) {
+            setRecentItineraries(prev =>
+                prev.filter(itinerary => itinerary.itineraryId !== itineraryId),
+            );
+
             toast.success("Itinerary deleted successfully.");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to delete itinerary.");
+        } else {
+            toast.error(result.message);
         }
     };
 

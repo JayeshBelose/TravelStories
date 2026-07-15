@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
 import {
     Search,
     Trash,
@@ -17,6 +16,13 @@ import {
 } from "lucide-react";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import {
+    addItineraryTypeService,
+    deleteItineraryByAdminService,
+    deleteItineraryTypeService,
+    getAdminItinerariesService,
+    getItineraryTypesAdminService,
+} from "@/services/adminService";
 
 const SORT_OPTIONS = [
     { value: "none", label: "No Filter" },
@@ -114,31 +120,31 @@ export default function ItineraryManagement() {
 
     // Fetching itineraries
     const fetchItineraries = async () => {
-        try {
-            const res = await api.get("/admin/itineraries", {
-                params: {
-                    page,
-                    size: 10,
-                    search,
-                    filter,
-                    type: typeFilter,
-                    sort: sortFilter,
-                },
-            });
-            setItineraries(res.data.content || []);
-            setTotalPages(res.data.totalPages || 0);
-        } catch (err) {
-            console.error(err);
+        const result = await getAdminItinerariesService({
+            page,
+            size: 10,
+            search,
+            filter,
+            type: typeFilter,
+            sort: sortFilter,
+        });
+
+        if (result.success) {
+            setItineraries(result.data.content || []);
+            setTotalPages(result.data.totalPages || 0);
+        } else {
+            console.error(result.message);
         }
     };
 
     // Fetching itinerary types
     const fetchTypes = async () => {
-        try {
-            const res = await api.get("/admin/itineraries/types");
-            setTypes(res.data);
-        } catch (error) {
-            console.log(error);
+        const result = await getItineraryTypesAdminService();
+
+        if (result.success) {
+            setTypes(result.data);
+        } else {
+            console.error(result.message);
         }
     };
 
@@ -152,29 +158,35 @@ export default function ItineraryManagement() {
             toast.error("Type name cannot be empty");
             return;
         }
+
         if (types.some(t => t.name.toLowerCase() === newType.trim().toLowerCase())) {
             toast.error("Type already exists");
             return;
         }
-        try {
-            await api.post(`/admin/itineraries/types/${newType}`);
+
+        const result = await addItineraryTypeService({
+            typeName: newType.trim(),
+        });
+
+        if (result.success) {
             toast.success("Type added.");
             setNewType("");
             fetchTypes();
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to add type");
+        } else {
+            toast.error(result.message);
         }
     };
 
     const deleteType = async typeId => {
-        try {
-            await api.delete(`/admin/itineraries/types/${typeId}`);
+        const result = await deleteItineraryTypeService({
+            typeId,
+        });
+
+        if (result.success) {
             toast.success("Type deleted.");
             fetchTypes();
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to delete type");
+        } else {
+            toast.error(result.message);
         }
     };
 
@@ -190,14 +202,19 @@ export default function ItineraryManagement() {
     }, [search, filter, typeFilter, sortFilter, page]);
 
     // Itinerary delete function
-    const handleDelete = async id => {
-        try {
-            await api.delete(`/admin/itineraries/${id}`);
-            setItineraries(prev => prev.filter(i => i.itineraryId !== id));
+    const handleDelete = async itineraryId => {
+        const result = await deleteItineraryByAdminService({
+            itineraryId,
+        });
+
+        if (result.success) {
+            setItineraries(prev =>
+                prev.filter(itinerary => itinerary.itineraryId !== itineraryId),
+            );
+
             toast.success("Itinerary deleted.");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to delete itinerary.");
+        } else {
+            toast.error(result.message);
         }
     };
 

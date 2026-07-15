@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
 import { Search, Trash, X, ChevronLeft, ChevronRight, Shield, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
+import { deleteUserByAdminService, getAdminUsersService } from "@/services/adminService";
 
 function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (
@@ -57,25 +57,31 @@ export default function UserManagement() {
     }, [page, debouncedSearch]);
 
     const fetchUsers = async () => {
-        try {
-            const res = await api.get("/admin/users", {
-                params: { page, size: 10, search: debouncedSearch },
-            });
-            setUsers(res.data.content);
-            setTotalPages(res.data.totalPages);
-        } catch (err) {
-            console.error(err);
+        const result = await getAdminUsersService({
+            page,
+            size: 10,
+            search: debouncedSearch,
+        });
+
+        if (result.success) {
+            setUsers(result.data.content);
+            setTotalPages(result.data.totalPages);
+        } else {
+            console.error(result.message);
         }
     };
 
-    const handleDelete = async id => {
-        try {
-            await api.delete(`/admin/users/${id}`);
-            setUsers(prev => prev.filter(u => u.userId !== id));
+    const handleDelete = async userId => {
+        const result = await deleteUserByAdminService({
+            userId,
+        });
+
+        if (result.success) {
+            setUsers(prev => prev.filter(user => user.userId !== userId));
+
             toast.success("User deleted successfully.");
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to delete user.");
+        } else {
+            toast.error(result.message);
         }
     };
 
