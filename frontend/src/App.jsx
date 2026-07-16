@@ -37,7 +37,7 @@ export default function App() {
 function Router() {
     const { user, loading } = useAuth();
 
-    if (loading) return null; // wait until localStorage is checked
+    if (loading) return null; // wait until sessionStorage is checked
 
     return (
         <>

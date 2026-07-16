@@ -28,7 +28,7 @@ function UserAvatar({ userId, username, size = "md" }) {
 }
 
 export default function Community() {
-    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
 
     const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);

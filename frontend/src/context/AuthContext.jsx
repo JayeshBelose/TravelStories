@@ -10,8 +10,8 @@ export function AuthProvider({ children }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        const token = localStorage.getItem("token");
+        const storedUser = sessionStorage.getItem("user");
+        const token = sessionStorage.getItem("token");
 
         if (storedUser && token) {
             setUser(JSON.parse(storedUser));
@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     const login = data => {
-        localStorage.setItem("token", data.token);
+        sessionStorage.setItem("token", data.token);
 
         const user = {
             userId: data.userId,
@@ -29,13 +29,13 @@ export function AuthProvider({ children }) {
             role: data.role,
         };
 
-        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("user", JSON.stringify(user));
         setUser(user);
     };
 
     const logout = () => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
         setUser(null);
         navigate("/login");
     };

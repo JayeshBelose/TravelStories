@@ -3,7 +3,12 @@ import {
     followUserApi,
     getFollowersApi,
     getFollowingApi,
+    getLikedStatusApi,
+    getSavedStatusApi,
+    getUserByUsernameApi,
     searchUsersApi,
+    toggleLikeItineraryApi,
+    toggleSaveItineraryApi,
     unfollowUserApi,
     updateUserProfileApi,
     uploadProfilePictureApi,
@@ -245,6 +250,183 @@ export const unfollowUserService = async ({ followerId, followingId }) => {
 
         if (err.response?.status >= 500) {
             message = "Server error. Please try again later.";
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const getLikedStatusService = async ({ userId, itineraryId }) => {
+    try {
+        const response = await getLikedStatusApi({
+            userId,
+            itineraryId,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Failed to fetch like status.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 404:
+                    message = "Itinerary not found.";
+                    break;
+
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const getSavedStatusService = async ({ userId, itineraryId }) => {
+    try {
+        const response = await getSavedStatusApi({
+            userId,
+            itineraryId,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Failed to fetch saved status.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 404:
+                    message = "Itinerary not found.";
+                    break;
+
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const toggleLikeItineraryService = async ({ userId, itineraryId }) => {
+    try {
+        const response = await toggleLikeItineraryApi({
+            userId,
+            itineraryId,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Failed to update like status.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 404:
+                    message = "Itinerary not found.";
+                    break;
+
+                case 403:
+                    message = "You are not authorized to perform this action.";
+                    break;
+
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const toggleSaveItineraryService = async ({ userId, itineraryId }) => {
+    try {
+        const response = await toggleSaveItineraryApi({
+            userId,
+            itineraryId,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Failed to update saved status.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 404:
+                    message = "Itinerary not found.";
+                    break;
+
+                case 403:
+                    message = "You are not authorized to perform this action.";
+                    break;
+
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
+        }
+
+        return {
+            success: false,
+            message,
+        };
+    }
+};
+
+export const getUserByUsernameService = async ({ username }) => {
+    try {
+        const response = await getUserByUsernameApi({
+            username,
+        });
+
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (err) {
+        let message = "Failed to fetch user.";
+
+        if (err.response) {
+            switch (err.response.status) {
+                case 404:
+                    message = "User not found.";
+                    break;
+
+                default:
+                    if (err.response.status >= 500) {
+                        message = "Server error. Please try again later.";
+                    }
+            }
         }
 
         return {

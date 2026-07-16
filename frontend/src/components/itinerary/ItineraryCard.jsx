@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
-import api from "@/api/axios";
+import {
+    getLikedStatusService,
+    getSavedStatusService,
+    toggleLikeItineraryService,
+    toggleSaveItineraryService,
+} from "@/services/userService";
 
 export default function ItineraryCard({ itinerary, onClick }) {
-    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
 
     const [likes, setLikes] = useState(itinerary.likeCount);
     const [saves, setSaves] = useState(itinerary.saveCount);
@@ -15,19 +20,27 @@ export default function ItineraryCard({ itinerary, onClick }) {
         if (!loggedInUser?.userId) return;
 
         const fetchStatus = async () => {
-            try {
-                const [likeRes, saveRes] = await Promise.all([
-                    api.get(
-                        `/users/${loggedInUser.userId}/likedItineraries/${itinerary.itineraryId}`,
-                    ),
-                    api.get(
-                        `/users/${loggedInUser.userId}/savedItineraries/${itinerary.itineraryId}`,
-                    ),
-                ]);
-                setLiked(likeRes.data);
-                setSaved(saveRes.data);
-            } catch (error) {
-                console.error(error);
+            const [likeResult, saveResult] = await Promise.all([
+                getLikedStatusService({
+                    userId: loggedInUser.userId,
+                    itineraryId: itinerary.itineraryId,
+                }),
+                getSavedStatusService({
+                    userId: loggedInUser.userId,
+                    itineraryId: itinerary.itineraryId,
+                }),
+            ]);
+
+            if (likeResult.success) {
+                setLiked(likeResult.data);
+            } else {
+                console.error(likeResult.message);
+            }
+
+            if (saveResult.success) {
+                setSaved(saveResult.data);
+            } else {
+                console.error(saveResult.message);
             }
         };
 
@@ -37,30 +50,38 @@ export default function ItineraryCard({ itinerary, onClick }) {
     // Like and save functions
     const handleLike = async e => {
         e.stopPropagation();
+
         if (!loggedInUser?.userId) return;
-        try {
-            await api.post(
-                `/users/${loggedInUser.userId}/likedItineraries/${itinerary.itineraryId}`,
-            );
+
+        const result = await toggleLikeItineraryService({
+            userId: loggedInUser.userId,
+            itineraryId: itinerary.itineraryId,
+        });
+
+        if (result.success) {
             setLiked(prev => !prev);
             setLikes(prev => (liked ? prev - 1 : prev + 1));
-        } catch (error) {
-            console.error(error);
+        } else {
+            console.error(result.message);
         }
     };
 
     const handleSave = async e => {
         e.stopPropagation();
+
         if (!loggedInUser?.userId) return;
-        if (loggedInUser?.username === itinerary.createdBy) return;
-        try {
-            await api.post(
-                `/users/${loggedInUser.userId}/savedItineraries/${itinerary.itineraryId}`,
-            );
+        if (loggedInUser.username === itinerary.createdBy) return;
+
+        const result = await toggleSaveItineraryService({
+            userId: loggedInUser.userId,
+            itineraryId: itinerary.itineraryId,
+        });
+
+        if (result.success) {
             setSaved(prev => !prev);
             setSaves(prev => (saved ? prev - 1 : prev + 1));
-        } catch (error) {
-            console.error(error);
+        } else {
+            console.error(result.message);
         }
     };
 

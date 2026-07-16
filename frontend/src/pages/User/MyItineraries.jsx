@@ -51,7 +51,7 @@ export default function MyItineraries() {
     const [loadingCreated, setLoadingCreated] = useState(true);
     const [loadingSaved, setLoadingSaved] = useState(true);
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
 
     const confirmDelete = itineraryId => {
         toast(

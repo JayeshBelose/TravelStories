@@ -7,14 +7,38 @@ import {
     Globe,
     Lock,
     MapPin,
-    Calendar,
-    FileText,
     Users,
     ImageIcon,
     ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "@/api/axios";
+import {
+    addMemberService,
+    createItineraryService,
+    getItineraryDetailsService,
+    getItineraryTypesService,
+    removeMemberService,
+    updateItineraryService,
+    uploadThumbnailService,
+} from "@/services/itineraryService";
+import { getFollowingService } from "@/services/userService";
+import {
+    createDayService,
+    deleteDayService,
+    getItineraryDaysService,
+    updateDayService,
+} from "@/services/dayService";
+import {
+    createLocationService,
+    deleteLocationService,
+    getDayLocationsService,
+    updateLocationService,
+} from "@/services/locationService";
+import {
+    deleteLocationImageService,
+    getLocationImagesService,
+    uploadLocationImageService,
+} from "@/services/imageService";
 
 // Custom Tailwind CSS tags
 function SectionLabel({ children }) {
@@ -43,7 +67,7 @@ export default function CreateItineraryOverlay({
     existingItinerary = null,
     onSaved,
 }) {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
 
     // Allowing edit mode to both creator and the Admin
     const isEditMode = !!existingItinerary || user?.role === "admin";
@@ -74,67 +98,111 @@ export default function CreateItineraryOverlay({
     // Fetch itinerary data if in edit mode
     useEffect(() => {
         if (!open) return;
+
         const loadData = async () => {
-            try {
-                const [typeRes, followingRes] = await Promise.all([
-                    api.get("/users/itineraries/types"),
-                    api.get(`/users/community/${user.userId}/following`),
-                ]);
-                setTypes(typeRes.data);
-                setFollowingList(followingRes.data);
+            const [typesResult, followingResult] = await Promise.all([
+                getItineraryTypesService(),
+                getFollowingService({
+                    userId: user.userId,
+                }),
+            ]);
 
-                if (isEditMode && existingItinerary) {
-                    const id = existingItinerary.itineraryId;
-                    setItineraryId(id);
+            if (typesResult.success) {
+                setTypes(typesResult.data);
+            }
 
-                    const itineraryRes = await api.get(`/itineraries/${id}`);
-                    const itinerary = itineraryRes.data;
+            if (followingResult.success) {
+                setFollowingList(followingResult.data);
+            }
 
-                    setTitle(itinerary.title);
-                    setPlace(itinerary.place);
-                    setType(itinerary.type);
-                    setStartDate(itinerary.startDate);
-                    setEndDate(itinerary.endDate);
-                    setDescription(itinerary.description);
-                    setIsPublic(itinerary.public);
-                    setMembers(itinerary.members || []);
+            if (!isEditMode || !existingItinerary) {
+                resetForm();
+                return;
+            }
 
-                    const daysRes = await api.get(`/itineraries/${id}/days`);
-                    const loadedDays = [];
+            const itineraryId = existingItinerary.itineraryId;
+            setItineraryId(itineraryId);
 
-                    for (let day of daysRes.data) {
-                        const locRes = await api.get(
-                            `/itineraries/days/${day.dayId}/locations`,
-                        );
-                        const loadedLocations = [];
+            const [itineraryResult, daysResult] = await Promise.all([
+                getItineraryDetailsService({ itineraryId }),
+                getItineraryDaysService({ itineraryId }),
+            ]);
 
-                        for (let loc of locRes.data) {
-                            const imgRes = await api.get(
-                                `/itineraries/days/locations/${loc.locationId}/images`,
-                            );
-                            loadedLocations.push({
-                                ...loc,
-                                name: loc.locationName || "",
-                                address: loc.locationAddress || "",
-                                images: imgRes.data.map(img => ({
-                                    ...img,
+            if (!itineraryResult.success) {
+                console.error(itineraryResult.message);
+                return;
+            }
+
+            if (!daysResult.success) {
+                console.error(daysResult.message);
+                return;
+            }
+
+            const itinerary = itineraryResult.data;
+
+            setTitle(itinerary.title);
+            setPlace(itinerary.place);
+            setType(itinerary.type);
+            setStartDate(itinerary.startDate);
+            setEndDate(itinerary.endDate);
+            setDescription(itinerary.description);
+            setIsPublic(itinerary.public);
+            setMembers(itinerary.members || []);
+
+            const loadedDays = await Promise.all(
+                daysResult.data.map(async day => {
+                    const locationsResult = await getDayLocationsService({
+                        dayId: day.dayId,
+                    });
+
+                    if (!locationsResult.success) {
+                        console.error(locationsResult.message);
+                        return {
+                            ...day,
+                            locations: [],
+                        };
+                    }
+
+                    const loadedLocations = await Promise.all(
+                        locationsResult.data.map(async location => {
+                            const imagesResult = await getLocationImagesService({
+                                locationId: location.locationId,
+                            });
+
+                            if (!imagesResult.success) {
+                                console.error(imagesResult.message);
+
+                                return {
+                                    ...location,
+                                    name: location.locationName || "",
+                                    address: location.locationAddress || "",
+                                    images: [],
+                                };
+                            }
+
+                            return {
+                                ...location,
+                                name: location.locationName || "",
+                                address: location.locationAddress || "",
+                                images: imagesResult.data.map(image => ({
+                                    ...image,
                                     isNew: false,
                                     file: null,
                                 })),
-                            });
-                        }
+                            };
+                        }),
+                    );
 
-                        loadedDays.push({ ...day, locations: loadedLocations });
-                    }
+                    return {
+                        ...day,
+                        locations: loadedLocations,
+                    };
+                }),
+            );
 
-                    setDays(loadedDays);
-                } else {
-                    resetForm();
-                }
-            } catch (err) {
-                console.error(err);
-            }
+            setDays(loadedDays);
         };
+
         loadData();
     }, [open, existingItinerary]);
 
@@ -163,107 +231,189 @@ export default function CreateItineraryOverlay({
             toast.error("Please fill all required fields.");
             return;
         }
+
         setSaving(true);
+
         try {
-            let response;
+            const itinerary = {
+                title,
+                place,
+                type,
+                startDate,
+                endDate,
+                description,
+                public: isPublic,
+            };
+
+            let result;
+
             if (isEditMode && isCreator) {
-                response = await api.put(`/itineraries/${itineraryId}`, {
-                    title,
-                    place,
-                    type,
-                    startDate,
-                    endDate,
-                    description,
-                    public: isPublic,
+                result = await updateItineraryService({
+                    itineraryId,
+                    itinerary,
                 });
             } else {
-                response = await api.post(`/itineraries/users/${user.userId}`, {
-                    title,
-                    place,
-                    type,
-                    startDate,
-                    endDate,
-                    description,
-                    public: isPublic,
+                result = await createItineraryService({
+                    userId: user.userId,
+                    itinerary,
                 });
-                setItineraryId(response.data.itineraryId);
             }
 
-            const id = response?.data?.itineraryId || itineraryId;
-            if (onSaved) onSaved(response.data);
+            if (!result.success) {
+                toast.error(result.message);
+                return;
+            }
 
-            for (let imageId of deletedImages)
-                await api.delete(`/itineraries/days/locations/images/${imageId}`);
-            for (let locationId of deletedLocations)
-                await api.delete(`/itineraries/days/locations/${locationId}`);
-            for (let dayId of deletedDays)
-                await api.delete(`/itineraries/${id}/days/${dayId}`);
+            const id = result.data.itineraryId;
+
+            setItineraryId(id);
+
+            onSaved?.(result.data);
+
+            await Promise.all([
+                ...deletedImages.map(imageId => deleteLocationImageService({ imageId })),
+                ...deletedLocations.map(locationId =>
+                    deleteLocationService({ locationId }),
+                ),
+                ...deletedDays.map(dayId =>
+                    deleteDayService({
+                        itineraryId: id,
+                        dayId,
+                    }),
+                ),
+            ]);
 
             if (thumbnailFile) {
                 const formData = new FormData();
                 formData.append("file", thumbnailFile);
-                await api.post(`/itineraries/${id}/thumbnail`, formData);
+
+                await uploadThumbnailService({
+                    itineraryId: id,
+                    formData,
+                });
             }
 
-            for (let day of days) {
+            for (const day of days) {
                 let dayId = day.dayId;
-                if (!dayId) {
-                    const dayRes = await api.post(`/itineraries/${id}/days`, {
-                        description: day.description,
-                    });
-                    dayId = dayRes.data.dayId;
-                } else {
-                    await api.put(`/itineraries/${id}/days/${dayId}`, {
-                        description: day.description,
-                    });
-                }
 
-                for (let loc of day.locations) {
-                    let locationId = loc.locationId;
-                    if (!locationId) {
-                        const locRes = await api.post(
-                            `/itineraries/days/${dayId}/locations`,
-                            {
-                                locationName: loc.name,
-                                locationAddress: loc.address,
-                            },
-                        );
-                        locationId = locRes.data.locationId;
-                    } else {
-                        await api.put(
-                            `/itineraries/days/${dayId}/locations/${locationId}`,
-                            {
-                                locationName: loc.name,
-                                locationAddress: loc.address,
-                            },
-                        );
+                if (!dayId) {
+                    const dayResult = await createDayService({
+                        itineraryId: id,
+                        day: {
+                            description: day.description,
+                        },
+                    });
+
+                    if (!dayResult.success) {
+                        toast.error(dayResult.message);
+                        return;
                     }
 
-                    for (let image of loc.images) {
-                        if (image.isNew && image.file) {
-                            const imgForm = new FormData();
-                            imgForm.append("file", image.file);
-                            await api.post(
-                                `/itineraries/days/locations/${locationId}/images`,
-                                imgForm,
-                            );
+                    dayId = dayResult.data.dayId;
+                } else {
+                    const dayResult = await updateDayService({
+                        itineraryId: id,
+                        dayId,
+                        day: {
+                            description: day.description,
+                        },
+                    });
+
+                    if (!dayResult.success) {
+                        toast.error(dayResult.message);
+                        return;
+                    }
+                }
+
+                for (const location of day.locations) {
+                    let locationId = location.locationId;
+
+                    if (!locationId) {
+                        const locationResult = await createLocationService({
+                            dayId,
+                            location: {
+                                locationName: location.name,
+                                locationAddress: location.address,
+                            },
+                        });
+
+                        if (!locationResult.success) {
+                            toast.error(locationResult.message);
+                            return;
+                        }
+
+                        locationId = locationResult.data.locationId;
+                    } else {
+                        const locationResult = await updateLocationService({
+                            dayId,
+                            locationId,
+                            location: {
+                                locationName: location.name,
+                                locationAddress: location.address,
+                            },
+                        });
+
+                        if (!locationResult.success) {
+                            toast.error(locationResult.message);
+                            return;
+                        }
+                    }
+
+                    for (const image of location.images) {
+                        if (!image.isNew || !image.file) continue;
+
+                        const formData = new FormData();
+                        formData.append("file", image.file);
+
+                        const imageResult = await uploadLocationImageService({
+                            locationId,
+                            formData,
+                        });
+
+                        if (!imageResult.success) {
+                            toast.error(imageResult.message);
+                            return;
                         }
                     }
                 }
             }
 
             const existingMembers = existingItinerary?.members || [];
-            for (let m of existingMembers)
-                if (!members.find(sel => sel.userId === m.userId))
-                    await api.delete(`/itineraries/members/${id}/${m.userId}`);
-            for (let m of members)
-                if (!existingMembers.find(em => em.userId === m.userId))
-                    await api.post(`/itineraries/members/${id}/${m.userId}`);
+
+            await Promise.all([
+                ...existingMembers
+                    .filter(
+                        member =>
+                            !members.some(selected => selected.userId === member.userId),
+                    )
+                    .map(member =>
+                        removeMemberService({
+                            itineraryId: id,
+                            userId: member.userId,
+                        }),
+                    ),
+
+                ...members
+                    .filter(
+                        member =>
+                            !existingMembers.some(
+                                existing => existing.userId === member.userId,
+                            ),
+                    )
+                    .map(member =>
+                        addMemberService({
+                            itineraryId: id,
+                            userId: member.userId,
+                        }),
+                    ),
+            ]);
 
             toast.success(isEditMode ? "Itinerary updated!" : "Itinerary created!");
+
             setDeletedDays([]);
             setDeletedLocations([]);
             setDeletedImages([]);
+
             onClose();
         } catch (err) {
             console.error(err);

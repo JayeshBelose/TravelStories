@@ -37,3 +37,18 @@ export const unfollowUserApi = ({ followerId, followingId }) =>
             followingId,
         },
     });
+
+export const getLikedStatusApi = ({ userId, itineraryId }) =>
+    api.get(`/users/${userId}/likedItineraries/${itineraryId}`);
+
+export const getSavedStatusApi = ({ userId, itineraryId }) =>
+    api.get(`/users/${userId}/savedItineraries/${itineraryId}`);
+
+export const toggleLikeItineraryApi = ({ userId, itineraryId }) =>
+    api.post(`/users/${userId}/likedItineraries/${itineraryId}`);
+
+export const toggleSaveItineraryApi = ({ userId, itineraryId }) =>
+    api.post(`/users/${userId}/savedItineraries/${itineraryId}`);
+
+export const getUserByUsernameApi = ({ username }) =>
+    api.get(`/users/username/${username}`);

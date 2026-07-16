@@ -19,7 +19,7 @@ import {
 
 export default function Profile() {
     const { logout } = useAuth();
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
     const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
@@ -77,7 +77,7 @@ export default function Profile() {
         });
 
         if (result.success) {
-            localStorage.setItem(
+            sessionStorage.setItem(
                 "user",
                 JSON.stringify({
                     ...user,
@@ -110,7 +110,7 @@ export default function Profile() {
             });
 
             logout();
-            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
             navigate("/");
         } else {
             toast.update(loadingToast, {

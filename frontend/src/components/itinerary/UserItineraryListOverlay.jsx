@@ -1,9 +1,9 @@
 import { X, MapIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryOverlay from "./ItineraryOverlay";
+import { getUserCreatedItinerariesService } from "@/services/itineraryService";
 
 export default function UserItineraryListOverlay({
     open,
@@ -14,29 +14,32 @@ export default function UserItineraryListOverlay({
     const [itineraries, setItineraries] = useState([]);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
 
-    const currentUser = JSON.parse(localStorage.getItem("user"));
+    const currentUser = JSON.parse(sessionStorage.getItem("user"));
 
     // Fetching all user itineraries
     useEffect(() => {
         if (!open || !user?.userId) return;
 
         const fetchItineraries = async () => {
-            try {
-                const res = await api.get(`/itineraries/users/${user.userId}`);
-                const data = res.data || [];
-                setItineraries(
+            const result = await getUserCreatedItinerariesService({
+                userId: user.userId,
+            });
+
+            if (result.success) {
+                const itineraries =
                     currentUser?.role === "admin"
-                        ? data
-                        : data.filter(i => i?.public === true),
-                );
-            } catch (err) {
-                console.error("Failed to fetch itineraries", err);
+                        ? result.data
+                        : result.data.filter(itinerary => itinerary.public);
+
+                setItineraries(itineraries);
+            } else {
+                console.error(result.message);
                 setItineraries([]);
             }
         };
 
         fetchItineraries();
-    }, [user, open]);
+    }, [open, user?.userId, currentUser?.role]);
 
     if (!open || !user) return null;
 

@@ -1,4 +1,3 @@
-import api from "@/api/axios";
 import {
     X,
     MapPin,
@@ -10,6 +9,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import UserItineraryListOverlay from "./UserItineraryListOverlay";
+import { getUserByUsernameService } from "@/services/userService";
+import { getItineraryDaysService } from "@/services/dayService";
+import { getDayLocationsService } from "@/services/locationService";
+import { getLocationImagesService } from "@/services/imageService";
 
 export default function ItineraryOverlay({ itinerary, onClose }) {
     const [days, setDays] = useState([]);
@@ -24,78 +27,110 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     // Fetching user info the itinerary creator
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
+
         setLoading(true);
+
         const fetchCreator = async () => {
-            try {
-                const response = await api.get(`/users/username/${itinerary.createdBy}`);
-                setItineraryCreator(response.data);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
+            const result = await getUserByUsernameService({
+                username: itinerary.createdBy,
+            });
+
+            if (result.success) {
+                setItineraryCreator(result.data);
+            } else {
+                console.error(result.message);
             }
+
+            setLoading(false);
         };
+
         fetchCreator();
     }, [itinerary]);
 
     // Fetching itinerary days, locations and images
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
+
         setLoading(true);
+
         const fetchDays = async () => {
-            try {
-                const response = await api.get(
-                    `/itineraries/${itinerary.itineraryId}/days`,
-                );
-                setDays(response.data);
-                if (response.data.length > 0) setActiveDay(response.data[0].dayId);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
+            const result = await getItineraryDaysService({
+                itineraryId: itinerary.itineraryId,
+            });
+
+            if (result.success) {
+                setDays(result.data);
+
+                if (result.data.length > 0) {
+                    setActiveDay(result.data[0].dayId);
+                }
+            } else {
+                console.error(result.message);
             }
+
+            setLoading(false);
         };
+
         fetchDays();
-    }, [itinerary]);
+    }, [itinerary?.itineraryId]);
 
     useEffect(() => {
-        if (!days || days.length === 0) return;
+        if (!days?.length) return;
+
         const fetchLocationsForAllDays = async () => {
-            try {
-                const requests = days.map(day =>
-                    api.get(`/itineraries/days/${day.dayId}/locations`),
-                );
-                const responses = await Promise.all(requests);
-                const locations = {};
-                responses.forEach((res, index) => {
-                    locations[days[index].dayId] = res.data;
-                });
-                setLocationsByDays(locations);
-            } catch (error) {
-                console.error(error);
-            }
+            const results = await Promise.all(
+                days.map(day =>
+                    getDayLocationsService({
+                        dayId: day.dayId,
+                    }),
+                ),
+            );
+
+            const locations = {};
+
+            results.forEach((result, index) => {
+                if (result.success) {
+                    locations[days[index].dayId] = result.data;
+                } else {
+                    console.error(result.message);
+                    locations[days[index].dayId] = [];
+                }
+            });
+
+            setLocationsByDays(locations);
         };
+
         fetchLocationsForAllDays();
     }, [days]);
 
     useEffect(() => {
-        if (!locationsByDay || Object.keys(locationsByDay).length === 0) return;
+        if (!Object.keys(locationsByDay).length) return;
+
         const fetchImagesForAllLocations = async () => {
-            try {
-                const allLocations = Object.values(locationsByDay).flat();
-                const requests = allLocations.map(loc =>
-                    api.get(`/itineraries/days/locations/${loc.locationId}/images`),
-                );
-                const responses = await Promise.all(requests);
-                const images = {};
-                responses.forEach((res, index) => {
-                    images[allLocations[index].locationId] = res.data;
-                });
-                setImagesByLocation(images);
-            } catch (error) {
-                console.log(error);
-            }
+            const allLocations = Object.values(locationsByDay).flat();
+
+            const results = await Promise.all(
+                allLocations.map(location =>
+                    getLocationImagesService({
+                        locationId: location.locationId,
+                    }),
+                ),
+            );
+
+            const images = {};
+
+            results.forEach((result, index) => {
+                if (result.success) {
+                    images[allLocations[index].locationId] = result.data;
+                } else {
+                    console.error(result.message);
+                    images[allLocations[index].locationId] = [];
+                }
+            });
+
+            setImagesByLocation(images);
         };
+
         fetchImagesForAllLocations();
     }, [locationsByDay]);
 
