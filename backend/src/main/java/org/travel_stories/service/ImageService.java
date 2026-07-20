@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.dto.ImageResponseDto;
 import org.travel_stories.entity.Image;
 import org.travel_stories.entity.Location;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ImageRepository;
 import org.travel_stories.repository.LocationRepository;
 
@@ -30,9 +31,12 @@ public class ImageService {
         );
     }
 
+    @Transactional
     public void uploadImage(UUID locationId, MultipartFile file) throws IOException {
+
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Location not found."));
 
         int nextOrderNumber = imageRepository.findNextOrderNumber(locationId) + 1;
 
@@ -45,43 +49,52 @@ public class ImageService {
         imageRepository.save(image);
     }
 
+    @Transactional
     public void deleteImage(UUID imageId) {
+
         Image image = imageRepository.findById(imageId)
-                        .orElseThrow(() -> new RuntimeException("Image not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Image not found."));
 
-        int deleteImageNumber = image.getOrderNumber();
+        int deletedImageNumber = image.getOrderNumber();
+        UUID locationId = image.getLocation().getLocationId();
 
-        imageRepository.deleteById(imageId);
+        imageRepository.delete(image);
         imageRepository.flush();
 
-        List<Image> imageToAdjust = imageRepository.findByLocationLocationIdOrderByOrderNumber(image.getLocation().getLocationId());
+        List<Image> imagesToAdjust =
+                imageRepository.findByLocationLocationIdOrderByOrderNumber(locationId);
 
-        for (Image i : imageToAdjust){
-            if (i.getOrderNumber() > deleteImageNumber){
-                i.setOrderNumber(i.getOrderNumber()-1);
+        for (Image img : imagesToAdjust) {
+            if (img.getOrderNumber() > deletedImageNumber) {
+                img.setOrderNumber(img.getOrderNumber() - 1);
             }
         }
-        imageRepository.saveAll(imageToAdjust);
+
+        imageRepository.saveAll(imagesToAdjust);
     }
 
     public List<ImageResponseDto> getImagesByLocation(UUID locationId) {
+
         return imageRepository.findByLocationLocationIdOrderByOrderNumber(locationId)
                 .stream()
                 .map(this::map)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ImageResponseDto> getAllImages() {
+
         return imageRepository.findAll()
                 .stream()
                 .map(this::map)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Image getImageById(UUID imageId) {
-        Image image = imageRepository.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found."));
-        return image;
+
+        return imageRepository.findById(imageId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Image not found."));
     }
 
 }

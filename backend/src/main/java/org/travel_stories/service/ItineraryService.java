@@ -13,6 +13,8 @@ import org.travel_stories.dto.MemberResponseDto;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
+import org.travel_stories.exception.InvalidOperationException;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.*;
 
 import java.time.temporal.ChronoUnit;
@@ -62,10 +64,33 @@ public class ItineraryService {
         return itineraryResponseDto;
     }
 
+    @Transactional
     public ItineraryResponseDto createItinerary(
             ItineraryRequestDto itineraryRequestDto,
             UUID userId
     ) {
+
+        if (itineraryRequestDto.getEndDate()
+                .isBefore(itineraryRequestDto.getStartDate())) {
+
+            throw new InvalidOperationException(
+                    "End date cannot be before start date."
+            );
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found."));
+
+        ItineraryType itineraryType =
+                itineraryTypeRepository.findByName(itineraryRequestDto.getType());
+
+        if (itineraryType == null) {
+            throw new ResourceNotFoundException(
+                    "Itinerary type not found."
+            );
+        }
+
         Itinerary itinerary = new Itinerary();
 
         itinerary.setPlace(itineraryRequestDto.getPlace());
@@ -74,41 +99,58 @@ public class ItineraryService {
         itinerary.setStartDate(itineraryRequestDto.getStartDate());
         itinerary.setEndDate(itineraryRequestDto.getEndDate());
 
-        if (itineraryRequestDto.getEndDate().isBefore(itineraryRequestDto.getStartDate())) {
-            throw new RuntimeException("End date cannot be before start date");
-        }
         Long totalDays = ChronoUnit.DAYS.between(
                 itineraryRequestDto.getStartDate(),
                 itineraryRequestDto.getEndDate()
         ) + 1;
+
         itinerary.setTotalDays(totalDays);
-
         itinerary.setPublic(itineraryRequestDto.isPublic());
-
-        User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found."));
         itinerary.setCreatedBy(user);
-
-        ItineraryType itineraryType = itineraryTypeRepository.findByName(itineraryRequestDto.getType());
         itinerary.setType(itineraryType);
 
-        Itinerary newItinerary = itineraryRepository.save(itinerary);
-
-        return map(newItinerary);
+        return map(itineraryRepository.save(itinerary));
     }
 
-    public void deleteItineraryById(UUID itineraryId){
-        itineraryRepository.deleteById(itineraryId);
+    @Transactional
+    public void deleteItineraryById(UUID itineraryId) {
+
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Itinerary not found."));
+
         likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
         savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
+
+        itineraryRepository.delete(itinerary);
     }
 
+    @Transactional
     public ItineraryResponseDto updateItinerary(
             ItineraryRequestDto itineraryRequestDto,
             UUID itineraryId
-    ){
+    ) {
+
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() -> new RuntimeException("Itinerary not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Itinerary not found."));
+
+        if (itineraryRequestDto.getEndDate()
+                .isBefore(itineraryRequestDto.getStartDate())) {
+
+            throw new InvalidOperationException(
+                    "End date cannot be before start date."
+            );
+        }
+
+        ItineraryType itineraryType =
+                itineraryTypeRepository.findByName(itineraryRequestDto.getType());
+
+        if (itineraryType == null) {
+            throw new ResourceNotFoundException(
+                    "Itinerary type not found."
+            );
+        }
 
         itinerary.setPlace(itineraryRequestDto.getPlace());
         itinerary.setTitle(itineraryRequestDto.getTitle());
@@ -116,22 +158,17 @@ public class ItineraryService {
         itinerary.setStartDate(itineraryRequestDto.getStartDate());
         itinerary.setEndDate(itineraryRequestDto.getEndDate());
 
-        if (itineraryRequestDto.getEndDate().isBefore(itineraryRequestDto.getStartDate())) {
-            throw new RuntimeException("End date cannot be before start date");
-        }
-        Long totalDays = ChronoUnit.DAYS.between(
-                itineraryRequestDto.getStartDate(),
-                itineraryRequestDto.getEndDate()
-        ) + 1;
-        itinerary.setTotalDays(totalDays);
+        itinerary.setTotalDays(
+                ChronoUnit.DAYS.between(
+                        itineraryRequestDto.getStartDate(),
+                        itineraryRequestDto.getEndDate()
+                ) + 1
+        );
 
         itinerary.setPublic(itineraryRequestDto.isPublic());
-
-        ItineraryType itineraryType = itineraryTypeRepository.findByName(itineraryRequestDto.getType());
         itinerary.setType(itineraryType);
 
-        Itinerary updatedItinerary = itineraryRepository.save(itinerary);
-        return map(updatedItinerary);
+        return map(itineraryRepository.save(itinerary));
     }
 
     public Page<ItineraryResponseDto> getItineraries(
@@ -169,8 +206,13 @@ public class ItineraryService {
     }
 
     public ItineraryResponseDto getItineraryById(UUID itineraryId){
+
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() -> new RuntimeException("Itinerary not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Itinerary not found."
+                        ));
+
         return map(itinerary);
     }
 

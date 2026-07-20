@@ -7,4 +7,5 @@ public interface ItineraryTypeRepository extends JpaRepository<ItineraryType, Lo
 
     ItineraryType findByName(String name);
 
+    boolean existsByNameIgnoreCase(String name);
 }

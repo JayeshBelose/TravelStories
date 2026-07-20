@@ -11,6 +11,8 @@ import org.travel_stories.dto.*;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.entity.User;
+import org.travel_stories.exception.ResourceAlreadyExistsException;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ImageRepository;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ItineraryTypeRepository;
@@ -141,15 +143,27 @@ public class AdminService {
         return itineraryTypeService.getAllTypes();
     }
 
+    @Transactional
     public void addType(String name) {
+
+        if (itineraryTypeRepository.existsByNameIgnoreCase(name)) {
+            throw new ResourceAlreadyExistsException("Itinerary type already exists.");
+        }
+
         ItineraryType type = new ItineraryType();
         type.setName(name);
 
         itineraryTypeRepository.save(type);
     }
 
+    @Transactional
     public void deleteType(Long typeId) {
-        itineraryTypeRepository.deleteById(typeId);
+
+        ItineraryType type = itineraryTypeRepository.findById(typeId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Itinerary type not found."));
+
+        itineraryTypeRepository.delete(type);
     }
 
 }

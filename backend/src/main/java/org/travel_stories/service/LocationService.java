@@ -7,6 +7,7 @@ import org.travel_stories.dto.LocationRequestDto;
 import org.travel_stories.dto.LocationResponseDto;
 import org.travel_stories.entity.Day;
 import org.travel_stories.entity.Location;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.DayRepository;
 import org.travel_stories.repository.LocationRepository;
 
@@ -33,61 +34,98 @@ public class LocationService {
         return locationResponseDto;
     }
 
-    public LocationResponseDto addLocation(UUID dayId, LocationRequestDto locationRequestDto){
-        Day day = dayRepository.findById(dayId)
-                .orElseThrow(() -> new RuntimeException("Day not found."));
+    @Transactional
+    public LocationResponseDto addLocation(
+            UUID dayId,
+            LocationRequestDto locationRequestDto
+    ) {
 
-        int nextLocationNumber = locationRepository.findNextLocationNumber(dayId) + 1;
+        Day day = dayRepository.findById(dayId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Day not found."));
+
+        int nextLocationNumber =
+                locationRepository.findNextLocationNumber(dayId) + 1;
 
         Location location = new Location();
+
         location.setLocationNumber(nextLocationNumber);
         location.setLocationName(locationRequestDto.getLocationName());
         location.setLocationAddress(locationRequestDto.getLocationAddress());
         location.setDay(day);
+
         locationRepository.save(location);
 
         return map(location);
     }
 
-    public void removeLocation(UUID dayId, UUID locationId){
+    @Transactional
+    public void removeLocation(UUID dayId, UUID locationId) {
+
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Location not found."
+                        ));
 
         dayRepository.findById(dayId)
-                .orElseThrow(() -> new RuntimeException("Day not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Day not found."
+                        ));
 
-        int deleteLocationNumber = location.getLocationNumber();
+        int deletedLocationNumber = location.getLocationNumber();
 
         locationRepository.delete(location);
         locationRepository.flush();
 
-        List<Location> locationsToAdjust = locationRepository.findByDayDayIdOrderByLocationNumber(dayId);
+        List<Location> locationsToAdjust =
+                locationRepository.findByDayDayIdOrderByLocationNumber(dayId);
 
-        for (Location l : locationsToAdjust){
-            if (l.getLocationNumber() > deleteLocationNumber){
-                l.setLocationNumber(l.getLocationNumber()-1);
+        for (Location l : locationsToAdjust) {
+
+            if (l.getLocationNumber() > deletedLocationNumber) {
+                l.setLocationNumber(
+                        l.getLocationNumber() - 1
+                );
             }
         }
 
         locationRepository.saveAll(locationsToAdjust);
     }
 
-    public List<LocationResponseDto> getLocationsByDay(UUID dayId){
-        List<LocationResponseDto> locations = locationRepository.findByDayDayIdOrderByLocationNumber(dayId)
+    public List<LocationResponseDto> getLocationsByDay(UUID dayId) {
+
+        return locationRepository
+                .findByDayDayIdOrderByLocationNumber(dayId)
                 .stream()
                 .map(this::map)
-                .collect(Collectors.toList());
-        return locations;
+                .toList();
     }
 
-    public void updateLocation(UUID locationId, LocationRequestDto locationRequestDto){
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found."));
+    @Transactional
+    public void updateLocation(
+            UUID locationId,
+            LocationRequestDto locationRequestDto
+    ) {
 
-        if (locationRequestDto.getLocationName() != null)
-            location.setLocationName(locationRequestDto.getLocationName());
-        if (locationRequestDto.getLocationAddress() != null)
-            location.setLocationAddress(locationRequestDto.getLocationAddress());
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Location not found."
+                        ));
+
+        if (locationRequestDto.getLocationName() != null) {
+            location.setLocationName(
+                    locationRequestDto.getLocationName()
+            );
+        }
+
+        if (locationRequestDto.getLocationAddress() != null) {
+            location.setLocationAddress(
+                    locationRequestDto.getLocationAddress()
+            );
+        }
     }
 
 }

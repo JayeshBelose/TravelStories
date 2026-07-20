@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.travel_stories.dto.*;
 import org.travel_stories.entity.User;
+import org.travel_stories.exception.InvalidCredentialsException;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
 import org.travel_stories.repository.SavedItineraryRepository;
@@ -44,25 +46,43 @@ public class UserService {
         return userResponseDto;
     }
 
-    public User createUser(String username, String email, String password){
+    @Transactional
+    public User createUser(
+            String username,
+            String email,
+            String password
+    ){
+
         User user = new User();
+
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
 
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     public UserResponseDto getUserById(UUID userId){
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User Not Found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found."
+                        ));
 
         return map(user);
     }
 
     public UserResponseDto getUserByName(String username){
+
         User user = userRepository.findByUsername(username);
+
+        if(user == null){
+            throw new ResourceNotFoundException(
+                    "User not found."
+            );
+        }
+
         return map(user);
     }
 
@@ -73,39 +93,70 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteUser(UUID userId){
+
+        userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found."
+                        ));
+
         likedItineraryRepository.deleteByUserUserId(userId);
+
         savedItineraryRepository.deleteByUserUserId(userId);
+
         followRepository.deleteByFollowerUserId(userId);
+
         followRepository.deleteByFollowingUserId(userId);
+
         userRepository.deleteById(userId);
     }
 
+    @Transactional
     public UserResponseDto updateUser(
             UserRequestDto userRequestDto,
             UUID userId
     ){
+
         User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found."
+                        ));
 
-        user.setUsername(userRequestDto.getUsername());
-        user.setBio(userRequestDto.getBio());
-        user.setCreatedAt(Instant.now());
+        if(userRequestDto.getUsername()!=null){
+            user.setUsername(
+                    userRequestDto.getUsername()
+            );
+        }
 
-        userRepository.save(user);
+        if(userRequestDto.getBio()!=null){
+            user.setBio(
+                    userRequestDto.getBio()
+            );
+        }
 
         return map(user);
     }
 
-    public User authenticate(String email, String password) {
+    public User authenticate(
+            String email,
+            String password
+    ){
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password")
-                );
+                        new InvalidCredentialsException(
+                                "Invalid email or password"
+                        ));
 
-        if (!user.getPassword().equals(password)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+
+        if(!user.getPassword().equals(password)){
+
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
         }
 
         return user;
@@ -125,28 +176,50 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public String forgotPassword(String email) {
+    public String forgotPassword(String email){
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found..."));
+                        new ResourceNotFoundException(
+                                "User not found."
+                        ));
 
-        String token = jwtUtil.generateResetToken(user.getUsername());
-
-        return token;
+        return jwtUtil.generateResetToken(
+                user.getUsername()
+        );
     }
 
-    public void resetPassword(String token, String newPassword) {
+    @Transactional
+    public void resetPassword(
+            String token,
+            String newPassword
+    ){
 
-        if (!jwtUtil.validateToken(token) || !jwtUtil.isResetToken(token)) {
-            throw new RuntimeException("Invalid or expired token");
+        if(!jwtUtil.validateToken(token)
+                || !jwtUtil.isResetToken(token)){
+
+            throw new InvalidTokenException(
+                    "Invalid or expired token"
+            );
         }
 
-        String username = jwtUtil.extractUsernameFromResetToken(token);
+
+        String username =
+                jwtUtil.extractUsernameFromResetToken(token);
+
 
         User user = userRepository.findByUsername(username);
 
+
+        if(user == null){
+
+            throw new ResourceNotFoundException(
+                    "User not found."
+            );
+        }
+
+
         user.setPassword(newPassword);
-        userRepository.save(user);
     }
 
 }

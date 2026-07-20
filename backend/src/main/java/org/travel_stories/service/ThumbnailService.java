@@ -6,10 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.Thumbnail;
+import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ThumbnailRepository;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,32 +22,47 @@ public class ThumbnailService {
     private final ThumbnailRepository thumbnailRepository;
     private final ItineraryRepository itineraryRepository;
 
-    public void uploadOrUpdate(UUID itineraryId, MultipartFile file) throws IOException {
+    @Transactional
+    public void uploadOrUpdate(
+            UUID itineraryId,
+            MultipartFile file
+    ) throws IOException {
+
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                        .orElseThrow(() -> new RuntimeException("Itinerary not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Itinerary not found."
+                        ));
 
-        thumbnailRepository.findByItineraryItineraryId(itineraryId)
-                .ifPresent(tn -> {
-                    try {
-                        tn.setThumbnailData(file.getBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    tn.setContentType(file.getContentType());
-                });
+        Optional<Thumbnail> existingThumbnail =
+                thumbnailRepository.findByItineraryItineraryId(itineraryId);
 
-        if (thumbnailRepository.findByItineraryItineraryId(itineraryId).isEmpty()){
+        if (existingThumbnail.isPresent()) {
+
+            Thumbnail thumbnail = existingThumbnail.get();
+
+            thumbnail.setThumbnailData(file.getBytes());
+            thumbnail.setContentType(file.getContentType());
+
+        } else {
+
             Thumbnail thumbnail = new Thumbnail();
+
             thumbnail.setContentType(file.getContentType());
             thumbnail.setThumbnailData(file.getBytes());
             thumbnail.setItinerary(itinerary);
+
             thumbnailRepository.save(thumbnail);
         }
     }
 
     public Thumbnail getThumbnailByItineraryId(UUID itineraryId){
+
         return thumbnailRepository.findByItineraryItineraryId(itineraryId)
-                .orElseThrow(() -> new RuntimeException("Thumbnail not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Thumbnail not found."
+                        ));
     }
 
 }
