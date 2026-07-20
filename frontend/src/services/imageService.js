@@ -12,7 +12,7 @@ export const getLocationImagesService = async ({ locationId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch location images.";
@@ -46,7 +46,7 @@ export const uploadLocationImageService = async ({ locationId, formData }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to upload image.";
@@ -83,7 +83,7 @@ export const deleteLocationImageService = async ({ imageId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete image.";

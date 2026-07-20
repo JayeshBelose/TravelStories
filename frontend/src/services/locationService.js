@@ -13,7 +13,7 @@ export const getDayLocationsService = async ({ dayId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch day locations.";
@@ -47,7 +47,7 @@ export const createLocationService = async ({ dayId, location }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to create location.";
@@ -86,7 +86,7 @@ export const updateLocationService = async ({ dayId, locationId, location }) => 
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update location.";
@@ -119,7 +119,7 @@ export const deleteLocationService = async ({ locationId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete location.";

@@ -20,7 +20,7 @@ export const getItineraryTypesService = async () => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itinerary types.";
@@ -50,7 +50,7 @@ export const getItinerariesService = async ({ search, type, sort, page, size }) 
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itineraries.";
@@ -74,7 +74,7 @@ export const deleteItineraryService = async ({ itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete itinerary.";
@@ -112,7 +112,7 @@ export const toggleSavedItineraryService = async ({ userId, itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update saved itinerary.";
@@ -147,7 +147,7 @@ export const getUserCreatedItinerariesService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch created itineraries.";
@@ -169,7 +169,7 @@ export const getSharedItinerariesService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch shared itineraries.";
@@ -191,7 +191,7 @@ export const getSavedItinerariesService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch saved itineraries.";
@@ -224,7 +224,7 @@ export const getItineraryDetailsService = async ({ itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itinerary details.";
@@ -258,7 +258,7 @@ export const createItineraryService = async ({ userId, itinerary }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to create itinerary.";
@@ -296,7 +296,7 @@ export const updateItineraryService = async ({ itineraryId, itinerary }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update itinerary.";
@@ -334,7 +334,7 @@ export const uploadThumbnailService = async ({ itineraryId, formData }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to upload thumbnail.";
@@ -372,7 +372,7 @@ export const addMemberService = async ({ itineraryId, userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to add member.";
@@ -410,7 +410,7 @@ export const removeMemberService = async ({ itineraryId, userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to remove member.";

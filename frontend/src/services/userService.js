@@ -23,7 +23,7 @@ export const uploadProfilePictureService = async ({ userId, formData }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Image upload failed.";
@@ -66,7 +66,7 @@ export const updateUserProfileService = async ({ userId, username, bio }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update profile.";
@@ -105,7 +105,7 @@ export const deleteUserAccountService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete account.";
@@ -140,7 +140,7 @@ export const getFollowingService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch following list.";
@@ -162,7 +162,7 @@ export const getFollowersService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch followers.";
@@ -184,7 +184,7 @@ export const searchUsersService = async ({ query }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to search users.";
@@ -218,7 +218,7 @@ export const followUserService = async ({ followerId, followingId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to follow user.";
@@ -243,7 +243,7 @@ export const unfollowUserService = async ({ followerId, followingId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to unfollow user.";
@@ -268,7 +268,7 @@ export const getLikedStatusService = async ({ userId, itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch like status.";
@@ -302,7 +302,7 @@ export const getSavedStatusService = async ({ userId, itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch saved status.";
@@ -336,7 +336,7 @@ export const toggleLikeItineraryService = async ({ userId, itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update like status.";
@@ -374,7 +374,7 @@ export const toggleSaveItineraryService = async ({ userId, itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update saved status.";
@@ -411,7 +411,7 @@ export const getUserByUsernameService = async ({ username }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch user.";

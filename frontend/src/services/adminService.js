@@ -17,7 +17,7 @@ export const getDashboardStatsService = async () => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch dashboard statistics.";
@@ -39,7 +39,7 @@ export const getRecentItinerariesService = async () => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch recent itineraries.";
@@ -61,7 +61,7 @@ export const getWeeklyActivityService = async () => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch weekly activity.";
@@ -85,7 +85,7 @@ export const deleteItineraryByAdminService = async ({ itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete itinerary.";
@@ -134,7 +134,7 @@ export const getAdminItinerariesService = async ({
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itineraries.";
@@ -165,7 +165,7 @@ export const getItineraryTypesAdminService = async () => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itinerary types.";
@@ -198,7 +198,7 @@ export const addItineraryTypeService = async ({ typeName }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to add itinerary type.";
@@ -235,7 +235,7 @@ export const deleteItineraryTypeService = async ({ typeId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete itinerary type.";
@@ -274,7 +274,7 @@ export const getAdminUsersService = async ({ page, size, search }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch users.";
@@ -307,7 +307,7 @@ export const deleteUserByAdminService = async ({ userId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete user.";

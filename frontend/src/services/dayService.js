@@ -13,7 +13,7 @@ export const getItineraryDaysService = async ({ itineraryId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to fetch itinerary days.";
@@ -47,7 +47,7 @@ export const createDayService = async ({ itineraryId, day }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to create day.";
@@ -86,7 +86,7 @@ export const updateDayService = async ({ itineraryId, dayId, day }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to update day.";
@@ -120,7 +120,7 @@ export const deleteDayService = async ({ itineraryId, dayId }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to delete day.";
