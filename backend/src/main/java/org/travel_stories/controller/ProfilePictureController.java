@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.service.ProfilePictureService;
 
@@ -19,18 +20,25 @@ public class ProfilePictureController {
     private final ProfilePictureService profilePictureService;
 
     @PostMapping
-    public ResponseEntity<String> uploadOrUpdate(
+    public ResponseEntity<ApiResponse<Void>> uploadOrUpdate(
             @PathVariable("userId") UUID userId,
             @RequestParam MultipartFile file
     ) throws IOException {
+
         profilePictureService.uploadOrUpdate(userId, file);
-        return ResponseEntity.ok().body("Profile picture updated.");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Profile picture updated successfully")
+        );
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> getPfpByUser(@PathVariable UUID userId){
+    public ResponseEntity<byte[]> getPfpByUser(
+            @PathVariable UUID userId) {
+
         ProfilePicture pfp = profilePictureService.getPfpByUser(userId);
-        if (pfp == null){
+
+        if (pfp == null) {
             return ResponseEntity.notFound().build();
         }
 

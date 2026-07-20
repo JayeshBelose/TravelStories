@@ -6,7 +6,7 @@ export const loginService = async ({ email, password }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Something went wrong. Please try again.";
@@ -43,7 +43,7 @@ export const signupService = async ({ username, email, password }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Signup failed. Please try again.";
@@ -78,7 +78,7 @@ export const forgotPasswordService = async ({ email }) => {
 
         return {
             success: true,
-            data: response.data,
+            data: response.data.data,
         };
     } catch (err) {
         let message = "Failed to generate reset token";
@@ -111,7 +111,7 @@ export const resetPasswordService = async ({ token, newPassword }) => {
 
         return {
             success: true,
-            message: response.data,
+            message: response.data.data,
         };
     } catch (err) {
         return {

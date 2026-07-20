@@ -3,6 +3,7 @@ package org.travel_stories.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.LocationRequestDto;
 import org.travel_stories.dto.LocationResponseDto;
 import org.travel_stories.service.LocationService;
@@ -18,33 +19,62 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    public ResponseEntity<LocationResponseDto> addLocation(
+    public ResponseEntity<ApiResponse<LocationResponseDto>> addLocation(
             @PathVariable UUID dayId,
             @RequestBody LocationRequestDto locationRequestDto
-    ){
-        LocationResponseDto locationResponseDto = locationService.addLocation(dayId, locationRequestDto);
-        return ResponseEntity.ok().body(locationResponseDto);
+    ) {
+
+        LocationResponseDto locationResponseDto =
+                locationService.addLocation(dayId, locationRequestDto);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Location added successfully",
+                        locationResponseDto
+                )
+        );
     }
 
     @DeleteMapping("/{locationId}")
-    public ResponseEntity<String> removeLocation(
+    public ResponseEntity<ApiResponse<Void>> removeLocation(
             @PathVariable UUID dayId,
             @PathVariable UUID locationId
-    ){
+    ) {
+
         locationService.removeLocation(dayId, locationId);
-        return ResponseEntity.ok().body("Location removed.");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Location removed successfully")
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationResponseDto>> getLocationsByDay(@PathVariable("dayId") UUID dayId){
-        List<LocationResponseDto> locations = locationService.getLocationsByDay(dayId);
-        return ResponseEntity.ok().body(locations);
+    public ResponseEntity<ApiResponse<List<LocationResponseDto>>> getLocationsByDay(
+            @PathVariable("dayId") UUID dayId
+    ) {
+
+        List<LocationResponseDto> locations =
+                locationService.getLocationsByDay(dayId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Locations fetched successfully",
+                        locations
+                )
+        );
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<String> updateLocation(@PathVariable("locationId") UUID locationId, @RequestBody LocationRequestDto locationRequestDto){
+    public ResponseEntity<ApiResponse<Void>> updateLocation(
+            @PathVariable("locationId") UUID locationId,
+            @RequestBody LocationRequestDto locationRequestDto
+    ) {
+
         locationService.updateLocation(locationId, locationRequestDto);
-        return ResponseEntity.ok().body("Updated.");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Location updated successfully")
+        );
     }
 
 }

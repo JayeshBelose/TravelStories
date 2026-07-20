@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.service.ItineraryService;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,86 +22,154 @@ public class ItineraryController {
     private final ItineraryService itineraryService;
 
     @PostMapping("/users/{userId}")
-    public ResponseEntity<ItineraryResponseDto> createItinerary(
+    public ResponseEntity<ApiResponse<ItineraryResponseDto>> createItinerary(
             @RequestBody String data,
             @PathVariable("userId") UUID userId
-    ){
-        ObjectMapper mapper = new ObjectMapper();
-        ItineraryRequestDto itineraryRequestDto = mapper.readValue(data, ItineraryRequestDto.class);
+    ) throws IOException {
 
-        ItineraryResponseDto itineraryResponseDto = itineraryService.createItinerary(itineraryRequestDto, userId);
-        return ResponseEntity.ok().body(itineraryResponseDto);
+        ObjectMapper mapper = new ObjectMapper();
+        ItineraryRequestDto itineraryRequestDto =
+                mapper.readValue(data, ItineraryRequestDto.class);
+
+        ItineraryResponseDto itineraryResponseDto =
+                itineraryService.createItinerary(itineraryRequestDto, userId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itinerary created successfully",
+                        itineraryResponseDto
+                )
+        );
     }
 
     @DeleteMapping("/{itineraryId}")
-    public ResponseEntity<String> deleteItineraryById(@PathVariable UUID itineraryId){
+    public ResponseEntity<ApiResponse<Void>> deleteItineraryById(
+            @PathVariable UUID itineraryId) {
+
         itineraryService.deleteItineraryById(itineraryId);
-        return ResponseEntity.ok().body("Itinerary deleted");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Itinerary deleted successfully")
+        );
     }
 
     @PutMapping("/{itineraryId}")
-    public ResponseEntity<ItineraryResponseDto> updateItinerary(
+    public ResponseEntity<ApiResponse<ItineraryResponseDto>> updateItinerary(
             @RequestBody String data,
             @PathVariable UUID itineraryId
-    ){
-        ObjectMapper mapper = new ObjectMapper();
-        ItineraryRequestDto itineraryRequestDto = mapper.readValue(data, ItineraryRequestDto.class);
+    ) throws IOException {
 
-        ItineraryResponseDto itineraryResponseDto = itineraryService.updateItinerary(itineraryRequestDto, itineraryId);
-        return ResponseEntity.ok().body(itineraryResponseDto);
+        ObjectMapper mapper = new ObjectMapper();
+        ItineraryRequestDto itineraryRequestDto =
+                mapper.readValue(data, ItineraryRequestDto.class);
+
+        ItineraryResponseDto itineraryResponseDto =
+                itineraryService.updateItinerary(itineraryRequestDto, itineraryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itinerary updated successfully",
+                        itineraryResponseDto
+                )
+        );
     }
 
     @GetMapping
-    public Page<ItineraryResponseDto> getItineraries(
+    public ResponseEntity<ApiResponse<Page<ItineraryResponseDto>>> getItineraries(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ) {
-        return itineraryService.getItineraries(search, type, sort, page, size);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itineraries fetched successfully",
+                        itineraryService.getItineraries(search, type, sort, page, size)
+                )
+        );
     }
 
     @GetMapping("/types/{typeId}")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByType(@PathVariable("typeId") Long typeId){
-        List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByType(typeId);
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByType(
+            @PathVariable Long typeId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itineraries fetched successfully",
+                        itineraryService.getAllItinerariesByType(typeId)
+                )
+        );
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserId(@PathVariable("userId") UUID userId){
-        List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByUserId(userId);
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserId(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "User itineraries fetched successfully",
+                        itineraryService.getAllItinerariesByUserId(userId)
+                )
+        );
     }
 
     @GetMapping("/{itineraryId}")
-    public ResponseEntity<ItineraryResponseDto> getItineraryById(@PathVariable("itineraryId") UUID itineraryId){
-        ItineraryResponseDto itinerary = itineraryService.getItineraryById(itineraryId);
-        return ResponseEntity.ok().body(itinerary);
+    public ResponseEntity<ApiResponse<ItineraryResponseDto>> getItineraryById(
+            @PathVariable UUID itineraryId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itinerary fetched successfully",
+                        itineraryService.getItineraryById(itineraryId)
+                )
+        );
     }
 
     @GetMapping("/{userId}/membership")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllItinerariesByUserMembership(@PathVariable("userId") UUID userId){
-        List<ItineraryResponseDto> itineraries = itineraryService.getAllItinerariesByUserMembership(userId);
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserMembership(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Membership itineraries fetched successfully",
+                        itineraryService.getAllItinerariesByUserMembership(userId)
+                )
+        );
     }
 
     @GetMapping("/{userId}/saved")
-    public ResponseEntity<List<ItineraryResponseDto>> getAllSavedItinerariesByUserId(@PathVariable("userId") UUID userId){
-        List<ItineraryResponseDto> itineraries = itineraryService.getAllSavedItinerariesByUserId(userId);
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllSavedItinerariesByUserId(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Saved itineraries fetched successfully",
+                        itineraryService.getAllSavedItinerariesByUserId(userId)
+                )
+        );
     }
 
     @GetMapping("/mostSaved")
-    public ResponseEntity<List<ItineraryResponseDto>> getMostSavedItineraries(){
-        List<ItineraryResponseDto> itineraries = itineraryService.getMostSavedItineraries();
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostSavedItineraries() {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Most saved itineraries fetched successfully",
+                        itineraryService.getMostSavedItineraries()
+                )
+        );
     }
 
     @GetMapping("/mostLiked")
-    public ResponseEntity<List<ItineraryResponseDto>> getMostLikedItineraries(){
-        List<ItineraryResponseDto> itineraries = itineraryService.getMostLikedItineraries();
-        return ResponseEntity.ok().body(itineraries);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostLikedItineraries() {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Most liked itineraries fetched successfully",
+                        itineraryService.getMostLikedItineraries()
+                )
+        );
     }
 
 }

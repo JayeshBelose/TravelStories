@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.entity.Thumbnail;
 import org.travel_stories.service.ThumbnailService;
 
@@ -19,17 +20,24 @@ public class ThumbnailController {
     private final ThumbnailService thumbnailService;
 
     @PostMapping
-    public ResponseEntity<String> uploadOrUpdate(
-            @PathVariable("itineraryId")UUID itineraryId,
-            @RequestParam MultipartFile file
-    ) throws IOException{
+    public ResponseEntity<ApiResponse<Void>> uploadOrUpdate(
+            @PathVariable("itineraryId") UUID itineraryId,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+
         thumbnailService.uploadOrUpdate(itineraryId, file);
-        return ResponseEntity.ok().body("Thumbnail updated.");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Thumbnail updated successfully")
+        );
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> getThumbnailByItineraryId(@PathVariable("itineraryId") UUID itineraryId){
+    public ResponseEntity<byte[]> getThumbnailByItineraryId(
+            @PathVariable("itineraryId") UUID itineraryId) {
+
         Thumbnail thumbnail = thumbnailService.getThumbnailByItineraryId(itineraryId);
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(thumbnail.getContentType()))
                 .body(thumbnail.getThumbnailData());

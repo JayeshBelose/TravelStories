@@ -3,6 +3,7 @@ package org.travel_stories.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.DayRequestDto;
 import org.travel_stories.dto.DayResponseDto;
 import org.travel_stories.service.DayService;
@@ -18,33 +19,50 @@ public class DayController {
     private final DayService dayService;
 
     @PostMapping
-    public ResponseEntity<DayResponseDto> addDay(
+    public ResponseEntity<ApiResponse<DayResponseDto>> addDay(
             @PathVariable UUID itineraryId,
             @RequestBody DayRequestDto dayRequestDto
-    ){
-        DayResponseDto dayResponseDto = dayService.addDay(itineraryId,dayRequestDto);
-        return ResponseEntity.ok().body(dayResponseDto);
+    ) {
+        DayResponseDto dayResponseDto = dayService.addDay(itineraryId, dayRequestDto);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Day added successfully", dayResponseDto)
+        );
     }
 
     @DeleteMapping("/{dayId}")
-    public ResponseEntity<String> removeDay(
+    public ResponseEntity<ApiResponse<Void>> removeDay(
             @PathVariable UUID itineraryId,
             @PathVariable UUID dayId
-    ){
-        dayService.removeDay(itineraryId,dayId);
-        return ResponseEntity.ok().body("Day removed.");
+    ) {
+        dayService.removeDay(itineraryId, dayId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Day removed successfully")
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<DayResponseDto>> getDaysByItinerary(@PathVariable("itineraryId") UUID itineraryId){
+    public ResponseEntity<ApiResponse<List<DayResponseDto>>> getDaysByItinerary(
+            @PathVariable("itineraryId") UUID itineraryId
+    ) {
         List<DayResponseDto> days = dayService.getDaysByItinerary(itineraryId);
-        return ResponseEntity.ok().body(days);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Days fetched successfully", days)
+        );
     }
 
     @PutMapping("/{dayId}")
-    public ResponseEntity<String> updateDay(@PathVariable("dayId") UUID dayId, @RequestBody DayRequestDto dayRequestDto){
+    public ResponseEntity<ApiResponse<Void>> updateDay(
+            @PathVariable("dayId") UUID dayId,
+            @RequestBody DayRequestDto dayRequestDto
+    ) {
         dayService.updateDay(dayId, dayRequestDto);
-        return ResponseEntity.ok().body("Updated.");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Day updated successfully")
+        );
     }
 
 }

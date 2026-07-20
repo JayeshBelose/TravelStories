@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.service.SavedItineraryService;
 
 import java.util.UUID;
@@ -15,17 +16,29 @@ public class SavedItineraryController {
 
     private final SavedItineraryService savedItineraryService;
 
-    @Transactional
     @PostMapping("/{itineraryId}")
-    public ResponseEntity<String> saveItinerary(@PathVariable UUID userId, @PathVariable UUID itineraryId){
-        String msg = savedItineraryService.saveItinerary(userId, itineraryId);
-        return ResponseEntity.ok().body(msg);
+    public ResponseEntity<ApiResponse<String>> saveItinerary(
+            @PathVariable UUID userId,
+            @PathVariable UUID itineraryId) {
+
+        String message = savedItineraryService.saveItinerary(userId, itineraryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(message, message)
+        );
     }
 
-    @Transactional
     @GetMapping("/{itineraryId}")
-    public ResponseEntity<Boolean> checkIfSaved(@PathVariable("userId") UUID userId, @PathVariable("itineraryId") UUID itineraryId){
-        return ResponseEntity.ok().body(savedItineraryService.checkIfSaved(userId, itineraryId));
+    public ResponseEntity<ApiResponse<Boolean>> checkIfSaved(
+            @PathVariable("userId") UUID userId,
+            @PathVariable("itineraryId") UUID itineraryId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Saved status fetched successfully",
+                        savedItineraryService.checkIfSaved(userId, itineraryId)
+                )
+        );
     }
 
 }

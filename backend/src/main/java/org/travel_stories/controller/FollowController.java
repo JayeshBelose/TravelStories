@@ -3,6 +3,7 @@ package org.travel_stories.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.FollowRequestDto;
 import org.travel_stories.dto.FollowResponseDto;
 import org.travel_stories.service.FollowService;
@@ -18,25 +19,55 @@ public class FollowController {
     private final FollowService followService;
 
     @PostMapping
-    public ResponseEntity<String> follow(@RequestBody FollowRequestDto followRequestDto){
-        String msg = followService.follow(followRequestDto.getFollowerId(), followRequestDto.getFollowingId());
-        return ResponseEntity.ok().body(msg);
+    public ResponseEntity<ApiResponse<String>> follow(
+            @RequestBody FollowRequestDto followRequestDto) {
+
+        String message = followService.follow(
+                followRequestDto.getFollowerId(),
+                followRequestDto.getFollowingId()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(message, message)
+        );
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> unfollow(@RequestBody FollowRequestDto followRequestDto){
-        followService.unfollow(followRequestDto.getFollowerId(), followRequestDto.getFollowingId());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<Void>> unfollow(
+            @RequestBody FollowRequestDto followRequestDto) {
+
+        followService.unfollow(
+                followRequestDto.getFollowerId(),
+                followRequestDto.getFollowingId()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success("User unfollowed successfully")
+        );
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<FollowResponseDto>> getFollowers(@PathVariable("userId")UUID userId){
-        return ResponseEntity.ok(followService.getFollowers(userId));
+    public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getFollowers(
+            @PathVariable("userId") UUID userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Followers fetched successfully",
+                        followService.getFollowers(userId)
+                )
+        );
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<List<FollowResponseDto>> getFollowing(@PathVariable("userId")UUID userId){
-        return ResponseEntity.ok(followService.getFollowing(userId));
+    public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getFollowing(
+            @PathVariable("userId") UUID userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Following list fetched successfully",
+                        followService.getFollowing(userId)
+                )
+        );
     }
 
 }

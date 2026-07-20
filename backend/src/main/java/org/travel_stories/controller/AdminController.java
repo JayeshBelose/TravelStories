@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.*;
 import org.travel_stories.service.AdminService;
 
@@ -18,18 +19,25 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/stats")
-    public ResponseEntity<AdminStatsDto> getStats() {
-        return ResponseEntity.ok().body(adminService.getStats());
+    public ResponseEntity<ApiResponse<AdminStatsDto>> getStats() {
+        return ResponseEntity.ok(
+                ApiResponse.success("Admin statistics fetched successfully",
+                        adminService.getStats())
+        );
     }
 
     @GetMapping("/itineraries/recent")
-    public ResponseEntity<List<ItineraryResponseDto>> getRecentItineraries() {
-        List<ItineraryResponseDto> itineraryResponseDtos = adminService.getRecentItineraries();
-        return ResponseEntity.ok().body(itineraryResponseDtos);
+    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getRecentItineraries() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Recent itineraries fetched successfully",
+                        adminService.getRecentItineraries()
+                )
+        );
     }
 
     @GetMapping("/itineraries")
-    public Page<ItineraryResponseDto> getAllItineraries(
+    public ResponseEntity<ApiResponse<Page<ItineraryResponseDto>>> getAllItineraries(
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam(required = false) String search,
@@ -37,52 +45,90 @@ public class AdminController {
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "recent") String sort
     ) {
-        return adminService.getAllItineraries(page, size, search, filter, type, sort);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itineraries fetched successfully",
+                        adminService.getAllItineraries(page, size, search, filter, type, sort)
+                )
+        );
     }
 
     @GetMapping("/activity/weekly")
-    public ResponseEntity<List<WeeklyActivityDto>> getWeeklyActivity() {
-        List<WeeklyActivityDto> weeklyActivityDtos = adminService.getWeeklyActivity();
-        return ResponseEntity.ok().body(weeklyActivityDtos);
+    public ResponseEntity<ApiResponse<List<WeeklyActivityDto>>> getWeeklyActivity() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Weekly activity fetched successfully",
+                        adminService.getWeeklyActivity()
+                )
+        );
     }
 
     @DeleteMapping("/itineraries/{itineraryId}")
-    public ResponseEntity<Void> deleteItinerary(@PathVariable("itineraryId")UUID itineraryId) {
+    public ResponseEntity<ApiResponse<Void>> deleteItinerary(
+            @PathVariable("itineraryId") UUID itineraryId) {
+
         adminService.deleteItinerary(itineraryId);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Itinerary deleted successfully")
+        );
     }
 
     @GetMapping("/users")
-    public Page<UserResponseDto> getAllUsers(
+    public ResponseEntity<ApiResponse<Page<UserResponseDto>>> getAllUsers(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return adminService.getAllUsers(search, page, size);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Users fetched successfully",
+                        adminService.getAllUsers(search, page, size)
+                )
+        );
     }
 
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userId")UUID userId) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable("userId") UUID userId) {
+
         adminService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.success("User deleted successfully")
+        );
     }
 
     @GetMapping("/itineraries/types")
-    public ResponseEntity<List<ItineraryTypeDto>> getAllTypes() {
-        List<ItineraryTypeDto> types = adminService.getAllTypes();
-        return ResponseEntity.ok().body(types);
+    public ResponseEntity<ApiResponse<List<ItineraryTypeDto>>> getAllTypes() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Itinerary types fetched successfully",
+                        adminService.getAllTypes()
+                )
+        );
     }
 
     @PostMapping("/itineraries/types/{name}")
-    public ResponseEntity<Void> addType(@PathVariable("name") String name) {
+    public ResponseEntity<ApiResponse<Void>> addType(
+            @PathVariable("name") String name) {
+
         adminService.addType(name);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Itinerary type added successfully")
+        );
     }
 
     @DeleteMapping("/itineraries/types/{typeId}")
-    public ResponseEntity<Void> deleteType(@PathVariable("typeId") Long typeId) {
+    public ResponseEntity<ApiResponse<Void>> deleteType(
+            @PathVariable("typeId") Long typeId) {
+
         adminService.deleteType(typeId);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Itinerary type deleted successfully")
+        );
     }
 
 }
