@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.travel_stories.dto.*;
 import org.travel_stories.entity.User;
 import org.travel_stories.exception.InvalidCredentialsException;
+import org.travel_stories.exception.InvalidTokenException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
