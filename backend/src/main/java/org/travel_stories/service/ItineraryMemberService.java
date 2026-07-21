@@ -1,6 +1,7 @@
 package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.entity.Itinerary;
@@ -14,6 +15,7 @@ import org.travel_stories.repository.UserRepository;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
