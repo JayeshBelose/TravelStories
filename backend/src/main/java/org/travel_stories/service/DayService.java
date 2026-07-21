@@ -57,6 +57,12 @@ public class DayService {
 
         dayRepository.save(day);
 
+        log.info(
+                "Day {} added to itinerary {}",
+                day.getDayNumber(),
+                itineraryId
+        );
+
         return map(day);
     }
 
@@ -86,6 +92,12 @@ public class DayService {
         }
 
         dayRepository.saveAll(daysToAdjust);
+
+        log.info(
+                "Day {} removed from itinerary {}",
+                deletedDayNumber,
+                itineraryId
+        );
     }
 
     public List<DayResponseDto> getDaysByItinerary(UUID itineraryId) {
@@ -106,6 +118,12 @@ public class DayService {
         if (dayRequestDto.getDescription() != null) {
             day.setDescription(dayRequestDto.getDescription());
         }
+
+        log.info(
+                "Day {} updated for itinerary {}",
+                dayId,
+                day.getItinerary().getItineraryId()
+        );
     }
 
 }

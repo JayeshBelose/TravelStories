@@ -58,6 +58,13 @@ public class LocationService {
 
         locationRepository.save(location);
 
+        log.info(
+                "Location '{}' added to day {} with order {}",
+                location.getLocationName(),
+                dayId,
+                nextLocationNumber
+        );
+
         return map(location);
     }
 
@@ -94,6 +101,12 @@ public class LocationService {
         }
 
         locationRepository.saveAll(locationsToAdjust);
+
+        log.info(
+                "Location {} removed from day {}",
+                locationId,
+                dayId
+        );
     }
 
     public List<LocationResponseDto> getLocationsByDay(UUID dayId) {
@@ -128,6 +141,11 @@ public class LocationService {
                     locationRequestDto.getLocationAddress()
             );
         }
+
+        log.info(
+                "Location {} updated",
+                locationId
+        );
     }
 
 }

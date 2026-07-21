@@ -35,6 +35,12 @@ public class ItineraryTypeService {
 
         ItineraryType savedType = itineraryTypeRepository.save(itineraryType);
 
+        log.info(
+                "Itinerary type created: typeId={}, name={}",
+                savedType.getTypeId(),
+                savedType.getName()
+        );
+
         ItineraryTypeDto responseDto = new ItineraryTypeDto();
 
         responseDto.setTypeId(savedType.getTypeId());
@@ -71,6 +77,12 @@ public class ItineraryTypeService {
                                 ));
 
         itineraryTypeRepository.delete(itineraryType);
+
+        log.info(
+                "Itinerary type deleted: typeId={}, name={}",
+                itineraryType.getTypeId(),
+                itineraryType.getName()
+        );
     }
 
 }

@@ -62,7 +62,14 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(password);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        log.info(
+                "User '{}' registered successfully",
+                savedUser.getUsername()
+        );
+
+        return savedUser;
     }
 
     public UserResponseDto getUserById(UUID userId){
@@ -114,6 +121,11 @@ public class UserService {
         followRepository.deleteByFollowingUserId(userId);
 
         userRepository.deleteById(userId);
+
+        log.info(
+                "User {} deleted",
+                userId
+        );
     }
 
     @Transactional
@@ -140,6 +152,11 @@ public class UserService {
             );
         }
 
+        log.info(
+                "User {} updated profile",
+                userId
+        );
+
         return map(user);
     }
 
@@ -161,6 +178,11 @@ public class UserService {
                     "Invalid email or password"
             );
         }
+
+        log.info(
+                "User '{}' authenticated successfully",
+                user.getUsername()
+        );
 
         return user;
     }
@@ -187,9 +209,16 @@ public class UserService {
                                 "User not found."
                         ));
 
-        return jwtUtil.generateResetToken(
+        String token = jwtUtil.generateResetToken(
                 user.getUsername()
         );
+
+        log.info(
+                "Password reset token generated for user '{}'",
+                user.getUsername()
+        );
+
+        return token;
     }
 
     @Transactional
@@ -223,6 +252,11 @@ public class UserService {
 
 
         user.setPassword(newPassword);
+
+        log.info(
+                "Password reset completed for user '{}'",
+                user.getUsername()
+        );
     }
 
 }

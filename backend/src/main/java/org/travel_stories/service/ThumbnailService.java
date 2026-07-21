@@ -46,6 +46,11 @@ public class ThumbnailService {
             thumbnail.setThumbnailData(file.getBytes());
             thumbnail.setContentType(file.getContentType());
 
+            log.info(
+                    "Thumbnail updated for itinerary {}",
+                    itineraryId
+            );
+
         } else {
 
             Thumbnail thumbnail = new Thumbnail();
@@ -55,6 +60,11 @@ public class ThumbnailService {
             thumbnail.setItinerary(itinerary);
 
             thumbnailRepository.save(thumbnail);
+
+            log.info(
+                    "Thumbnail uploaded for itinerary {}",
+                    itineraryId
+            );
         }
     }
 

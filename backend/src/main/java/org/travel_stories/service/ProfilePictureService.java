@@ -46,6 +46,8 @@ public class ProfilePictureService {
             pfp.setPfpData(file.getBytes());
             pfp.setContentType(file.getContentType());
 
+            log.info("Profile picture updated for user {}", userId);
+
         } else {
 
             ProfilePicture pfp = new ProfilePicture();
@@ -55,6 +57,8 @@ public class ProfilePictureService {
             pfp.setUser(user);
 
             profilePictureRepository.save(pfp);
+
+            log.info("Profile picture uploaded for user {}", userId);
         }
     }
 

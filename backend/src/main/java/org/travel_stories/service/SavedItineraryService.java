@@ -59,6 +59,12 @@ public class SavedItineraryService {
                             .countByItineraryItineraryId(itineraryId)
             );
 
+            log.info(
+                    "User {} removed itinerary {} from saved itineraries",
+                    userId,
+                    itineraryId
+            );
+
             return "Itinerary removed.";
 
         } else {
@@ -73,6 +79,12 @@ public class SavedItineraryService {
             itinerary.setSaveCount(
                     savedItineraryRepository
                             .countByItineraryItineraryId(itineraryId)
+            );
+
+            log.info(
+                    "User {} saved itinerary {}",
+                    userId,
+                    itineraryId
             );
 
             return "Itinerary saved.";

@@ -156,6 +156,8 @@ public class AdminService {
         type.setName(name);
 
         itineraryTypeRepository.save(type);
+
+        log.info("Itinerary type created: {}", name);
     }
 
     @Transactional
@@ -166,6 +168,8 @@ public class AdminService {
                         new ResourceNotFoundException("Itinerary type not found."));
 
         itineraryTypeRepository.delete(type);
+
+        log.info("Itinerary type deleted: id={}, name={}", typeId, type.getName());
     }
 
 }

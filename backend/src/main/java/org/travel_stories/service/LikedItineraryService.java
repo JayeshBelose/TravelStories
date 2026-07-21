@@ -50,12 +50,18 @@ public class LikedItineraryService {
                             itineraryId
                     );
 
+            log.info(
+                    "Itinerary unliked: itineraryId={}, userId={}",
+                    itineraryId,
+                    userId
+            );
+
             itinerary.setLikeCount(
                     likedItineraryRepository
                             .countByItineraryItineraryId(itineraryId)
             );
 
-            return "Itinerary disliked.";
+            return "Itinerary unliked.";
 
         } else {
 
@@ -65,6 +71,12 @@ public class LikedItineraryService {
             likedItinerary.setItinerary(itinerary);
 
             likedItineraryRepository.save(likedItinerary);
+
+            log.info(
+                    "Itinerary liked: itineraryId={}, userId={}",
+                    itineraryId,
+                    userId
+            );
 
             itinerary.setLikeCount(
                     likedItineraryRepository

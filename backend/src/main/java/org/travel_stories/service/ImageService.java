@@ -49,6 +49,13 @@ public class ImageService {
         image.setLocation(location);
 
         imageRepository.save(image);
+
+        log.info(
+                "Image uploaded: imageId={}, locationId={}, orderNumber={}",
+                image.getImageId(),
+                locationId,
+                nextOrderNumber
+        );
     }
 
     @Transactional
@@ -74,6 +81,13 @@ public class ImageService {
         }
 
         imageRepository.saveAll(imagesToAdjust);
+
+        log.info(
+                "Image deleted: imageId={}, locationId={}, orderNumber={}",
+                imageId,
+                locationId,
+                deletedImageNumber
+        );
     }
 
     public List<ImageResponseDto> getImagesByLocation(UUID locationId) {

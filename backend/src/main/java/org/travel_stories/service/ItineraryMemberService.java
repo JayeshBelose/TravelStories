@@ -47,6 +47,12 @@ public class ItineraryMemberService {
         itineraryMember.setUser(user);
 
         itineraryMemberRepository.save(itineraryMember);
+
+        log.info(
+                "Member added: userId={} to itineraryId={}",
+                userId,
+                itineraryId
+        );
     }
 
     @Transactional
@@ -61,6 +67,12 @@ public class ItineraryMemberService {
         itineraryMemberRepository.deleteByItineraryItineraryIdAndUserUserId(
                 itineraryId,
                 userId
+        );
+
+        log.info(
+                "Member removed: userId={} from itineraryId={}",
+                userId,
+                itineraryId
         );
     }
 

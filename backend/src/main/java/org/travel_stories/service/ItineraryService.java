@@ -111,7 +111,15 @@ public class ItineraryService {
         itinerary.setCreatedBy(user);
         itinerary.setType(itineraryType);
 
-        return map(itineraryRepository.save(itinerary));
+        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+
+        log.info(
+                "Itinerary created: itineraryId={}, userId={}",
+                savedItinerary.getItineraryId(),
+                userId
+        );
+
+        return map(savedItinerary);
     }
 
     @Transactional
@@ -125,6 +133,11 @@ public class ItineraryService {
         savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
 
         itineraryRepository.delete(itinerary);
+
+        log.info(
+                "Itinerary deleted: itineraryId={}",
+                itineraryId
+        );
     }
 
     @Transactional
@@ -170,7 +183,14 @@ public class ItineraryService {
         itinerary.setPublic(itineraryRequestDto.isPublic());
         itinerary.setType(itineraryType);
 
-        return map(itineraryRepository.save(itinerary));
+        Itinerary updatedItinerary = itineraryRepository.save(itinerary);
+
+        log.info(
+                "Itinerary updated: itineraryId={}",
+                itineraryId
+        );
+
+        return map(updatedItinerary);
     }
 
     public Page<ItineraryResponseDto> getItineraries(

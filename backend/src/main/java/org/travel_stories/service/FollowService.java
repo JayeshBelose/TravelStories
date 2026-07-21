@@ -50,7 +50,13 @@ public class FollowService {
 
         followRepository.save(follow);
 
-        return "Followed.";
+        log.info(
+                "User {} followed user {}",
+                followerId,
+                followingId
+        );
+
+        return "User followed successfully.";
     }
 
     @Transactional
@@ -61,6 +67,12 @@ public class FollowService {
         }
 
         followRepository.deleteByFollowerUserIdAndFollowingUserId(followerId, followingId);
+
+        log.info(
+                "User {} unfollowed user {}",
+                followerId,
+                followingId
+        );
     }
 
     public List<FollowResponseDto> getFollowers(UUID userId){
