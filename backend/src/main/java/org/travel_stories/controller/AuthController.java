@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<ApiResponse<AuthResponseDto>> login(
+            @Valid @RequestBody LoginDto loginDto) {
 
         User user = userService.authenticate(loginDto.getEmail(), loginDto.getPassword());
 
@@ -50,7 +52,8 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> signup(@RequestBody SignupDto signupDto) {
+    public ResponseEntity<ApiResponse<AuthResponseDto>> signup(
+            @Valid @RequestBody SignupDto signupDto) {
 
         if (userRepository.existsByEmail(signupDto.getEmail())) {
             return ResponseEntity.badRequest()
