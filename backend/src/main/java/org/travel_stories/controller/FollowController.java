@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class FollowController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<String>> follow(
-            @RequestBody FollowRequestDto followRequestDto) {
+            @Valid @RequestBody FollowRequestDto followRequestDto) {
 
         String message = followService.follow(
                 followRequestDto.getFollowerId(),
@@ -34,7 +35,7 @@ public class FollowController {
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> unfollow(
-            @RequestBody FollowRequestDto followRequestDto) {
+            @Valid @RequestBody FollowRequestDto followRequestDto) {
 
         followService.unfollow(
                 followRequestDto.getFollowerId(),

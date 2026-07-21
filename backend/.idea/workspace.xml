@@ -6,11 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/DayRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/DayRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/FollowRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/FollowRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryTypeDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ItineraryTypeDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/LocationRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/LocationRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/DayController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/DayController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/FollowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/FollowController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryTypeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ItineraryTypeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/LocationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

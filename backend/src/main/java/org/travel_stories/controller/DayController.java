@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class DayController {
     @PostMapping
     public ResponseEntity<ApiResponse<DayResponseDto>> addDay(
             @PathVariable UUID itineraryId,
-            @RequestBody DayRequestDto dayRequestDto
+            @Valid @RequestBody DayRequestDto dayRequestDto
     ) {
         DayResponseDto dayResponseDto = dayService.addDay(itineraryId, dayRequestDto);
 
@@ -56,7 +57,7 @@ public class DayController {
     @PutMapping("/{dayId}")
     public ResponseEntity<ApiResponse<Void>> updateDay(
             @PathVariable("dayId") UUID dayId,
-            @RequestBody DayRequestDto dayRequestDto
+            @Valid @RequestBody DayRequestDto dayRequestDto
     ) {
         dayService.updateDay(dayId, dayRequestDto);
 

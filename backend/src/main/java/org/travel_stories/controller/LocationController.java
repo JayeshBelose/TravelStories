@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class LocationController {
     @PostMapping
     public ResponseEntity<ApiResponse<LocationResponseDto>> addLocation(
             @PathVariable UUID dayId,
-            @RequestBody LocationRequestDto locationRequestDto
+            @Valid @RequestBody LocationRequestDto locationRequestDto
     ) {
 
         LocationResponseDto locationResponseDto =
@@ -67,7 +68,7 @@ public class LocationController {
     @PutMapping("/{locationId}")
     public ResponseEntity<ApiResponse<Void>> updateLocation(
             @PathVariable("locationId") UUID locationId,
-            @RequestBody LocationRequestDto locationRequestDto
+            @Valid @RequestBody LocationRequestDto locationRequestDto
     ) {
 
         locationService.updateLocation(locationId, locationRequestDto);

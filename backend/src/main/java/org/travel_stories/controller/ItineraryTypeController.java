@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ItineraryTypeController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ItineraryTypeDto>> addType(
-            @RequestBody ItineraryTypeDto requestDto) {
+            @Valid @RequestBody ItineraryTypeDto requestDto) {
 
         ItineraryTypeDto itineraryTypeDto = itineraryTypeService.addType(requestDto);
 

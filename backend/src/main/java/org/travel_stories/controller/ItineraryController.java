@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ItineraryController {
 
     @PostMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> createItinerary(
-            @RequestBody String data,
+            @Valid @RequestBody String data,
             @PathVariable("userId") UUID userId
     ) throws IOException {
 
@@ -55,7 +56,7 @@ public class ItineraryController {
 
     @PutMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> updateItinerary(
-            @RequestBody String data,
+            @Valid @RequestBody String data,
             @PathVariable UUID itineraryId
     ) throws IOException {
 

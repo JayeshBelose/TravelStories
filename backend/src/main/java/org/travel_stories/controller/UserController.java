@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +72,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
-            @RequestBody UserRequestDto userRequestDto,
+            @Valid @RequestBody UserRequestDto userRequestDto,
             @PathVariable("userId") UUID userId
     ) {
 
