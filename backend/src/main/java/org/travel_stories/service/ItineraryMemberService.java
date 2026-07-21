@@ -29,18 +29,27 @@ public class ItineraryMemberService {
     public void addMember(UUID itineraryId, UUID userId) {
 
         if (itineraryMemberRepository.existsByItineraryItineraryIdAndUserUserId(itineraryId, userId)) {
+            log.warn(
+                    "Failed to add member. User {} is already a member of itinerary {}.",
+                    userId,
+                    itineraryId
+            );
             throw new ResourceAlreadyExistsException(
                     "User is already a member of this itinerary."
             );
         }
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to add member. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to add member. User not found: {}", userId);
+                    return new ResourceNotFoundException("User not found.");
+                });
 
         ItineraryMember itineraryMember = new ItineraryMember();
         itineraryMember.setItinerary(itinerary);
@@ -59,6 +68,11 @@ public class ItineraryMemberService {
     public void removeMember(UUID itineraryId, UUID userId) {
 
         if (!itineraryMemberRepository.existsByItineraryItineraryIdAndUserUserId(itineraryId, userId)) {
+            log.warn(
+                    "Failed to remove member. User {} is not a member of itinerary {}.",
+                    userId,
+                    itineraryId
+            );
             throw new ResourceNotFoundException(
                     "Itinerary member not found."
             );

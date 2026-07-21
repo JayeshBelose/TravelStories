@@ -37,8 +37,10 @@ public class ImageService {
     public void uploadImage(UUID locationId, MultipartFile file) throws IOException {
 
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Location not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to upload image. Location not found: {}", locationId);
+                    return new ResourceNotFoundException("Location not found.");
+                });
 
         int nextOrderNumber = imageRepository.findNextOrderNumber(locationId) + 1;
 
@@ -62,8 +64,10 @@ public class ImageService {
     public void deleteImage(UUID imageId) {
 
         Image image = imageRepository.findById(imageId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Image not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to delete image. Image not found: {}", imageId);
+                    return new ResourceNotFoundException("Image not found.");
+                });
 
         int deletedImageNumber = image.getOrderNumber();
         UUID locationId = image.getLocation().getLocationId();
@@ -109,8 +113,10 @@ public class ImageService {
     public Image getImageById(UUID imageId) {
 
         return imageRepository.findById(imageId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Image not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to retrieve image. Image not found: {}", imageId);
+                    return new ResourceNotFoundException("Image not found.");
+                });
     }
 
 }

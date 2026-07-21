@@ -28,16 +28,26 @@ public class SavedItineraryService {
     public String saveItinerary(UUID userId, UUID itineraryId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to save itinerary: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Itinerary not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to save itinerary: itinerary not found, itineraryId={}",
+                            itineraryId
+                    );
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
+                });
 
         boolean alreadySaved =
                 savedItineraryRepository
@@ -97,16 +107,26 @@ public class SavedItineraryService {
     ) {
 
         userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to check saved itinerary: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Itinerary not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to check saved itinerary: itinerary not found, itineraryId={}",
+                            itineraryId
+                    );
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
+                });
 
         return savedItineraryRepository
                 .existsByUserUserIdAndItineraryItineraryId(

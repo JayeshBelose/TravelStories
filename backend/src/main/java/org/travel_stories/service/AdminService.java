@@ -149,6 +149,7 @@ public class AdminService {
     public void addType(String name) {
 
         if (itineraryTypeRepository.existsByNameIgnoreCase(name)) {
+            log.warn("Failed to create itinerary type. Type '{}' already exists.", name);
             throw new ResourceAlreadyExistsException("Itinerary type already exists.");
         }
 
@@ -164,8 +165,11 @@ public class AdminService {
     public void deleteType(Long typeId) {
 
         ItineraryType type = itineraryTypeRepository.findById(typeId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary type not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to delete itinerary type. Type not found: id={}", typeId);
+                    return new ResourceNotFoundException("Itinerary type not found.");
+                });
+
 
         itineraryTypeRepository.delete(type);
 

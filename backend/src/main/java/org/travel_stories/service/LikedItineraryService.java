@@ -28,12 +28,16 @@ public class LikedItineraryService {
     public String likeItinerary(UUID userId, UUID itineraryId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to like/unlike itinerary. User not found: {}", userId);
+                    return new ResourceNotFoundException("User not found.");
+                });
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to like/unlike itinerary. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         boolean alreadyLiked =
                 likedItineraryRepository
@@ -90,12 +94,16 @@ public class LikedItineraryService {
     public Boolean checkIfLiked(UUID userId, UUID itineraryId) {
 
         userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to check liked status. User not found: {}", userId);
+                    return new ResourceNotFoundException("User not found.");
+                });
 
         itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to check liked status. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         return likedItineraryRepository
                 .existsByUserUserIdAndItineraryItineraryId(

@@ -31,10 +31,15 @@ public class ThumbnailService {
     ) throws IOException {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Itinerary not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to upload/update thumbnail: itinerary not found, itineraryId={}",
+                            itineraryId
+                    );
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
+                });
 
         Optional<Thumbnail> existingThumbnail =
                 thumbnailRepository.findByItineraryItineraryId(itineraryId);
@@ -71,10 +76,15 @@ public class ThumbnailService {
     public Thumbnail getThumbnailByItineraryId(UUID itineraryId){
 
         return thumbnailRepository.findByItineraryItineraryId(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Thumbnail not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to fetch thumbnail: thumbnail not found, itineraryId={}",
+                            itineraryId
+                    );
+                    return new ResourceNotFoundException(
+                            "Thumbnail not found."
+                    );
+                });
     }
 
 }

@@ -39,12 +39,19 @@ public class DayService {
     public DayResponseDto addDay(UUID itineraryId, DayRequestDto dayRequestDto) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to add day. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         int nextDayNumber = dayRepository.findMaxDayNumber(itineraryId) + 1;
 
         if (nextDayNumber > itinerary.getTotalDays()) {
+            log.warn(
+                    "Failed to add day. Itinerary {} already has maximum {} days.",
+                    itineraryId,
+                    itinerary.getTotalDays()
+            );
             throw new InvalidOperationException(
                     "Cannot add more days than the itinerary total."
             );
@@ -70,12 +77,16 @@ public class DayService {
     public void removeDay(UUID itineraryId, UUID dayId) {
 
         Day day = dayRepository.findById(dayId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Day not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to remove day. Day not found: {}", dayId);
+                    return new ResourceNotFoundException("Day not found.");
+                });
 
         itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to remove day. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         int deletedDayNumber = day.getDayNumber();
 
@@ -112,8 +123,10 @@ public class DayService {
     public void updateDay(UUID dayId, DayRequestDto dayRequestDto) {
 
         Day day = dayRepository.findById(dayId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Day not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to update day. Day not found: {}", dayId);
+                    return new ResourceNotFoundException("Day not found.");
+                });
 
         if (dayRequestDto.getDescription() != null) {
             day.setDescription(dayRequestDto.getDescription());

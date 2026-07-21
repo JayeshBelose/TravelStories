@@ -75,10 +75,15 @@ public class UserService {
     public UserResponseDto getUserById(UUID userId){
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to fetch user: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         return map(user);
     }
@@ -88,6 +93,10 @@ public class UserService {
         User user = userRepository.findByUsername(username);
 
         if(user == null){
+            log.warn(
+                    "Failed to fetch user by username: user not found, username={}",
+                    username
+            );
             throw new ResourceNotFoundException(
                     "User not found."
             );
@@ -107,10 +116,15 @@ public class UserService {
     public void deleteUser(UUID userId){
 
         userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to delete user: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         likedItineraryRepository.deleteByUserUserId(userId);
 
@@ -135,10 +149,15 @@ public class UserService {
     ){
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to update user: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         if(userRequestDto.getUsername()!=null){
             user.setUsername(
@@ -166,13 +185,23 @@ public class UserService {
     ){
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new InvalidCredentialsException(
-                                "Invalid email or password"
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed login attempt: email not found, email={}",
+                            email
+                    );
+                    return new InvalidCredentialsException(
+                            "Invalid email or password"
+                    );
+                });
 
 
         if(!user.getPassword().equals(password)){
+
+            log.warn(
+                    "Failed login attempt: invalid password, email={}",
+                    email
+            );
 
             throw new InvalidCredentialsException(
                     "Invalid email or password"
@@ -204,10 +233,15 @@ public class UserService {
     public String forgotPassword(String email){
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed password reset request: user not found, email={}",
+                            email
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         String token = jwtUtil.generateResetToken(
                 user.getUsername()
@@ -230,26 +264,31 @@ public class UserService {
         if(!jwtUtil.validateToken(token)
                 || !jwtUtil.isResetToken(token)){
 
+            log.warn(
+                    "Failed password reset: invalid or expired token"
+            );
+
             throw new InvalidTokenException(
                     "Invalid or expired token"
             );
         }
 
-
         String username =
                 jwtUtil.extractUsernameFromResetToken(token);
 
-
         User user = userRepository.findByUsername(username);
 
-
         if(user == null){
+
+            log.warn(
+                    "Failed password reset: user not found, username={}",
+                    username
+            );
 
             throw new ResourceNotFoundException(
                     "User not found."
             );
         }
-
 
         user.setPassword(newPassword);
 

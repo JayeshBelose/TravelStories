@@ -31,10 +31,15 @@ public class ProfilePictureService {
     ) throws IOException {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to upload/update profile picture: user not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
+                });
 
         Optional<ProfilePicture> existingPfp =
                 profilePictureRepository.findByUserUserId(userId);
@@ -65,10 +70,15 @@ public class ProfilePictureService {
     public ProfilePicture getPfpByUser(UUID userId) {
 
         return profilePictureRepository.findByUserUserId(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Profile picture not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to fetch profile picture: profile picture not found, userId={}",
+                            userId
+                    );
+                    return new ResourceNotFoundException(
+                            "Profile picture not found."
+                    );
+                });
     }
 
 }

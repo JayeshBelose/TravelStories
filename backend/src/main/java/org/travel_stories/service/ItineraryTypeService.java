@@ -24,6 +24,11 @@ public class ItineraryTypeService {
     public ItineraryTypeDto addType(ItineraryTypeDto requestDto) {
 
         if (itineraryTypeRepository.existsByNameIgnoreCase(requestDto.getName())) {
+            log.warn(
+                    "Failed to create itinerary type. Type '{}' already exists.",
+                    requestDto.getName()
+            );
+
             throw new ResourceAlreadyExistsException(
                     "Itinerary type already exists."
             );
@@ -71,10 +76,16 @@ public class ItineraryTypeService {
 
         ItineraryType itineraryType =
                 itineraryTypeRepository.findById(typeId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Itinerary type not found."
-                                ));
+                        .orElseThrow(() -> {
+                            log.warn(
+                                    "Failed to delete itinerary type. Type not found: {}",
+                                    typeId
+                            );
+
+                            return new ResourceNotFoundException(
+                                    "Itinerary type not found."
+                            );
+                        });
 
         itineraryTypeRepository.delete(itineraryType);
 

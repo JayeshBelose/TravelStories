@@ -29,20 +29,30 @@ public class FollowService {
     public String follow(UUID followerId, UUID followingId) {
 
         if (followerId.equals(followingId)) {
+            log.warn("User {} attempted to follow themselves.", followerId);
             throw new InvalidOperationException("User cannot follow themselves.");
         }
 
         if (followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId)) {
+            log.warn(
+                    "User {} attempted to follow user {} who is already being followed.",
+                    followerId,
+                    followingId
+            );
             throw new ResourceAlreadyExistsException("User is already being followed.");
         }
 
         User follower = userRepository.findById(followerId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Follower not found."));
+                .orElseThrow(() -> {
+                    log.warn("Follower not found: {}", followerId);
+                    return new ResourceNotFoundException("Follower not found.");
+                });
 
         User following = userRepository.findById(followingId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Following user not found."));
+                .orElseThrow(() -> {
+                    log.warn("Following user not found: {}", followingId);
+                    return new ResourceNotFoundException("Following user not found.");
+                });
 
         Follow follow = new Follow();
         follow.setFollower(follower);
@@ -63,6 +73,11 @@ public class FollowService {
     public void unfollow(UUID followerId, UUID followingId) {
 
         if (!followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId)) {
+            log.warn(
+                    "Failed to unfollow. Follow relationship not found between {} and {}.",
+                    followerId,
+                    followingId
+            );
             throw new ResourceNotFoundException("Follow relationship not found.");
         }
 

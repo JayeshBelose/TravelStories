@@ -43,8 +43,10 @@ public class LocationService {
     ) {
 
         Day day = dayRepository.findById(dayId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Day not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to add location: day not found, dayId={}", dayId);
+                    return new ResourceNotFoundException("Day not found.");
+                });
 
         int nextLocationNumber =
                 locationRepository.findNextLocationNumber(dayId) + 1;
@@ -59,8 +61,8 @@ public class LocationService {
         locationRepository.save(location);
 
         log.info(
-                "Location '{}' added to day {} with order {}",
-                location.getLocationName(),
+                "Location added: locationId={}, dayId={}, orderNumber={}",
+                location.getLocationId(),
                 dayId,
                 nextLocationNumber
         );
@@ -72,16 +74,20 @@ public class LocationService {
     public void removeLocation(UUID dayId, UUID locationId) {
 
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Location not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn("Failed to remove location: location not found, locationId={}", locationId);
+                    return new ResourceNotFoundException(
+                            "Location not found."
+                    );
+                });
 
         dayRepository.findById(dayId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Day not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn("Failed to remove location: day not found, dayId={}", dayId);
+                    return new ResourceNotFoundException(
+                            "Day not found."
+                    );
+                });
 
         int deletedLocationNumber = location.getLocationNumber();
 
@@ -103,9 +109,10 @@ public class LocationService {
         locationRepository.saveAll(locationsToAdjust);
 
         log.info(
-                "Location {} removed from day {}",
+                "Location removed: locationId={}, dayId={}, orderNumber={}",
                 locationId,
-                dayId
+                dayId,
+                deletedLocationNumber
         );
     }
 
@@ -125,10 +132,12 @@ public class LocationService {
     ) {
 
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Location not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn("Failed to update location: location not found, locationId={}", locationId);
+                    return new ResourceNotFoundException(
+                            "Location not found."
+                    );
+                });
 
         if (locationRequestDto.getLocationName() != null) {
             location.setLocationName(
@@ -143,8 +152,9 @@ public class LocationService {
         }
 
         log.info(
-                "Location {} updated",
-                locationId
+                "Location updated: locationId={}, dayId={}",
+                locationId,
+                location.getDay().getDayId()
         );
     }
 

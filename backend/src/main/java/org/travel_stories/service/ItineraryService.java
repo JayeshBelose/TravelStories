@@ -75,19 +75,32 @@ public class ItineraryService {
         if (itineraryRequestDto.getEndDate()
                 .isBefore(itineraryRequestDto.getStartDate())) {
 
+            log.warn(
+                    "Failed to create itinerary. End date {} is before start date {}.",
+                    itineraryRequestDto.getEndDate(),
+                    itineraryRequestDto.getStartDate()
+            );
+
             throw new InvalidOperationException(
                     "End date cannot be before start date."
             );
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to create itinerary. User not found: {}", userId);
+                    return new ResourceNotFoundException("User not found.");
+                });
 
         ItineraryType itineraryType =
                 itineraryTypeRepository.findByName(itineraryRequestDto.getType());
 
         if (itineraryType == null) {
+            log.warn(
+                    "Failed to create itinerary. Itinerary type '{}' not found.",
+                    itineraryRequestDto.getType()
+            );
+
             throw new ResourceNotFoundException(
                     "Itinerary type not found."
             );
@@ -126,8 +139,10 @@ public class ItineraryService {
     public void deleteItineraryById(UUID itineraryId) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to delete itinerary. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
         savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
@@ -147,11 +162,20 @@ public class ItineraryService {
     ) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found."));
+                .orElseThrow(() -> {
+                    log.warn("Failed to update itinerary. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         if (itineraryRequestDto.getEndDate()
                 .isBefore(itineraryRequestDto.getStartDate())) {
+
+            log.warn(
+                    "Failed to update itinerary {}. End date {} is before start date {}.",
+                    itineraryId,
+                    itineraryRequestDto.getEndDate(),
+                    itineraryRequestDto.getStartDate()
+            );
 
             throw new InvalidOperationException(
                     "End date cannot be before start date."
@@ -162,6 +186,12 @@ public class ItineraryService {
                 itineraryTypeRepository.findByName(itineraryRequestDto.getType());
 
         if (itineraryType == null) {
+            log.warn(
+                    "Failed to update itinerary {}. Itinerary type '{}' not found.",
+                    itineraryId,
+                    itineraryRequestDto.getType()
+            );
+
             throw new ResourceNotFoundException(
                     "Itinerary type not found."
             );
@@ -230,10 +260,10 @@ public class ItineraryService {
     public ItineraryResponseDto getItineraryById(UUID itineraryId){
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Itinerary not found."
-                        ));
+                .orElseThrow(() -> {
+                    log.warn("Failed to retrieve itinerary. Itinerary not found: {}", itineraryId);
+                    return new ResourceNotFoundException("Itinerary not found.");
+                });
 
         return map(itinerary);
     }
