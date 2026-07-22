@@ -2,6 +2,7 @@ package org.travel_stories.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
@@ -28,12 +29,13 @@ public class LocationController {
         LocationResponseDto locationResponseDto =
                 locationService.addLocation(dayId, locationRequestDto);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Location added successfully",
-                        locationResponseDto
-                )
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Location added successfully",
+                                locationResponseDto
+                        )
+                );
     }
 
     @DeleteMapping("/{locationId}")
