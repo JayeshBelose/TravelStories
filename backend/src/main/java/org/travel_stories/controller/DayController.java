@@ -2,6 +2,7 @@ package org.travel_stories.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
@@ -26,9 +27,10 @@ public class DayController {
     ) {
         DayResponseDto dayResponseDto = dayService.addDay(itineraryId, dayRequestDto);
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Day added successfully", dayResponseDto)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success("Day added successfully", dayResponseDto)
+                );
     }
 
     @DeleteMapping("/{dayId}")
