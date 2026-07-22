@@ -2,7 +2,6 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
 import org.travel_stories.service.SavedItineraryService;
@@ -17,14 +16,14 @@ public class SavedItineraryController {
     private final SavedItineraryService savedItineraryService;
 
     @PostMapping("/{itineraryId}")
-    public ResponseEntity<ApiResponse<String>> saveItinerary(
+    public ResponseEntity<ApiResponse<Void>> saveItinerary(
             @PathVariable UUID userId,
             @PathVariable UUID itineraryId) {
 
         String message = savedItineraryService.saveItinerary(userId, itineraryId);
 
         return ResponseEntity.ok(
-                ApiResponse.success(message, message)
+                ApiResponse.success(message)
         );
     }
 

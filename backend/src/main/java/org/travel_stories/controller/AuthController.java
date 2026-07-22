@@ -23,7 +23,6 @@ public class AuthController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponseDto>> login(
@@ -55,7 +54,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponseDto>> signup(
             @Valid @RequestBody SignupDto signupDto) {
 
-        if (userRepository.existsByEmail(signupDto.getEmail())) {
+        if (userService.existsByEmail(signupDto.getEmail())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("Email already in use."));
         }

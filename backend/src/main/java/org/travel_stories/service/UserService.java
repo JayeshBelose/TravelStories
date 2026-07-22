@@ -1,5 +1,7 @@
 package org.travel_stories.service;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -356,4 +358,10 @@ public class UserService {
         );
     }
 
+
+    public boolean existsByEmail(String email) {
+
+        return userRepository.existsByEmail(email);
+
+    }
 }

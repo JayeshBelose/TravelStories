@@ -20,15 +20,17 @@ public class ItineraryTypeController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ItineraryTypeDto>> addType(
-            @Valid @RequestBody ItineraryTypeDto requestDto) {
+            @Valid @RequestBody ItineraryTypeDto requestDto
+    ) {
 
-        ItineraryTypeDto itineraryTypeDto = itineraryTypeService.addType(requestDto);
+        ItineraryTypeDto responseDto =
+                itineraryTypeService.addType(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         ApiResponse.success(
                                 "Itinerary type added successfully",
-                                itineraryTypeDto
+                                responseDto
                         )
                 );
     }
@@ -36,7 +38,8 @@ public class ItineraryTypeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ItineraryTypeDto>>> getAllTypes() {
 
-        List<ItineraryTypeDto> types = itineraryTypeService.getAllTypes();
+        List<ItineraryTypeDto> types =
+                itineraryTypeService.getAllTypes();
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -48,12 +51,15 @@ public class ItineraryTypeController {
 
     @DeleteMapping("/{typeId}")
     public ResponseEntity<ApiResponse<Void>> deleteType(
-            @PathVariable("typeId") Long typeId) {
+            @PathVariable("typeId") Long typeId
+    ) {
 
         itineraryTypeService.deleteTypeById(typeId);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Itinerary type deleted successfully")
+                ApiResponse.success(
+                        "Itinerary type deleted successfully"
+                )
         );
     }
 

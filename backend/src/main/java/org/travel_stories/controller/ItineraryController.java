@@ -10,9 +10,7 @@ import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.service.ItineraryService;
-import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,18 +21,18 @@ public class ItineraryController {
 
     private final ItineraryService itineraryService;
 
+
     @PostMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> createItinerary(
-            @Valid @RequestBody String data,
+            @Valid @RequestBody ItineraryRequestDto itineraryRequestDto,
             @PathVariable("userId") UUID userId
-    ) throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        ItineraryRequestDto itineraryRequestDto =
-                mapper.readValue(data, ItineraryRequestDto.class);
+    ) {
 
         ItineraryResponseDto itineraryResponseDto =
-                itineraryService.createItinerary(itineraryRequestDto, userId);
+                itineraryService.createItinerary(
+                        itineraryRequestDto,
+                        userId
+                );
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -45,6 +43,7 @@ public class ItineraryController {
                 );
     }
 
+
     @DeleteMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<Void>> deleteItineraryById(
             @PathVariable UUID itineraryId) {
@@ -52,22 +51,24 @@ public class ItineraryController {
         itineraryService.deleteItineraryById(itineraryId);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Itinerary deleted successfully")
+                ApiResponse.success(
+                        "Itinerary deleted successfully"
+                )
         );
     }
 
+
     @PutMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> updateItinerary(
-            @Valid @RequestBody String data,
+            @Valid @RequestBody ItineraryRequestDto itineraryRequestDto,
             @PathVariable UUID itineraryId
-    ) throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        ItineraryRequestDto itineraryRequestDto =
-                mapper.readValue(data, ItineraryRequestDto.class);
+    ) {
 
         ItineraryResponseDto itineraryResponseDto =
-                itineraryService.updateItinerary(itineraryRequestDto, itineraryId);
+                itineraryService.updateItinerary(
+                        itineraryRequestDto,
+                        itineraryId
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -77,6 +78,7 @@ public class ItineraryController {
         );
     }
 
+
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ItineraryResponseDto>>> getItineraries(
             @RequestParam(defaultValue = "") String search,
@@ -85,13 +87,21 @@ public class ItineraryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ) {
+
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Itineraries fetched successfully",
-                        itineraryService.getItineraries(search, type, sort, page, size)
+                        itineraryService.getItineraries(
+                                search,
+                                type,
+                                sort,
+                                page,
+                                size
+                        )
                 )
         );
     }
+
 
     @GetMapping("/types/{typeId}")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByType(
@@ -105,6 +115,7 @@ public class ItineraryController {
         );
     }
 
+
     @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserId(
             @PathVariable UUID userId) {
@@ -116,6 +127,7 @@ public class ItineraryController {
                 )
         );
     }
+
 
     @GetMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> getItineraryById(
@@ -129,6 +141,7 @@ public class ItineraryController {
         );
     }
 
+
     @GetMapping("/{userId}/membership")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserMembership(
             @PathVariable UUID userId) {
@@ -140,6 +153,7 @@ public class ItineraryController {
                 )
         );
     }
+
 
     @GetMapping("/{userId}/saved")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllSavedItinerariesByUserId(
@@ -153,6 +167,7 @@ public class ItineraryController {
         );
     }
 
+
     @GetMapping("/mostSaved")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostSavedItineraries() {
 
@@ -163,6 +178,7 @@ public class ItineraryController {
                 )
         );
     }
+
 
     @GetMapping("/mostLiked")
     public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostLikedItineraries() {

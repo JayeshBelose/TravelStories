@@ -26,7 +26,7 @@ public class FollowService {
 
 
     @Transactional
-    public String follow(
+    public void follow(
             UUID followerId,
             UUID followingId
     ) {
@@ -104,8 +104,6 @@ public class FollowService {
                 followingId
         );
 
-
-        return "User followed successfully.";
     }
 
 

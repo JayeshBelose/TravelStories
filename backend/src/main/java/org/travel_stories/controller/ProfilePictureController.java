@@ -22,29 +22,35 @@ public class ProfilePictureController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> uploadOrUpdate(
             @PathVariable("userId") UUID userId,
-            @RequestParam MultipartFile file
+            @RequestParam("file") MultipartFile file
     ) throws IOException {
 
         profilePictureService.uploadOrUpdate(userId, file);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Profile picture updated successfully")
+                ApiResponse.success(
+                        "Profile picture updated successfully"
+                )
         );
     }
 
     @GetMapping
     public ResponseEntity<byte[]> getPfpByUser(
-            @PathVariable UUID userId) {
+            @PathVariable("userId") UUID userId
+    ) {
 
-        ProfilePicture pfp = profilePictureService.getPfpByUser(userId);
-
-        if (pfp == null) {
-            return ResponseEntity.notFound().build();
-        }
+        ProfilePicture pfp =
+                profilePictureService.getPfpByUser(userId);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(pfp.getContentType()))
-                .body(pfp.getPfpData());
+                .contentType(
+                        MediaType.parseMediaType(
+                                pfp.getContentType()
+                        )
+                )
+                .body(
+                        pfp.getPfpData()
+                );
     }
 
 }

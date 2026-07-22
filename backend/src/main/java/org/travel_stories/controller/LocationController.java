@@ -22,32 +22,34 @@ public class LocationController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<LocationResponseDto>> addLocation(
-            @PathVariable UUID dayId,
+            @PathVariable("dayId") UUID dayId,
             @Valid @RequestBody LocationRequestDto locationRequestDto
     ) {
 
-        LocationResponseDto locationResponseDto =
+        LocationResponseDto responseDto =
                 locationService.addLocation(dayId, locationRequestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         ApiResponse.success(
                                 "Location added successfully",
-                                locationResponseDto
+                                responseDto
                         )
                 );
     }
 
     @DeleteMapping("/{locationId}")
     public ResponseEntity<ApiResponse<Void>> removeLocation(
-            @PathVariable UUID dayId,
-            @PathVariable UUID locationId
+            @PathVariable("dayId") UUID dayId,
+            @PathVariable("locationId") UUID locationId
     ) {
 
         locationService.removeLocation(dayId, locationId);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Location removed successfully")
+                ApiResponse.success(
+                        "Location removed successfully"
+                )
         );
     }
 
@@ -76,7 +78,9 @@ public class LocationController {
         locationService.updateLocation(locationId, locationRequestDto);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Location updated successfully")
+                ApiResponse.success(
+                        "Location updated successfully"
+                )
         );
     }
 

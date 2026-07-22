@@ -20,16 +20,16 @@ public class FollowController {
     private final FollowService followService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> follow(
+    public ResponseEntity<ApiResponse<Void>> follow(
             @Valid @RequestBody FollowRequestDto followRequestDto) {
 
-        String message = followService.follow(
+        followService.follow(
                 followRequestDto.getFollowerId(),
                 followRequestDto.getFollowingId()
         );
 
         return ResponseEntity.ok(
-                ApiResponse.success(message, message)
+                ApiResponse.success("User followed successfully")
         );
     }
 

@@ -36,7 +36,8 @@ public class ThumbnailController {
     public ResponseEntity<byte[]> getThumbnailByItineraryId(
             @PathVariable("itineraryId") UUID itineraryId) {
 
-        Thumbnail thumbnail = thumbnailService.getThumbnailByItineraryId(itineraryId);
+        Thumbnail thumbnail =
+                thumbnailService.getThumbnailByItineraryId(itineraryId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(thumbnail.getContentType()))
