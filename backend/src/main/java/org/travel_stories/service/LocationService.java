@@ -14,7 +14,6 @@ import org.travel_stories.repository.LocationRepository;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,8 +24,11 @@ public class LocationService {
     private final DayRepository dayRepository;
     private final ImageService imageService;
 
-    public LocationResponseDto map(Location location){
+
+    public LocationResponseDto map(Location location) {
+
         LocationResponseDto locationResponseDto = new LocationResponseDto();
+
         locationResponseDto.setLocationId(location.getLocationId());
         locationResponseDto.setLocationNumber(location.getLocationNumber());
         locationResponseDto.setLocationName(location.getLocationName());
@@ -34,6 +36,7 @@ public class LocationService {
 
         return locationResponseDto;
     }
+
 
     @Transactional
     public LocationResponseDto addLocation(
@@ -43,12 +46,17 @@ public class LocationService {
 
         Day day = dayRepository.findById(dayId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to add location: day not found, dayId={}", dayId);
+                    log.warn(
+                            "Failed to add location: day not found, dayId={}",
+                            dayId
+                    );
                     return new ResourceNotFoundException("Day not found.");
                 });
 
+
         int nextLocationNumber =
                 locationRepository.findNextLocationNumber(dayId) + 1;
+
 
         Location location = new Location();
 
@@ -57,7 +65,9 @@ public class LocationService {
         location.setLocationAddress(locationRequestDto.getLocationAddress());
         location.setDay(day);
 
+
         locationRepository.save(location);
+
 
         log.info(
                 "Location added: locationId={}, dayId={}, orderNumber={}",
@@ -66,46 +76,67 @@ public class LocationService {
                 nextLocationNumber
         );
 
+
         return map(location);
     }
 
+
     @Transactional
-    public void removeLocation(UUID dayId, UUID locationId) {
+    public void removeLocation(
+            UUID dayId,
+            UUID locationId
+    ) {
 
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to remove location: location not found, locationId={}", locationId);
+                    log.warn(
+                            "Failed to remove location: location not found, locationId={}",
+                            locationId
+                    );
+
                     return new ResourceNotFoundException(
                             "Location not found."
                     );
                 });
 
+
         dayRepository.findById(dayId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to remove location: day not found, dayId={}", dayId);
+                    log.warn(
+                            "Failed to remove location: day not found, dayId={}",
+                            dayId
+                    );
+
                     return new ResourceNotFoundException(
                             "Day not found."
                     );
                 });
 
+
         int deletedLocationNumber = location.getLocationNumber();
+
 
         locationRepository.delete(location);
         locationRepository.flush();
 
+
         List<Location> locationsToAdjust =
                 locationRepository.findByDayDayIdOrderByLocationNumber(dayId);
+
 
         for (Location l : locationsToAdjust) {
 
             if (l.getLocationNumber() > deletedLocationNumber) {
+
                 l.setLocationNumber(
                         l.getLocationNumber() - 1
                 );
             }
         }
 
+
         locationRepository.saveAll(locationsToAdjust);
+
 
         log.info(
                 "Location removed: locationId={}, dayId={}, orderNumber={}",
@@ -115,7 +146,7 @@ public class LocationService {
         );
     }
 
-    @Transactional
+
     public List<LocationResponseDto> getLocationsByDay(UUID dayId) {
 
         return locationRepository
@@ -125,6 +156,7 @@ public class LocationService {
                 .toList();
     }
 
+
     @Transactional
     public void updateLocation(
             UUID locationId,
@@ -133,23 +165,32 @@ public class LocationService {
 
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to update location: location not found, locationId={}", locationId);
+                    log.warn(
+                            "Failed to update location: location not found, locationId={}",
+                            locationId
+                    );
+
                     return new ResourceNotFoundException(
                             "Location not found."
                     );
                 });
 
+
         if (locationRequestDto.getLocationName() != null) {
+
             location.setLocationName(
                     locationRequestDto.getLocationName()
             );
         }
 
+
         if (locationRequestDto.getLocationAddress() != null) {
+
             location.setLocationAddress(
                     locationRequestDto.getLocationAddress()
             );
         }
+
 
         log.info(
                 "Location updated: locationId={}, dayId={}",

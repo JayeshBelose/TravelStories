@@ -18,12 +18,12 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItineraryMemberService {
 
     private final ItineraryMemberRepository itineraryMemberRepository;
     private final ItineraryRepository itineraryRepository;
     private final UserRepository userRepository;
+
 
     @Transactional
     public void addMember(UUID itineraryId, UUID userId) {
@@ -34,10 +34,12 @@ public class ItineraryMemberService {
                     userId,
                     itineraryId
             );
+
             throw new ResourceAlreadyExistsException(
                     "User is already a member of this itinerary."
             );
         }
+
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
@@ -45,17 +47,21 @@ public class ItineraryMemberService {
                     return new ResourceNotFoundException("Itinerary not found.");
                 });
 
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("Failed to add member. User not found: {}", userId);
                     return new ResourceNotFoundException("User not found.");
                 });
 
+
         ItineraryMember itineraryMember = new ItineraryMember();
+
         itineraryMember.setItinerary(itinerary);
         itineraryMember.setUser(user);
 
         itineraryMemberRepository.save(itineraryMember);
+
 
         log.info(
                 "Member added: userId={} to itineraryId={}",
@@ -64,24 +70,29 @@ public class ItineraryMemberService {
         );
     }
 
+
     @Transactional
     public void removeMember(UUID itineraryId, UUID userId) {
 
         if (!itineraryMemberRepository.existsByItineraryItineraryIdAndUserUserId(itineraryId, userId)) {
+
             log.warn(
                     "Failed to remove member. User {} is not a member of itinerary {}.",
                     userId,
                     itineraryId
             );
+
             throw new ResourceNotFoundException(
                     "Itinerary member not found."
             );
         }
 
+
         itineraryMemberRepository.deleteByItineraryItineraryIdAndUserUserId(
                 itineraryId,
                 userId
         );
+
 
         log.info(
                 "Member removed: userId={} from itineraryId={}",

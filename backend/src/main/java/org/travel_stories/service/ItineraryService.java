@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItineraryService {
 
     private final ItineraryRepository itineraryRepository;
@@ -35,7 +34,9 @@ public class ItineraryService {
     private final LikedItineraryRepository likedItineraryRepository;
     private final SavedItineraryRepository savedItineraryRepository;
 
+
     public ItineraryResponseDto map(Itinerary itinerary){
+
         ItineraryResponseDto itineraryResponseDto = new ItineraryResponseDto();
 
         itineraryResponseDto.setItineraryId(itinerary.getItineraryId());
@@ -52,6 +53,7 @@ public class ItineraryService {
         itineraryResponseDto.setLastUpdated(itinerary.getLastUpdated());
         itineraryResponseDto.setCreatedBy(itinerary.getCreatedBy().getUsername());
         itineraryResponseDto.setType(itinerary.getType().getName());
+
         itineraryResponseDto.setMembers(
                 itinerary.getMembers().stream()
                         .map(m -> {
@@ -66,6 +68,7 @@ public class ItineraryService {
         return itineraryResponseDto;
     }
 
+
     @Transactional
     public ItineraryResponseDto createItinerary(
             ItineraryRequestDto itineraryRequestDto,
@@ -75,32 +78,20 @@ public class ItineraryService {
         if (itineraryRequestDto.getEndDate()
                 .isBefore(itineraryRequestDto.getStartDate())) {
 
-            log.warn(
-                    "Failed to create itinerary. End date {} is before start date {}.",
-                    itineraryRequestDto.getEndDate(),
-                    itineraryRequestDto.getStartDate()
-            );
-
             throw new InvalidOperationException(
                     "End date cannot be before start date."
             );
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("Failed to create itinerary. User not found: {}", userId);
-                    return new ResourceNotFoundException("User not found.");
-                });
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found.")
+                );
 
         ItineraryType itineraryType =
                 itineraryTypeRepository.findByName(itineraryRequestDto.getType());
 
         if (itineraryType == null) {
-            log.warn(
-                    "Failed to create itinerary. Itinerary type '{}' not found.",
-                    itineraryRequestDto.getType()
-            );
-
             throw new ResourceNotFoundException(
                     "Itinerary type not found."
             );
@@ -114,17 +105,19 @@ public class ItineraryService {
         itinerary.setStartDate(itineraryRequestDto.getStartDate());
         itinerary.setEndDate(itineraryRequestDto.getEndDate());
 
-        Long totalDays = ChronoUnit.DAYS.between(
-                itineraryRequestDto.getStartDate(),
-                itineraryRequestDto.getEndDate()
-        ) + 1;
+        itinerary.setTotalDays(
+                ChronoUnit.DAYS.between(
+                        itineraryRequestDto.getStartDate(),
+                        itineraryRequestDto.getEndDate()
+                ) + 1
+        );
 
-        itinerary.setTotalDays(totalDays);
         itinerary.setPublic(itineraryRequestDto.isPublic());
         itinerary.setCreatedBy(user);
         itinerary.setType(itineraryType);
 
-        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+        Itinerary savedItinerary =
+                itineraryRepository.save(itinerary);
 
         log.info(
                 "Itinerary created: itineraryId={}, userId={}",
@@ -135,14 +128,14 @@ public class ItineraryService {
         return map(savedItinerary);
     }
 
+
     @Transactional
     public void deleteItineraryById(UUID itineraryId) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() -> {
-                    log.warn("Failed to delete itinerary. Itinerary not found: {}", itineraryId);
-                    return new ResourceNotFoundException("Itinerary not found.");
-                });
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Itinerary not found.")
+                );
 
         likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
         savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
@@ -155,6 +148,7 @@ public class ItineraryService {
         );
     }
 
+
     @Transactional
     public ItineraryResponseDto updateItinerary(
             ItineraryRequestDto itineraryRequestDto,
@@ -162,40 +156,31 @@ public class ItineraryService {
     ) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() -> {
-                    log.warn("Failed to update itinerary. Itinerary not found: {}", itineraryId);
-                    return new ResourceNotFoundException("Itinerary not found.");
-                });
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Itinerary not found.")
+                );
+
 
         if (itineraryRequestDto.getEndDate()
                 .isBefore(itineraryRequestDto.getStartDate())) {
-
-            log.warn(
-                    "Failed to update itinerary {}. End date {} is before start date {}.",
-                    itineraryId,
-                    itineraryRequestDto.getEndDate(),
-                    itineraryRequestDto.getStartDate()
-            );
 
             throw new InvalidOperationException(
                     "End date cannot be before start date."
             );
         }
 
+
         ItineraryType itineraryType =
-                itineraryTypeRepository.findByName(itineraryRequestDto.getType());
+                itineraryTypeRepository.findByName(
+                        itineraryRequestDto.getType()
+                );
 
         if (itineraryType == null) {
-            log.warn(
-                    "Failed to update itinerary {}. Itinerary type '{}' not found.",
-                    itineraryId,
-                    itineraryRequestDto.getType()
-            );
-
             throw new ResourceNotFoundException(
                     "Itinerary type not found."
             );
         }
+
 
         itinerary.setPlace(itineraryRequestDto.getPlace());
         itinerary.setTitle(itineraryRequestDto.getTitle());
@@ -213,7 +198,10 @@ public class ItineraryService {
         itinerary.setPublic(itineraryRequestDto.isPublic());
         itinerary.setType(itineraryType);
 
-        Itinerary updatedItinerary = itineraryRepository.save(itinerary);
+
+        Itinerary updatedItinerary =
+                itineraryRepository.save(itinerary);
+
 
         log.info(
                 "Itinerary updated: itineraryId={}",
@@ -223,6 +211,8 @@ public class ItineraryService {
         return map(updatedItinerary);
     }
 
+
+    @Transactional(readOnly = true)
     public Page<ItineraryResponseDto> getItineraries(
             String search,
             String type,
@@ -230,80 +220,120 @@ public class ItineraryService {
             int page,
             int size
     ) {
+
         Sort sorting;
 
         switch (sort) {
             case "likes":
-                sorting = Sort.by(Sort.Direction.DESC, "likeCount");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "likeCount"
+                );
                 break;
+
             case "saves":
-                sorting = Sort.by(Sort.Direction.DESC, "saveCount");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "saveCount"
+                );
                 break;
+
             case "recent":
-                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"
+                );
                 break;
+
             default:
                 sorting = Sort.unsorted();
         }
 
-        Pageable pageable = PageRequest.of(page, size, sorting);
 
-        Page<Itinerary> result = itineraryRepository.searchItineraries(
-                search.toLowerCase(),
-                type,
-                pageable
-        );
+        Pageable pageable =
+                PageRequest.of(page, size, sorting);
+
+
+        Page<Itinerary> result =
+                itineraryRepository.searchItineraries(
+                        search.toLowerCase(),
+                        type,
+                        pageable
+                );
+
 
         return result.map(this::map);
     }
 
+
+    @Transactional(readOnly = true)
     public ItineraryResponseDto getItineraryById(UUID itineraryId){
 
-        Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() -> {
-                    log.warn("Failed to retrieve itinerary. Itinerary not found: {}", itineraryId);
-                    return new ResourceNotFoundException("Itinerary not found.");
-                });
+        Itinerary itinerary =
+                itineraryRepository.findById(itineraryId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Itinerary not found."
+                                )
+                        );
 
         return map(itinerary);
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getAllItinerariesByType(Long typeId){
+
         return itineraryRepository.findAllByTypeTypeId(typeId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getAllItinerariesByUserId(UUID userId){
+
         return itineraryRepository.findAllByCreatedByUserId(userId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getAllItinerariesByUserMembership(UUID userId){
+
         return itineraryRepository.findAllByMembersUserUserId(userId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getAllSavedItinerariesByUserId(UUID userId){
+
         return itineraryRepository.findAllBySavedByUserUserId(userId)
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getMostSavedItineraries(){
+
         return itineraryRepository.findMostSavedItineraries()
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getMostLikedItineraries(){
+
         return itineraryRepository.findMostLikedItineraries()
                 .stream()
                 .map(this::map)

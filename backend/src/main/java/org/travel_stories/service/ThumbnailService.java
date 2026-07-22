@@ -18,11 +18,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ThumbnailService {
 
     private final ThumbnailRepository thumbnailRepository;
     private final ItineraryRepository itineraryRepository;
+
 
     @Transactional
     public void uploadOrUpdate(
@@ -36,13 +36,16 @@ public class ThumbnailService {
                             "Failed to upload/update thumbnail: itinerary not found, itineraryId={}",
                             itineraryId
                     );
+
                     return new ResourceNotFoundException(
                             "Itinerary not found."
                     );
                 });
 
+
         Optional<Thumbnail> existingThumbnail =
                 thumbnailRepository.findByItineraryItineraryId(itineraryId);
+
 
         if (existingThumbnail.isPresent()) {
 
@@ -50,6 +53,7 @@ public class ThumbnailService {
 
             thumbnail.setThumbnailData(file.getBytes());
             thumbnail.setContentType(file.getContentType());
+
 
             log.info(
                     "Thumbnail updated for itinerary {}",
@@ -64,7 +68,9 @@ public class ThumbnailService {
             thumbnail.setThumbnailData(file.getBytes());
             thumbnail.setItinerary(itinerary);
 
+
             thumbnailRepository.save(thumbnail);
+
 
             log.info(
                     "Thumbnail uploaded for itinerary {}",
@@ -73,7 +79,8 @@ public class ThumbnailService {
         }
     }
 
-    public Thumbnail getThumbnailByItineraryId(UUID itineraryId){
+
+    public Thumbnail getThumbnailByItineraryId(UUID itineraryId) {
 
         return thumbnailRepository.findByItineraryItineraryId(itineraryId)
                 .orElseThrow(() -> {
@@ -81,6 +88,7 @@ public class ThumbnailService {
                             "Failed to fetch thumbnail: thumbnail not found, itineraryId={}",
                             itineraryId
                     );
+
                     return new ResourceNotFoundException(
                             "Thumbnail not found."
                     );

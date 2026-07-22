@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AdminService {
 
     private final UserRepository userRepository;
@@ -40,6 +39,7 @@ public class AdminService {
     private final ItineraryTypeRepository itineraryTypeRepository;
 
 
+    @Transactional(readOnly = true)
     public AdminStatsDto getStats() {
         return new AdminStatsDto(
                 userRepository.count(),
@@ -48,18 +48,23 @@ public class AdminService {
         );
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryResponseDto> getRecentItineraries() {
         return itineraryRepository.findTop5ByOrderByCreatedAtDesc()
                 .stream()
-                .map(itinerary -> {return itineraryService.map(itinerary);})
+                .map(itineraryService::map)
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional(readOnly = true)
     public List<WeeklyActivityDto> getWeeklyActivity() {
         LocalDate today = LocalDate.now();
         List<WeeklyActivityDto> result = new ArrayList<>();
 
         for (int i = 6; i >= 0; i--) {
+
             LocalDate date = today.minusDays(i);
 
             long users = userRepository.countByCreatedAt(date);
@@ -75,15 +80,19 @@ public class AdminService {
         return result;
     }
 
+
     public void deleteItinerary(UUID itineraryId) {
         itineraryService.deleteItineraryById(itineraryId);
     }
 
+
+    @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(
             String search,
             int page,
             int size
     ) {
+
         Pageable pageable = PageRequest.of(page, size);
 
         Page<User> users;
@@ -91,16 +100,22 @@ public class AdminService {
         if (search == null || search.isBlank()) {
             users = userRepository.findAll(pageable);
         } else {
-            users = userRepository.searchUsersForAdmin(search.toLowerCase(), pageable);
+            users = userRepository.searchUsersForAdmin(
+                    search.toLowerCase(),
+                    pageable
+            );
         }
 
         return users.map(userService::map);
     }
 
+
     public void deleteUser(UUID userId) {
         userService.deleteUser(userId);
     }
 
+
+    @Transactional(readOnly = true)
     public Page<ItineraryResponseDto> getAllItineraries(
             int page,
             int size,
@@ -109,6 +124,7 @@ public class AdminService {
             String type,
             String sort
     ) {
+
         if (search == null) search = "";
         if (filter == null) filter = "ALL";
         if (type == null) type = "all";
@@ -117,40 +133,67 @@ public class AdminService {
         Sort sorting;
 
         switch (sort) {
+
             case "likes":
-                sorting = Sort.by(Sort.Direction.DESC, "likeCount");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "likeCount"
+                );
                 break;
+
             case "saves":
-                sorting = Sort.by(Sort.Direction.DESC, "saveCount");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "saveCount"
+                );
                 break;
+
             case "recent":
             default:
-                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                sorting = Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"
+                );
                 break;
         }
 
-        Pageable pageable = PageRequest.of(page, size, sorting);
-
-        Page<Itinerary> itineraries = itineraryRepository.searchItinerariesAdmin(
-                search,
-                filter,
-                type,
-                pageable
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                sorting
         );
+
+        Page<Itinerary> itineraries =
+                itineraryRepository.searchItinerariesAdmin(
+                        search,
+                        filter,
+                        type,
+                        pageable
+                );
 
         return itineraries.map(itineraryService::map);
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryTypeDto> getAllTypes() {
         return itineraryTypeService.getAllTypes();
     }
+
 
     @Transactional
     public void addType(String name) {
 
         if (itineraryTypeRepository.existsByNameIgnoreCase(name)) {
-            log.warn("Failed to create itinerary type. Type '{}' already exists.", name);
-            throw new ResourceAlreadyExistsException("Itinerary type already exists.");
+
+            log.warn(
+                    "Failed to create itinerary type. Type '{}' already exists.",
+                    name
+            );
+
+            throw new ResourceAlreadyExistsException(
+                    "Itinerary type already exists."
+            );
         }
 
         ItineraryType type = new ItineraryType();
@@ -158,22 +201,38 @@ public class AdminService {
 
         itineraryTypeRepository.save(type);
 
-        log.info("Itinerary type created: {}", name);
+        log.info(
+                "Itinerary type created: {}",
+                name
+        );
     }
+
 
     @Transactional
     public void deleteType(Long typeId) {
 
-        ItineraryType type = itineraryTypeRepository.findById(typeId)
-                .orElseThrow(() -> {
-                    log.warn("Failed to delete itinerary type. Type not found: id={}", typeId);
-                    return new ResourceNotFoundException("Itinerary type not found.");
-                });
+        ItineraryType type =
+                itineraryTypeRepository.findById(typeId)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Failed to delete itinerary type. Type not found: id={}",
+                                    typeId
+                            );
+
+                            return new ResourceNotFoundException(
+                                    "Itinerary type not found."
+                            );
+                        });
 
 
         itineraryTypeRepository.delete(type);
 
-        log.info("Itinerary type deleted: id={}, name={}", typeId, type.getName());
+        log.info(
+                "Itinerary type deleted: id={}, name={}",
+                typeId,
+                type.getName()
+        );
     }
 
 }

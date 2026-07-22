@@ -17,27 +17,41 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LikedItineraryService {
 
     private final LikedItineraryRepository likedItineraryRepository;
     private final UserRepository userRepository;
     private final ItineraryRepository itineraryRepository;
 
+
     @Transactional
     public String likeItinerary(UUID userId, UUID itineraryId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to like/unlike itinerary. User not found: {}", userId);
-                    return new ResourceNotFoundException("User not found.");
+                    log.warn(
+                            "Failed to like/unlike itinerary. User not found: {}",
+                            userId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
                 });
+
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to like/unlike itinerary. Itinerary not found: {}", itineraryId);
-                    return new ResourceNotFoundException("Itinerary not found.");
+                    log.warn(
+                            "Failed to like/unlike itinerary. Itinerary not found: {}",
+                            itineraryId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
                 });
+
 
         boolean alreadyLiked =
                 likedItineraryRepository
@@ -45,6 +59,7 @@ public class LikedItineraryService {
                                 userId,
                                 itineraryId
                         );
+
 
         if (alreadyLiked) {
 
@@ -54,57 +69,82 @@ public class LikedItineraryService {
                             itineraryId
                     );
 
+
             log.info(
                     "Itinerary unliked: itineraryId={}, userId={}",
                     itineraryId,
                     userId
             );
 
+
             itinerary.setLikeCount(
                     likedItineraryRepository
                             .countByItineraryItineraryId(itineraryId)
             );
+
 
             return "Itinerary unliked.";
 
-        } else {
-
-            LikedItinerary likedItinerary = new LikedItinerary();
-
-            likedItinerary.setUser(user);
-            likedItinerary.setItinerary(itinerary);
-
-            likedItineraryRepository.save(likedItinerary);
-
-            log.info(
-                    "Itinerary liked: itineraryId={}, userId={}",
-                    itineraryId,
-                    userId
-            );
-
-            itinerary.setLikeCount(
-                    likedItineraryRepository
-                            .countByItineraryItineraryId(itineraryId)
-            );
-
-            return "Itinerary liked.";
         }
+
+
+        LikedItinerary likedItinerary =
+                new LikedItinerary();
+
+        likedItinerary.setUser(user);
+        likedItinerary.setItinerary(itinerary);
+
+
+        likedItineraryRepository.save(likedItinerary);
+
+
+        log.info(
+                "Itinerary liked: itineraryId={}, userId={}",
+                itineraryId,
+                userId
+        );
+
+
+        itinerary.setLikeCount(
+                likedItineraryRepository
+                        .countByItineraryItineraryId(itineraryId)
+        );
+
+
+        return "Itinerary liked.";
     }
 
-    @Transactional
+
+    @Transactional(readOnly = true)
     public Boolean checkIfLiked(UUID userId, UUID itineraryId) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to check liked status. User not found: {}", userId);
-                    return new ResourceNotFoundException("User not found.");
+
+                    log.warn(
+                            "Failed to check liked status. User not found: {}",
+                            userId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "User not found."
+                    );
                 });
+
 
         itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
-                    log.warn("Failed to check liked status. Itinerary not found: {}", itineraryId);
-                    return new ResourceNotFoundException("Itinerary not found.");
+
+                    log.warn(
+                            "Failed to check liked status. Itinerary not found: {}",
+                            itineraryId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
                 });
+
 
         return likedItineraryRepository
                 .existsByUserUserIdAndItineraryItineraryId(

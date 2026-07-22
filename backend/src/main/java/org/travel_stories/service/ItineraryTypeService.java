@@ -11,7 +11,6 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryTypeRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 public class ItineraryTypeService {
 
     private final ItineraryTypeRepository itineraryTypeRepository;
+
 
     @Transactional
     public ItineraryTypeDto addType(ItineraryTypeDto requestDto) {
@@ -34,11 +34,15 @@ public class ItineraryTypeService {
             );
         }
 
+
         ItineraryType itineraryType = new ItineraryType();
 
         itineraryType.setName(requestDto.getName());
 
-        ItineraryType savedType = itineraryTypeRepository.save(itineraryType);
+
+        ItineraryType savedType =
+                itineraryTypeRepository.save(itineraryType);
+
 
         log.info(
                 "Itinerary type created: typeId={}, name={}",
@@ -46,14 +50,18 @@ public class ItineraryTypeService {
                 savedType.getName()
         );
 
+
         ItineraryTypeDto responseDto = new ItineraryTypeDto();
 
         responseDto.setTypeId(savedType.getTypeId());
         responseDto.setName(savedType.getName());
 
+
         return responseDto;
     }
 
+
+    @Transactional(readOnly = true)
     public List<ItineraryTypeDto> getAllTypes() {
 
         return itineraryTypeRepository.findAll()
@@ -71,12 +79,14 @@ public class ItineraryTypeService {
                 .toList();
     }
 
+
     @Transactional
     public void deleteTypeById(Long typeId) {
 
         ItineraryType itineraryType =
                 itineraryTypeRepository.findById(typeId)
                         .orElseThrow(() -> {
+
                             log.warn(
                                     "Failed to delete itinerary type. Type not found: {}",
                                     typeId
@@ -87,7 +97,9 @@ public class ItineraryTypeService {
                             );
                         });
 
+
         itineraryTypeRepository.delete(itineraryType);
+
 
         log.info(
                 "Itinerary type deleted: typeId={}, name={}",

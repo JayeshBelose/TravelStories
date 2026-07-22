@@ -15,16 +15,15 @@ import org.travel_stories.repository.LocationRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ImageService {
 
     private final ImageRepository imageRepository;
     private final LocationRepository locationRepository;
+
 
     public ImageResponseDto map(Image image){
         return new ImageResponseDto(
@@ -32,6 +31,7 @@ public class ImageService {
                 image.getImageData()
         );
     }
+
 
     @Transactional
     public void uploadImage(UUID locationId, MultipartFile file) throws IOException {
@@ -45,6 +45,7 @@ public class ImageService {
         int nextOrderNumber = imageRepository.findNextOrderNumber(locationId) + 1;
 
         Image image = new Image();
+
         image.setOrderNumber(nextOrderNumber);
         image.setImageData(file.getBytes());
         image.setContentType(file.getContentType());
@@ -60,6 +61,7 @@ public class ImageService {
         );
     }
 
+
     @Transactional
     public void deleteImage(UUID imageId) {
 
@@ -69,22 +71,29 @@ public class ImageService {
                     return new ResourceNotFoundException("Image not found.");
                 });
 
+
         int deletedImageNumber = image.getOrderNumber();
         UUID locationId = image.getLocation().getLocationId();
+
 
         imageRepository.delete(image);
         imageRepository.flush();
 
+
         List<Image> imagesToAdjust =
                 imageRepository.findByLocationLocationIdOrderByOrderNumber(locationId);
 
+
         for (Image img : imagesToAdjust) {
+
             if (img.getOrderNumber() > deletedImageNumber) {
                 img.setOrderNumber(img.getOrderNumber() - 1);
             }
         }
 
+
         imageRepository.saveAll(imagesToAdjust);
+
 
         log.info(
                 "Image deleted: imageId={}, locationId={}, orderNumber={}",
@@ -94,6 +103,8 @@ public class ImageService {
         );
     }
 
+
+    @Transactional(readOnly = true)
     public List<ImageResponseDto> getImagesByLocation(UUID locationId) {
 
         return imageRepository.findByLocationLocationIdOrderByOrderNumber(locationId)
@@ -102,6 +113,8 @@ public class ImageService {
                 .toList();
     }
 
+
+    @Transactional(readOnly = true)
     public List<ImageResponseDto> getAllImages() {
 
         return imageRepository.findAll()
@@ -110,6 +123,8 @@ public class ImageService {
                 .toList();
     }
 
+
+    @Transactional(readOnly = true)
     public Image getImageById(UUID imageId) {
 
         return imageRepository.findById(imageId)

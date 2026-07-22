@@ -19,46 +19,84 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
+
     @Transactional
-    public String follow(UUID followerId, UUID followingId) {
+    public String follow(
+            UUID followerId,
+            UUID followingId
+    ) {
 
         if (followerId.equals(followingId)) {
-            log.warn("User {} attempted to follow themselves.", followerId);
-            throw new InvalidOperationException("User cannot follow themselves.");
+
+            log.warn(
+                    "User {} attempted to follow themselves.",
+                    followerId
+            );
+
+            throw new InvalidOperationException(
+                    "User cannot follow themselves."
+            );
         }
 
-        if (followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId)) {
+
+        if (followRepository.existsByFollowerUserIdAndFollowingUserId(
+                followerId,
+                followingId
+        )) {
+
             log.warn(
                     "User {} attempted to follow user {} who is already being followed.",
                     followerId,
                     followingId
             );
-            throw new ResourceAlreadyExistsException("User is already being followed.");
+
+            throw new ResourceAlreadyExistsException(
+                    "User is already being followed."
+            );
         }
+
 
         User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> {
-                    log.warn("Follower not found: {}", followerId);
-                    return new ResourceNotFoundException("Follower not found.");
+
+                    log.warn(
+                            "Follower not found: {}",
+                            followerId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Follower not found."
+                    );
                 });
+
 
         User following = userRepository.findById(followingId)
                 .orElseThrow(() -> {
-                    log.warn("Following user not found: {}", followingId);
-                    return new ResourceNotFoundException("Following user not found.");
+
+                    log.warn(
+                            "Following user not found: {}",
+                            followingId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Following user not found."
+                    );
                 });
 
+
         Follow follow = new Follow();
+
         follow.setFollower(follower);
         follow.setFollowing(following);
 
+
         followRepository.save(follow);
+
 
         log.info(
                 "User {} followed user {}",
@@ -66,22 +104,39 @@ public class FollowService {
                 followingId
         );
 
+
         return "User followed successfully.";
     }
 
-    @Transactional
-    public void unfollow(UUID followerId, UUID followingId) {
 
-        if (!followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId)) {
+    @Transactional
+    public void unfollow(
+            UUID followerId,
+            UUID followingId
+    ) {
+
+        if (!followRepository.existsByFollowerUserIdAndFollowingUserId(
+                followerId,
+                followingId
+        )) {
+
             log.warn(
                     "Failed to unfollow. Follow relationship not found between {} and {}.",
                     followerId,
                     followingId
             );
-            throw new ResourceNotFoundException("Follow relationship not found.");
+
+            throw new ResourceNotFoundException(
+                    "Follow relationship not found."
+            );
         }
 
-        followRepository.deleteByFollowerUserIdAndFollowingUserId(followerId, followingId);
+
+        followRepository.deleteByFollowerUserIdAndFollowingUserId(
+                followerId,
+                followingId
+        );
+
 
         log.info(
                 "User {} unfollowed user {}",
@@ -90,7 +145,10 @@ public class FollowService {
         );
     }
 
-    public List<FollowResponseDto> getFollowers(UUID userId){
+
+    @Transactional(readOnly = true)
+    public List<FollowResponseDto> getFollowers(UUID userId) {
+
         return followRepository.findFollowers(userId)
                 .stream()
                 .map(follower -> new FollowResponseDto(
@@ -100,7 +158,10 @@ public class FollowService {
                 .toList();
     }
 
-    public List<FollowResponseDto> getFollowing(UUID userId){
+
+    @Transactional(readOnly = true)
+    public List<FollowResponseDto> getFollowing(UUID userId) {
+
         return followRepository.findFollowing(userId)
                 .stream()
                 .map(follower -> new FollowResponseDto(

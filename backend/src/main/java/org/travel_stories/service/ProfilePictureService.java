@@ -18,11 +18,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ProfilePictureService {
 
     private final ProfilePictureRepository profilePictureRepository;
     private final UserRepository userRepository;
+
 
     @Transactional
     public void uploadOrUpdate(
@@ -36,13 +36,16 @@ public class ProfilePictureService {
                             "Failed to upload/update profile picture: user not found, userId={}",
                             userId
                     );
+
                     return new ResourceNotFoundException(
                             "User not found."
                     );
                 });
 
+
         Optional<ProfilePicture> existingPfp =
                 profilePictureRepository.findByUserUserId(userId);
+
 
         if (existingPfp.isPresent()) {
 
@@ -51,7 +54,10 @@ public class ProfilePictureService {
             pfp.setPfpData(file.getBytes());
             pfp.setContentType(file.getContentType());
 
-            log.info("Profile picture updated for user {}", userId);
+            log.info(
+                    "Profile picture updated for user {}",
+                    userId
+            );
 
         } else {
 
@@ -63,9 +69,13 @@ public class ProfilePictureService {
 
             profilePictureRepository.save(pfp);
 
-            log.info("Profile picture uploaded for user {}", userId);
+            log.info(
+                    "Profile picture uploaded for user {}",
+                    userId
+            );
         }
     }
+
 
     public ProfilePicture getPfpByUser(UUID userId) {
 
@@ -75,6 +85,7 @@ public class ProfilePictureService {
                             "Failed to fetch profile picture: profile picture not found, userId={}",
                             userId
                     );
+
                     return new ResourceNotFoundException(
                             "Profile picture not found."
                     );

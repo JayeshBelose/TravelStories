@@ -17,15 +17,18 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class SavedItineraryService {
 
     private final SavedItineraryRepository savedItineraryRepository;
     private final UserRepository userRepository;
     private final ItineraryRepository itineraryRepository;
 
+
     @Transactional
-    public String saveItinerary(UUID userId, UUID itineraryId) {
+    public String saveItinerary(
+            UUID userId,
+            UUID itineraryId
+    ) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -33,10 +36,12 @@ public class SavedItineraryService {
                             "Failed to save itinerary: user not found, userId={}",
                             userId
                     );
+
                     return new ResourceNotFoundException(
                             "User not found."
                     );
                 });
+
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
@@ -44,10 +49,12 @@ public class SavedItineraryService {
                             "Failed to save itinerary: itinerary not found, itineraryId={}",
                             itineraryId
                     );
+
                     return new ResourceNotFoundException(
                             "Itinerary not found."
                     );
                 });
+
 
         boolean alreadySaved =
                 savedItineraryRepository
@@ -55,6 +62,7 @@ public class SavedItineraryService {
                                 userId,
                                 itineraryId
                         );
+
 
         if (alreadySaved) {
 
@@ -64,10 +72,12 @@ public class SavedItineraryService {
                             itineraryId
                     );
 
+
             itinerary.setSaveCount(
                     savedItineraryRepository
                             .countByItineraryItineraryId(itineraryId)
             );
+
 
             log.info(
                     "User {} removed itinerary {} from saved itineraries",
@@ -75,21 +85,26 @@ public class SavedItineraryService {
                     itineraryId
             );
 
+
             return "Itinerary removed.";
 
         } else {
 
-            SavedItinerary savedItinerary = new SavedItinerary();
+            SavedItinerary savedItinerary =
+                    new SavedItinerary();
 
             savedItinerary.setUser(user);
             savedItinerary.setItinerary(itinerary);
 
+
             savedItineraryRepository.save(savedItinerary);
+
 
             itinerary.setSaveCount(
                     savedItineraryRepository
                             .countByItineraryItineraryId(itineraryId)
             );
+
 
             log.info(
                     "User {} saved itinerary {}",
@@ -97,9 +112,11 @@ public class SavedItineraryService {
                     itineraryId
             );
 
+
             return "Itinerary saved.";
         }
     }
+
 
     public Boolean checkIfSaved(
             UUID userId,
@@ -112,10 +129,12 @@ public class SavedItineraryService {
                             "Failed to check saved itinerary: user not found, userId={}",
                             userId
                     );
+
                     return new ResourceNotFoundException(
                             "User not found."
                     );
                 });
+
 
         itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
@@ -123,10 +142,12 @@ public class SavedItineraryService {
                             "Failed to check saved itinerary: itinerary not found, itineraryId={}",
                             itineraryId
                     );
+
                     return new ResourceNotFoundException(
                             "Itinerary not found."
                     );
                 });
+
 
         return savedItineraryRepository
                 .existsByUserUserIdAndItineraryItineraryId(
