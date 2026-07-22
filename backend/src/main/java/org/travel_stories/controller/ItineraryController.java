@@ -3,6 +3,7 @@ package org.travel_stories.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
@@ -35,12 +36,13 @@ public class ItineraryController {
         ItineraryResponseDto itineraryResponseDto =
                 itineraryService.createItinerary(itineraryRequestDto, userId);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Itinerary created successfully",
-                        itineraryResponseDto
-                )
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Itinerary created successfully",
+                                itineraryResponseDto
+                        )
+                );
     }
 
     @DeleteMapping("/{itineraryId}")
