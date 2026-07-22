@@ -76,9 +76,10 @@ public class AuthController {
                 null
         );
 
-        return ResponseEntity.ok(
-                ApiResponse.success("User registered successfully", response)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success("User registered successfully", response)
+                );
     }
 
     @PostMapping("/forgotPassword")
