@@ -16,7 +16,6 @@ public class LikedItineraryController {
 
     private final LikedItineraryService likedItineraryService;
 
-    @Transactional
     @PostMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<String>> likeItinerary(
             @PathVariable("userId") UUID userId,
@@ -29,7 +28,6 @@ public class LikedItineraryController {
         );
     }
 
-    @Transactional
     @GetMapping("/{itineraryId}")
     public ResponseEntity<ApiResponse<Boolean>> checkIfLiked(
             @PathVariable("userId") UUID userId,

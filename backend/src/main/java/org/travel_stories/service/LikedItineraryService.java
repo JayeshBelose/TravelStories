@@ -91,6 +91,7 @@ public class LikedItineraryService {
         }
     }
 
+    @Transactional
     public Boolean checkIfLiked(UUID userId, UUID itineraryId) {
 
         userRepository.findById(userId)

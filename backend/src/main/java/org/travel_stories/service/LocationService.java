@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LocationService {
 
     private final LocationRepository locationRepository;
@@ -116,6 +115,7 @@ public class LocationService {
         );
     }
 
+    @Transactional
     public List<LocationResponseDto> getLocationsByDay(UUID dayId) {
 
         return locationRepository
