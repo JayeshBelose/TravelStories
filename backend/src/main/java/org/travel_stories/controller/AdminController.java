@@ -2,6 +2,7 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
@@ -115,9 +116,10 @@ public class AdminController {
 
         adminService.addType(name);
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Itinerary type added successfully")
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success("Itinerary type added successfully")
+                );
     }
 
     @DeleteMapping("/itineraries/types/{typeId}")

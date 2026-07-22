@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.travel_stories.exception.InvalidTokenException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -54,12 +55,11 @@ public class JwtUtil {
         return getClaims(token).get("role", String.class);
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             getClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException("Invalid or expired token");
         }
     }
 
