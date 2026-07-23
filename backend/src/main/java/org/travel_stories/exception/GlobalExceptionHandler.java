@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
 
         log.warn("Access denied: {}", ex.getMessage());
 
-        return error(HttpStatus.FORBIDDEN, "Access denied");
+        return error(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
