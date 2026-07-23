@@ -3,6 +3,7 @@ package org.travel_stories.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.travel_stories.exception.InvalidTokenException;
@@ -17,6 +18,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Getter
     @Value("${jwt.expiration}")
     private long expiration;
 
@@ -83,6 +85,7 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }
 
 // Token generation

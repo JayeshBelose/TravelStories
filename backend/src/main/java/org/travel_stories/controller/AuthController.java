@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.AuthResponseDto;
 import org.travel_stories.dto.LoginDto;
+import org.travel_stories.dto.RefreshTokenRequestDto;
 import org.travel_stories.dto.SignupDto;
+import org.travel_stories.entity.RefreshToken;
 import org.travel_stories.entity.User;
 import org.travel_stories.repository.UserRepository;
 import org.travel_stories.security.JwtUtil;
+import org.travel_stories.service.RefreshTokenService;
 import org.travel_stories.service.UserService;
 
 import java.util.Map;
@@ -23,6 +26,7 @@ public class AuthController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponseDto>> login(
@@ -35,15 +39,26 @@ public class AuthController {
                     .body(ApiResponse.error("Invalid email or password"));
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String accessToken =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getRole()
+                );
 
-        AuthResponseDto response = new AuthResponseDto(
-                token,
-                user.getUserId(),
-                user.getUsername(),
-                user.getRole(),
-                null
-        );
+
+        RefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(user);
+
+
+        AuthResponseDto response =
+                new AuthResponseDto(
+                        accessToken,
+                        refreshToken.getToken(),
+                        jwtUtil.getExpiration(),
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success("Login successful", response)
@@ -65,15 +80,26 @@ public class AuthController {
                 signupDto.getPassword()
         );
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String accessToken =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getRole()
+                );
 
-        AuthResponseDto response = new AuthResponseDto(
-                token,
-                user.getUserId(),
-                user.getUsername(),
-                user.getRole(),
-                null
-        );
+
+        RefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(user);
+
+
+        AuthResponseDto response =
+                new AuthResponseDto(
+                        accessToken,
+                        refreshToken.getToken(),
+                        jwtUtil.getExpiration(),
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -105,6 +131,48 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Password updated successfully")
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponseDto>> refresh(
+            @Valid @RequestBody RefreshTokenRequestDto request
+    ) {
+
+
+        RefreshToken newRefreshToken =
+                refreshTokenService.rotateRefreshToken(
+                        request.getRefreshToken()
+                );
+
+
+        User user =
+                newRefreshToken.getUser();
+
+
+        String accessToken =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getRole()
+                );
+
+
+        AuthResponseDto response =
+                new AuthResponseDto(
+                        accessToken,
+                        newRefreshToken.getToken(),
+                        jwtUtil.getExpiration(),
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
+
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Token refreshed successfully",
+                        response
+                )
         );
     }
 

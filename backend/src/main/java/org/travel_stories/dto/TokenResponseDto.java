@@ -3,22 +3,14 @@ package org.travel_stories.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
-public class AuthResponseDto {
+public class TokenResponseDto {
 
     private String accessToken;
 
     private String refreshToken;
 
-    private long expiresIn;
-
-    private UUID userId;
-
-    private String username;
-
-    private String role;
+    private Long expiresIn;
 
 }

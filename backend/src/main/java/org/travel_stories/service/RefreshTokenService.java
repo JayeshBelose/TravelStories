@@ -57,13 +57,14 @@ public class RefreshTokenService {
                         .orElseThrow(() -> {
 
                             log.warn(
-                                    "Refresh token not found."
+                                    "Invalid refresh token used."
                             );
 
                             return new InvalidTokenException(
                                     "Invalid refresh token."
                             );
                         });
+
 
         if (refreshToken.isRevoked()) {
 
@@ -76,7 +77,10 @@ public class RefreshTokenService {
             );
         }
 
-        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+
+        if (refreshToken.getExpiryDate()
+                .isBefore(Instant.now())) {
+
 
             log.warn(
                     "Expired refresh token used."
@@ -87,21 +91,30 @@ public class RefreshTokenService {
             );
         }
 
+
+        // Force initialization while transaction is active
+        refreshToken.getUser().getEmail();
+        refreshToken.getUser().getRole();
+        refreshToken.getUser().getUsername();
+
+
         return refreshToken;
     }
 
     @Transactional
     public void revokeRefreshToken(String token) {
 
-        RefreshToken refreshToken =
-                validateRefreshToken(token);
+        refreshTokenRepository.findByToken(token)
+                .ifPresent(refreshToken -> {
 
-        refreshToken.setRevoked(true);
+                    refreshToken.setRevoked(true);
 
-        log.info(
-                "Refresh token revoked for user {}",
-                refreshToken.getUser().getUserId()
-        );
+                    log.info(
+                            "Refresh token revoked for user {}",
+                            refreshToken.getUser().getUserId()
+                    );
+
+                });
     }
 
     @Transactional
@@ -125,6 +138,28 @@ public class RefreshTokenService {
         return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(randomBytes);
+    }
+
+    @Transactional
+    public RefreshToken rotateRefreshToken(String oldToken) {
+
+        RefreshToken existingToken =
+                validateRefreshToken(oldToken);
+
+        existingToken.setRevoked(true);
+
+
+        RefreshToken newToken =
+                createRefreshToken(existingToken.getUser());
+
+
+        log.info(
+                "Refresh token rotated for user {}",
+                existingToken.getUser().getUserId()
+        );
+
+
+        return newToken;
     }
 
 }
