@@ -11,6 +11,7 @@ import org.travel_stories.entity.Location;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.DayRepository;
 import org.travel_stories.repository.LocationRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final DayRepository dayRepository;
     private final ImageService imageService;
+    private final AuthorizationService authorizationService;
 
 
     public LocationResponseDto map(Location location) {
@@ -52,6 +54,12 @@ public class LocationService {
                     );
                     return new ResourceNotFoundException("Day not found.");
                 });
+
+        authorizationService.verifyOwnership(
+                day.getItinerary()
+                        .getCreatedBy()
+                        .getUserId()
+        );
 
 
         int nextLocationNumber =
@@ -112,6 +120,19 @@ public class LocationService {
                     );
                 });
 
+        if (!location.getDay().getDayId().equals(dayId)) {
+
+            throw new ResourceNotFoundException(
+                    "Location does not belong to the specified day."
+            );
+        }
+
+        authorizationService.verifyOwnership(
+                location.getDay()
+                        .getItinerary()
+                        .getCreatedBy()
+                        .getUserId()
+        );
 
         int deletedLocationNumber = location.getLocationNumber();
 
@@ -174,6 +195,13 @@ public class LocationService {
                             "Location not found."
                     );
                 });
+
+        authorizationService.verifyOwnership(
+                location.getDay()
+                        .getItinerary()
+                        .getCreatedBy()
+                        .getUserId()
+        );
 
 
         if (locationRequestDto.getLocationName() != null) {

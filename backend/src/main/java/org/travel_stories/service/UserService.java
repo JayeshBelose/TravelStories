@@ -15,6 +15,7 @@ import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
 import org.travel_stories.repository.SavedItineraryRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.AuthorizationService;
 import org.travel_stories.security.JwtUtil;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class UserService {
     private final SavedItineraryRepository savedItineraryRepository;
     private final FollowRepository followRepository;
     private final JwtUtil jwtUtil;
+    private final AuthorizationService authorizationService;
 
 
     public UserResponseDto map(User user){
@@ -128,44 +130,12 @@ public class UserService {
 
 
     @Transactional
-    public void deleteUser(UUID userId){
-
-        userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn(
-                            "Failed to delete user: user not found, userId={}",
-                            userId
-                    );
-
-                    return new ResourceNotFoundException(
-                            "User not found."
-                    );
-                });
-
-
-        likedItineraryRepository.deleteByUserUserId(userId);
-
-        savedItineraryRepository.deleteByUserUserId(userId);
-
-        followRepository.deleteByFollowerUserId(userId);
-
-        followRepository.deleteByFollowingUserId(userId);
-
-        userRepository.deleteById(userId);
-
-
-        log.info(
-                "User {} deleted",
-                userId
-        );
-    }
-
-
-    @Transactional
     public UserResponseDto updateUser(
             UserRequestDto userRequestDto,
             UUID userId
     ){
+
+        authorizationService.verifyOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -179,28 +149,18 @@ public class UserService {
                     );
                 });
 
-
-        if(userRequestDto.getUsername()!=null){
-
-            user.setUsername(
-                    userRequestDto.getUsername()
-            );
+        if(userRequestDto.getUsername() != null){
+            user.setUsername(userRequestDto.getUsername());
         }
 
-
-        if(userRequestDto.getBio()!=null){
-
-            user.setBio(
-                    userRequestDto.getBio()
-            );
+        if(userRequestDto.getBio() != null){
+            user.setBio(userRequestDto.getBio());
         }
-
 
         log.info(
                 "User {} updated profile",
                 userId
         );
-
 
         return map(user);
     }
@@ -364,4 +324,38 @@ public class UserService {
         return userRepository.existsByEmail(email);
 
     }
+
+    @Transactional
+    public void deleteUser(UUID userId) {
+        authorizationService.verifyOwnership(userId);
+        performUserDeletion(userId);
+    }
+
+    @Transactional
+    public void deleteUserAsAdmin(UUID userId) {
+        performUserDeletion(userId);
+    }
+
+    private void performUserDeletion(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to delete user: user not found, userId={}",
+                            userId
+                    );
+
+                    return new ResourceNotFoundException("User not found.");
+                });
+
+        likedItineraryRepository.deleteByUserUserId(userId);
+        savedItineraryRepository.deleteByUserUserId(userId);
+        followRepository.deleteByFollowerUserId(userId);
+        followRepository.deleteByFollowingUserId(userId);
+
+        userRepository.delete(user);
+
+        log.info("User {} deleted", userId);
+    }
+
 }

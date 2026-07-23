@@ -12,6 +12,7 @@ import org.travel_stories.exception.ResourceAlreadyExistsException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
 
     @Transactional
@@ -30,6 +32,8 @@ public class FollowService {
             UUID followerId,
             UUID followingId
     ) {
+
+        authorizationService.verifyOwnership(followerId);
 
         if (followerId.equals(followingId)) {
 
@@ -112,6 +116,8 @@ public class FollowService {
             UUID followerId,
             UUID followingId
     ) {
+
+        authorizationService.verifyOwnership(followerId);
 
         if (!followRepository.existsByFollowerUserIdAndFollowingUserId(
                 followerId,

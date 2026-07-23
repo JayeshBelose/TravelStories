@@ -12,6 +12,7 @@ import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ImageRepository;
 import org.travel_stories.repository.LocationRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
     private final LocationRepository locationRepository;
-
+    private final AuthorizationService authorizationService;
 
     public ImageResponseDto map(Image image) {
 
@@ -51,6 +52,13 @@ public class ImageService {
                             "Location not found."
                     );
                 });
+
+        authorizationService.verifyOwnership(
+                location.getDay()
+                        .getItinerary()
+                        .getCreatedBy()
+                        .getUserId()
+        );
 
         int nextOrderNumber =
                 imageRepository.findNextOrderNumber(locationId) + 1;
@@ -101,6 +109,13 @@ public class ImageService {
                     );
                 });
 
+        authorizationService.verifyOwnership(
+                image.getLocation()
+                        .getDay()
+                        .getItinerary()
+                        .getCreatedBy()
+                        .getUserId()
+        );
 
         int deletedImageNumber = image.getOrderNumber();
 

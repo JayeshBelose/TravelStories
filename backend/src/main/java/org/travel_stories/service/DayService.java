@@ -12,6 +12,7 @@ import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.DayRepository;
 import org.travel_stories.repository.ItineraryRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class DayService {
 
     private final DayRepository dayRepository;
     private final ItineraryRepository itineraryRepository;
+    private final AuthorizationService authorizationService;
 
 
     public DayResponseDto map(Day day) {
@@ -56,6 +58,9 @@ public class DayService {
                     );
                 });
 
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
 
         int nextDayNumber =
                 dayRepository.findMaxDayNumber(itineraryId) + 1;
@@ -129,6 +134,16 @@ public class DayService {
                     );
                 });
 
+        authorizationService.verifyOwnership(
+                day.getItinerary().getCreatedBy().getUserId()
+        );
+
+        if (!day.getItinerary().getItineraryId().equals(itineraryId)) {
+
+            throw new ResourceNotFoundException(
+                    "Day does not belong to the specified itinerary."
+            );
+        }
 
         int deletedDayNumber = day.getDayNumber();
 
@@ -195,6 +210,10 @@ public class DayService {
                             "Day not found."
                     );
                 });
+
+        authorizationService.verifyOwnership(
+                day.getItinerary().getCreatedBy().getUserId()
+        );
 
 
         if (dayRequestDto.getDescription() != null) {

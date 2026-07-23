@@ -12,6 +12,7 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryMemberRepository;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ public class ItineraryMemberService {
     private final ItineraryMemberRepository itineraryMemberRepository;
     private final ItineraryRepository itineraryRepository;
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
 
     @Transactional
@@ -47,6 +49,9 @@ public class ItineraryMemberService {
                     return new ResourceNotFoundException("Itinerary not found.");
                 });
 
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -87,12 +92,25 @@ public class ItineraryMemberService {
             );
         }
 
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Failed to remove member. Itinerary not found: {}",
+                            itineraryId
+                    );
+                    return new ResourceNotFoundException(
+                            "Itinerary not found."
+                    );
+                });
+
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
 
         itineraryMemberRepository.deleteByItineraryItineraryIdAndUserUserId(
                 itineraryId,
                 userId
         );
-
 
         log.info(
                 "Member removed: userId={} from itineraryId={}",

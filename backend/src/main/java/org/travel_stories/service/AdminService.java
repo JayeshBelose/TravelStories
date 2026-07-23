@@ -111,7 +111,7 @@ public class AdminService {
 
 
     public void deleteUser(UUID userId) {
-        userService.deleteUser(userId);
+        userService.deleteUserAsAdmin(userId);
     }
 
 

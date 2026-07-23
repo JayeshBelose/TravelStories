@@ -11,6 +11,7 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.util.UUID;
 
@@ -22,10 +23,12 @@ public class LikedItineraryService {
     private final LikedItineraryRepository likedItineraryRepository;
     private final UserRepository userRepository;
     private final ItineraryRepository itineraryRepository;
-
+    private final AuthorizationService authorizationService;
 
     @Transactional
     public String likeItinerary(UUID userId, UUID itineraryId) {
+
+        authorizationService.verifyOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {

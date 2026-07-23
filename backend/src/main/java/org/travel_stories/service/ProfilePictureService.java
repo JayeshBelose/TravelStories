@@ -10,6 +10,7 @@ import org.travel_stories.entity.User;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ProfilePictureRepository;
 import org.travel_stories.repository.UserRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class ProfilePictureService {
 
     private final ProfilePictureRepository profilePictureRepository;
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
 
     @Transactional
@@ -29,6 +31,8 @@ public class ProfilePictureService {
             UUID userId,
             MultipartFile file
     ) throws IOException {
+
+        authorizationService.verifyOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {

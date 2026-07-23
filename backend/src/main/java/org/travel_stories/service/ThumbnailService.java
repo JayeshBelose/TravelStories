@@ -10,6 +10,7 @@ import org.travel_stories.entity.Thumbnail;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ThumbnailRepository;
+import org.travel_stories.security.AuthorizationService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class ThumbnailService {
 
     private final ThumbnailRepository thumbnailRepository;
     private final ItineraryRepository itineraryRepository;
-
+    private final AuthorizationService authorizationService;
 
     @Transactional
     public void uploadOrUpdate(
@@ -42,6 +43,9 @@ public class ThumbnailService {
                     );
                 });
 
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
 
         Optional<Thumbnail> existingThumbnail =
                 thumbnailRepository.findByItineraryItineraryId(itineraryId);

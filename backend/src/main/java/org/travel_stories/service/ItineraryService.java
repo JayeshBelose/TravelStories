@@ -17,6 +17,7 @@ import org.travel_stories.entity.User;
 import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.*;
+import org.travel_stories.security.AuthorizationService;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -33,6 +34,7 @@ public class ItineraryService {
     private final ItineraryTypeRepository itineraryTypeRepository;
     private final LikedItineraryRepository likedItineraryRepository;
     private final SavedItineraryRepository savedItineraryRepository;
+    private final AuthorizationService authorizationService;
 
 
     public ItineraryResponseDto map(Itinerary itinerary){
@@ -82,6 +84,8 @@ public class ItineraryService {
                     "End date cannot be before start date."
             );
         }
+
+        authorizationService.verifyOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
@@ -137,6 +141,10 @@ public class ItineraryService {
                         new ResourceNotFoundException("Itinerary not found.")
                 );
 
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
+
         likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
         savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
 
@@ -159,6 +167,10 @@ public class ItineraryService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Itinerary not found.")
                 );
+
+        authorizationService.verifyOwnership(
+                itinerary.getCreatedBy().getUserId()
+        );
 
 
         if (itineraryRequestDto.getEndDate()
