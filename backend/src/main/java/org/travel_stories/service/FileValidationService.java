@@ -17,9 +17,6 @@ import java.util.Set;
 @Slf4j
 public class FileValidationService {
 
-    @Value("${spring.servlet.multipart.max-file-size}")
-    private DataSize maxFileSize;
-
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             "image/jpeg",
             "image/png",
@@ -51,8 +48,6 @@ public class FileValidationService {
         }
 
         validateExtension(file);
-
-        validateFileSize(file);
 
         try {
 
@@ -129,27 +124,5 @@ public class FileValidationService {
         );
     }
 
-    private void validateFileSize(MultipartFile file) {
-
-        if (file.getSize() > maxFileSize.toBytes()) {
-
-            log.warn(
-                    "Upload rejected: file size {} bytes exceeds configured limit {} bytes",
-                    file.getSize(),
-                    maxFileSize.toBytes()
-            );
-
-            throw new InvalidOperationException(
-                    "File size exceeds the maximum allowed limit of "
-                            + maxFileSize.toMegabytes()
-                            + " MB."
-            );
-        }
-
-        log.debug(
-                "Validated file size: {} bytes",
-                file.getSize()
-        );
-    }
 
 }

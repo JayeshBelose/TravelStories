@@ -14,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.travel_stories.common.ApiResponse;
 
 import java.util.LinkedHashMap;
@@ -168,6 +169,20 @@ public class GlobalExceptionHandler {
         return error(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred"
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(
+            MaxUploadSizeExceededException ex) {
+
+        log.warn(
+                "Upload rejected: file size exceeds configured maximum."
+        );
+
+        return error(
+                HttpStatus.PAYLOAD_TOO_LARGE,
+                "Uploaded file exceeds the maximum allowed size of 20 MB."
         );
     }
 
