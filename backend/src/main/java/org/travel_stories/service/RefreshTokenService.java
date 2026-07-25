@@ -162,4 +162,30 @@ public class RefreshTokenService {
         return newToken;
     }
 
+    @Transactional
+    public void logout(String token) {
+
+        RefreshToken refreshToken =
+                refreshTokenRepository.findByToken(token)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Logout failed. Refresh token not found."
+                            );
+
+                            return new InvalidTokenException(
+                                    "Invalid refresh token."
+                            );
+                        });
+
+
+        refreshToken.setRevoked(true);
+
+
+        log.info(
+                "Refresh token revoked during logout for user {}",
+                refreshToken.getUser().getUserId()
+        );
+    }
+
 }

@@ -6,13 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
-import org.travel_stories.dto.AuthResponseDto;
-import org.travel_stories.dto.LoginDto;
-import org.travel_stories.dto.RefreshTokenRequestDto;
-import org.travel_stories.dto.SignupDto;
+import org.travel_stories.dto.*;
 import org.travel_stories.entity.RefreshToken;
 import org.travel_stories.entity.User;
-import org.travel_stories.repository.UserRepository;
 import org.travel_stories.security.JwtUtil;
 import org.travel_stories.service.RefreshTokenService;
 import org.travel_stories.service.UserService;
@@ -29,7 +25,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> login(
+    public ResponseEntity<ApiResponse<AuthTokenResponseDto>> login(
             @Valid @RequestBody LoginDto loginDto) {
 
         User user = userService.authenticate(loginDto.getEmail(), loginDto.getPassword());
@@ -46,18 +42,17 @@ public class AuthController {
                 );
 
 
-        RefreshToken refreshToken =
-                refreshTokenService.createRefreshToken(user);
+        String refreshToken =
+                refreshTokenService
+                        .createRefreshToken(user)
+                        .getToken();
 
 
-        AuthResponseDto response =
-                new AuthResponseDto(
+        AuthTokenResponseDto response =
+                new AuthTokenResponseDto(
                         accessToken,
-                        refreshToken.getToken(),
-                        jwtUtil.getExpiration(),
-                        user.getUserId(),
-                        user.getUsername(),
-                        user.getRole()
+                        refreshToken,
+                        jwtUtil.getExpiration()
                 );
 
         return ResponseEntity.ok(
@@ -66,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> signup(
+    public ResponseEntity<ApiResponse<AuthTokenResponseDto>> signup(
             @Valid @RequestBody SignupDto signupDto) {
 
         if (userService.existsByEmail(signupDto.getEmail())) {
@@ -87,24 +82,40 @@ public class AuthController {
                 );
 
 
-        RefreshToken refreshToken =
-                refreshTokenService.createRefreshToken(user);
+        String refreshToken =
+                refreshTokenService
+                        .createRefreshToken(user)
+                        .getToken();
 
 
-        AuthResponseDto response =
-                new AuthResponseDto(
+        AuthTokenResponseDto response =
+                new AuthTokenResponseDto(
                         accessToken,
-                        refreshToken.getToken(),
-                        jwtUtil.getExpiration(),
-                        user.getUserId(),
-                        user.getUsername(),
-                        user.getRole()
+                        refreshToken,
+                        jwtUtil.getExpiration()
                 );
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         ApiResponse.success("User registered successfully", response)
                 );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @Valid @RequestBody LogoutRequestDto request
+    ) {
+
+        refreshTokenService.logout(
+                request.getRefreshToken()
+        );
+
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Logged out successfully"
+                )
+        );
     }
 
     @PostMapping("/forgotPassword")
@@ -135,7 +146,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> refresh(
+    public ResponseEntity<ApiResponse<AuthTokenResponseDto>> refresh(
             @Valid @RequestBody RefreshTokenRequestDto request
     ) {
 
@@ -157,14 +168,11 @@ public class AuthController {
                 );
 
 
-        AuthResponseDto response =
-                new AuthResponseDto(
+        AuthTokenResponseDto response =
+                new AuthTokenResponseDto(
                         accessToken,
                         newRefreshToken.getToken(),
-                        jwtUtil.getExpiration(),
-                        user.getUserId(),
-                        user.getUsername(),
-                        user.getRole()
+                        jwtUtil.getExpiration()
                 );
 
 
