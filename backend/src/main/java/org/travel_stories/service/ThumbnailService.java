@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.Thumbnail;
+import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ThumbnailRepository;
@@ -24,12 +25,15 @@ public class ThumbnailService {
     private final ThumbnailRepository thumbnailRepository;
     private final ItineraryRepository itineraryRepository;
     private final AuthorizationService authorizationService;
+    private final FileValidationService fileValidationService;
 
     @Transactional
     public void uploadOrUpdate(
             UUID itineraryId,
             MultipartFile file
-    ) throws IOException {
+    ) {
+        String detectedMimeType =
+                fileValidationService.validateMimeType(file);
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> {
@@ -55,8 +59,23 @@ public class ThumbnailService {
 
             Thumbnail thumbnail = existingThumbnail.get();
 
-            thumbnail.setThumbnailData(file.getBytes());
-            thumbnail.setContentType(file.getContentType());
+            try {
+
+                thumbnail.setThumbnailData(file.getBytes());
+
+            } catch (IOException exception) {
+
+                log.error(
+                        "Failed to read thumbnail file for itinerary {}",
+                        itineraryId,
+                        exception
+                );
+
+                throw new InvalidOperationException(
+                        "Unable to process thumbnail file."
+                );
+            }
+            thumbnail.setContentType(detectedMimeType);
 
 
             log.info(
@@ -68,8 +87,25 @@ public class ThumbnailService {
 
             Thumbnail thumbnail = new Thumbnail();
 
-            thumbnail.setContentType(file.getContentType());
-            thumbnail.setThumbnailData(file.getBytes());
+            thumbnail.setContentType(detectedMimeType);
+
+            try {
+
+                thumbnail.setThumbnailData(file.getBytes());
+
+            } catch (IOException exception) {
+
+                log.error(
+                        "Failed to read thumbnail file for itinerary {}",
+                        itineraryId,
+                        exception
+                );
+
+                throw new InvalidOperationException(
+                        "Unable to process thumbnail file."
+                );
+            }
+
             thumbnail.setItinerary(itinerary);
 
 

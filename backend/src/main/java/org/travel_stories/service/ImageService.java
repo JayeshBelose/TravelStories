@@ -27,6 +27,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final LocationRepository locationRepository;
     private final AuthorizationService authorizationService;
+    private final FileValidationService fileValidationService;
 
     public ImageResponseDto map(Image image) {
 
@@ -41,6 +42,8 @@ public class ImageService {
             UUID locationId,
             MultipartFile file
     ) {
+        String detectedMimeType =
+                fileValidationService.validateMimeType(file);
 
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> {
@@ -69,7 +72,7 @@ public class ImageService {
 
             image.setOrderNumber(nextOrderNumber);
             image.setImageData(file.getBytes());
-            image.setContentType(file.getContentType());
+            image.setContentType(detectedMimeType);
             image.setLocation(location);
 
         } catch (IOException exception) {
