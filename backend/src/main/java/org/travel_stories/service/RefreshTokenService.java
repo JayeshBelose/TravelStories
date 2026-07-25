@@ -3,6 +3,7 @@ package org.travel_stories.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.entity.RefreshToken;
@@ -117,16 +118,22 @@ public class RefreshTokenService {
                 });
     }
 
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void deleteExpiredTokens() {
 
-        refreshTokenRepository.deleteByExpiryDateBefore(
-                Instant.now()
-        );
+        long deleted =
+                refreshTokenRepository.deleteByExpiryDateBefore(
+                        Instant.now()
+                );
 
-        log.info(
-                "Expired refresh tokens removed."
-        );
+        if (deleted > 0) {
+
+            log.info(
+                    "Deleted {} expired refresh tokens.",
+                    deleted
+            );
+        }
     }
 
     private String generateSecureToken() {
