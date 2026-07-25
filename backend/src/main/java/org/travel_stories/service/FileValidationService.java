@@ -2,8 +2,10 @@ package org.travel_stories.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.exception.InvalidOperationException;
 
@@ -14,6 +16,9 @@ import java.util.Set;
 @Service
 @Slf4j
 public class FileValidationService {
+
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private DataSize maxFileSize;
 
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             "image/jpeg",
@@ -46,6 +51,8 @@ public class FileValidationService {
         }
 
         validateExtension(file);
+
+        validateFileSize(file);
 
         try {
 
@@ -122,5 +129,27 @@ public class FileValidationService {
         );
     }
 
+    private void validateFileSize(MultipartFile file) {
+
+        if (file.getSize() > maxFileSize.toBytes()) {
+
+            log.warn(
+                    "Upload rejected: file size {} bytes exceeds configured limit {} bytes",
+                    file.getSize(),
+                    maxFileSize.toBytes()
+            );
+
+            throw new InvalidOperationException(
+                    "File size exceeds the maximum allowed limit of "
+                            + maxFileSize.toMegabytes()
+                            + " MB."
+            );
+        }
+
+        log.debug(
+                "Validated file size: {} bytes",
+                file.getSize()
+        );
+    }
 
 }
