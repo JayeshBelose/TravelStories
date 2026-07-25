@@ -3,10 +3,12 @@ package org.travel_stories.service;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.exception.InvalidOperationException;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -17,6 +19,13 @@ public class FileValidationService {
             "image/jpeg",
             "image/png",
             "image/webp"
+    );
+
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            "jpg",
+            "jpeg",
+            "png",
+            "webp"
     );
 
     private final Tika tika = new Tika();
@@ -35,6 +44,8 @@ public class FileValidationService {
             log.warn("Upload rejected: empty file");
             throw new InvalidOperationException("Uploaded file cannot be empty.");
         }
+
+        validateExtension(file);
 
         try {
 
@@ -62,6 +73,53 @@ public class FileValidationService {
             );
         }
 
+    }
+
+    private void validateExtension(MultipartFile file) {
+
+        String originalFilename = file.getOriginalFilename();
+
+        if (originalFilename == null || originalFilename.isBlank()) {
+
+            log.warn("Upload rejected: missing original filename");
+
+            throw new InvalidOperationException(
+                    "Uploaded file must have a valid filename."
+            );
+        }
+
+        String extension = StringUtils.getFilenameExtension(originalFilename);
+
+        if (extension == null || extension.isBlank()) {
+
+            log.warn(
+                    "Upload rejected: filename has no extension ({})",
+                    originalFilename
+            );
+
+            throw new InvalidOperationException(
+                    "Uploaded file must have a valid extension."
+            );
+        }
+
+        extension = extension.toLowerCase(Locale.ROOT);
+
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+
+            log.warn(
+                    "Upload rejected: unsupported file extension '{}'",
+                    extension
+            );
+
+            throw new InvalidOperationException(
+                    "Unsupported file extension. Only JPG, JPEG, PNG and WEBP files are allowed."
+            );
+        }
+
+        log.debug(
+                "Validated file extension: {}",
+                extension
+        );
     }
 
 
