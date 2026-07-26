@@ -287,20 +287,7 @@ public class UserService {
             String newPassword
     ){
 
-        try {
-
-            jwtUtil.validateResetToken(token);
-
-        } catch (Exception e) {
-
-            log.warn(
-                    "Failed password reset: invalid or expired token"
-            );
-
-            throw new InvalidTokenException(
-                    "Invalid or expired token"
-            );
-        }
+        jwtUtil.validateResetToken(token);
 
 
         String username =

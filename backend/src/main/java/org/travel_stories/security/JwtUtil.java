@@ -69,15 +69,6 @@ public class JwtUtil {
         }
     }
 
-    public boolean isResetToken(String token) {
-        try {
-            Claims claims = getClaims(token);
-            return PASSWORD_RESET_TYPE.equals(claims.get("type"));
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     public String extractUsernameFromResetToken(String token) {
         return getClaims(token).getSubject();
     }
