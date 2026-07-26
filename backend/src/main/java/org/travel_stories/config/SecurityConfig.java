@@ -1,7 +1,6 @@
 package org.travel_stories.config;
 
 import jakarta.servlet.DispatcherType;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
@@ -12,12 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.travel_stories.security.JwtAuthenticationEntryPoint;
 import org.travel_stories.security.JwtFilter;
-import org.travel_stories.security.JwtUtil;
+import org.travel_stories.security.ratelimit.RateLimitingFilter;
 
 import java.util.List;
 
@@ -27,12 +23,16 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final RateLimitingFilter rateLimitingFilter;
 
     public SecurityConfig(
             JwtFilter jwtFilter,
+            RateLimitingFilter rateLimitingFilter,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
     ) {
+
         this.jwtFilter = jwtFilter;
+        this.rateLimitingFilter = rateLimitingFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
@@ -61,7 +61,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(
+                        rateLimitingFilter,
+                        JwtFilter.class
+                )
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

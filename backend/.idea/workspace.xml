@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/RateLimitingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/RateLimitingFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/JwtFilter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
