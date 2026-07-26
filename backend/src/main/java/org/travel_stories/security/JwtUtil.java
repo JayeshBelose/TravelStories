@@ -22,7 +22,11 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.reset-expiration}")
+    private long resetExpiration;
+
     private Key key;
+    private static final String PASSWORD_RESET_TYPE = "PASSWORD_RESET";
 
     @PostConstruct
     public void init() {
@@ -42,9 +46,9 @@ public class JwtUtil {
     public String generateResetToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("type", "PASSWORD_RESET")
+                .claim("type", PASSWORD_RESET_TYPE)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + resetExpiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -68,8 +72,8 @@ public class JwtUtil {
     public boolean isResetToken(String token) {
         try {
             Claims claims = getClaims(token);
-            return "PASSWORD_RESET".equals(claims.get("type"));
-        } catch (Exception e) {
+            return PASSWORD_RESET_TYPE.equals(claims.get("type"));
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -84,6 +88,17 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public void validateResetToken(String token) {
+
+        Claims claims = getClaims(token);
+
+        if (!PASSWORD_RESET_TYPE.equals(claims.get("type"))) {
+            throw new InvalidTokenException(
+                    "Invalid reset token."
+            );
+        }
     }
 
 }

@@ -289,8 +289,7 @@ public class UserService {
 
         try {
 
-            jwtUtil.validateToken(token);
-            jwtUtil.isResetToken(token);
+            jwtUtil.validateResetToken(token);
 
         } catch (Exception e) {
 
