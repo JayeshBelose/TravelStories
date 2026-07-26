@@ -33,6 +33,7 @@ public class UserService {
     private final FollowRepository followRepository;
     private final JwtUtil jwtUtil;
     private final AuthorizationService authorizationService;
+    private final PasswordValidationService passwordValidationService;
 
 
     public UserResponseDto map(User user){
@@ -69,6 +70,9 @@ public class UserService {
 
         user.setUsername(username);
         user.setEmail(email);
+
+        passwordValidationService.validate(password);
+
         user.setPassword(password);
 
         User savedUser = userRepository.save(user);
@@ -308,6 +312,8 @@ public class UserService {
             );
         }
 
+
+        passwordValidationService.validate(newPassword);
 
         user.setPassword(newPassword);
 

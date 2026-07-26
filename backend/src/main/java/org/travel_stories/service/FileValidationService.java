@@ -67,7 +67,7 @@ public class FileValidationService {
                     "File validation successful. MIME type: {}",
                     detectedType
             );
-            
+
             return detectedType;
 
         } catch (IOException ex) {
