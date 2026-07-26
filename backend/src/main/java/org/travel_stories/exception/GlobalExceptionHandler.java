@@ -7,6 +7,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -184,6 +185,28 @@ public class GlobalExceptionHandler {
                 HttpStatus.PAYLOAD_TOO_LARGE,
                 "Uploaded file exceeds the maximum allowed size of 20 MB."
         );
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRateLimitExceededException(
+            RateLimitExceededException ex) {
+
+        log.warn(
+                "Rate limit exceeded. Retry after {} seconds.",
+                ex.getRetryAfterSeconds()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(
+                        HttpHeaders.RETRY_AFTER,
+                        String.valueOf(ex.getRetryAfterSeconds())
+                )
+                .body(
+                        ApiResponse.error(
+                                "Too many requests. Please try again later."
+                        )
+                );
     }
 
     private ResponseEntity<ApiResponse<Void>> error(
