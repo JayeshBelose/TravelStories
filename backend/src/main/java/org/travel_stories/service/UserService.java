@@ -1,14 +1,14 @@
 package org.travel_stories.service;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.*;
 import org.travel_stories.entity.User;
 import org.travel_stories.exception.InvalidCredentialsException;
+import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.InvalidTokenException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.FollowRepository;
@@ -34,6 +34,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final AuthorizationService authorizationService;
     private final PasswordValidationService passwordValidationService;
+    private final PasswordEncoder passwordEncoder;
 
 
     public UserResponseDto map(User user){
@@ -73,7 +74,9 @@ public class UserService {
 
         passwordValidationService.validate(password);
 
-        user.setPassword(password);
+        user.setPassword(
+                passwordEncoder.encode(password)
+        );
 
         User savedUser = userRepository.save(user);
 
@@ -188,26 +191,36 @@ public class UserService {
                     );
                 });
 
+        try {
 
-        if(!user.getPassword().equals(password)){
+            if (!passwordEncoder.matches(password, user.getPassword())) {
 
-            log.warn(
-                    "Failed login attempt: invalid password, email={}",
-                    email
+                log.warn(
+                        "Failed login attempt: invalid password, email={}",
+                        email
+                );
+
+                throw new InvalidCredentialsException(
+                        "Invalid email or password"
+                );
+            }
+
+        } catch (IllegalArgumentException ex) {
+
+            log.error(
+                    "Stored password hash is invalid for userId={}",
+                    user.getUserId()
             );
-
 
             throw new InvalidCredentialsException(
                     "Invalid email or password"
             );
         }
 
-
         log.info(
                 "User '{}' authenticated successfully",
                 user.getUsername()
         );
-
 
         return user;
     }
@@ -315,8 +328,21 @@ public class UserService {
 
         passwordValidationService.validate(newPassword);
 
-        user.setPassword(newPassword);
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
 
+            log.warn(
+                    "Password reset rejected: new password matches current password, userId={}",
+                    user.getUserId()
+            );
+
+            throw new InvalidOperationException(
+                    "New password must be different from the current password."
+            );
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(newPassword)
+        );
 
         log.info(
                 "Password reset completed for user '{}'",
