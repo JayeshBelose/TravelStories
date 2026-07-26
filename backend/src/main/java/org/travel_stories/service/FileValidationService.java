@@ -63,12 +63,19 @@ public class FileValidationService {
                 );
             }
 
-            log.debug("Upload MIME validated successfully: {}", detectedType);
+            log.debug(
+                    "File validation successful. MIME type: {}",
+                    detectedType
+            );
+            
             return detectedType;
 
         } catch (IOException ex) {
 
-            log.error("Unable to inspect uploaded file.", ex);
+            log.error(
+                    "Failed to inspect uploaded file while detecting MIME type.",
+                    ex
+            );
 
             throw new InvalidOperationException(
                     "Unable to validate uploaded file."
@@ -87,6 +94,20 @@ public class FileValidationService {
 
             throw new InvalidOperationException(
                     "Uploaded file must have a valid filename."
+            );
+        }
+
+        originalFilename = StringUtils.cleanPath(originalFilename);
+
+        if (originalFilename.contains("..")) {
+
+            log.warn(
+                    "Upload rejected: invalid filename '{}'",
+                    originalFilename
+            );
+
+            throw new InvalidOperationException(
+                    "Invalid file name."
             );
         }
 
