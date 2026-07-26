@@ -2,10 +2,13 @@ package org.travel_stories.config;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+
+import java.time.Duration;
 
 @Getter
 @Setter
@@ -41,7 +44,7 @@ public class RateLimitProperties {
         @Min(1)
         private long refillTokens;
 
-        @Min(1)
-        private long refillPeriodMinutes;
+        @NotNull
+        private Duration refillPeriod = Duration.ofMinutes(1);
     }
 }
