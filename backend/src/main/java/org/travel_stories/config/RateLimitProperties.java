@@ -41,9 +41,6 @@ public class RateLimitProperties {
         @Min(1)
         private long refillTokens;
 
-        /**
-         * Refill interval in minutes.
-         */
         @Min(1)
         private long refillDurationMinutes;
     }
