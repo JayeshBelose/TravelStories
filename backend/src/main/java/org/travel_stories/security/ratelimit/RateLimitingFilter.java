@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.travel_stories.exception.RateLimitExceededException;
 import org.travel_stories.service.RateLimitingService;
 
 import java.io.IOException;
@@ -19,6 +21,14 @@ import java.util.Map;
 public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final RateLimitingService rateLimitingService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    public RateLimitingFilter(
+            RateLimitingService rateLimitingService, HandlerExceptionResolver handlerExceptionResolver
+    ) {
+        this.rateLimitingService = rateLimitingService;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+    }
 
     private static final Map<String, EndpointCategory> RATE_LIMITED_ENDPOINTS =
             Map.of(
@@ -36,12 +46,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                 || uri.matches("^/api/itineraries/days/locations/[^/]+/images$");
     }
 
-    public RateLimitingFilter(
-            RateLimitingService rateLimitingService
-    ) {
-        this.rateLimitingService = rateLimitingService;
-    }
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -50,7 +54,12 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         EndpointCategory category =
-                RATE_LIMITED_ENDPOINTS.get(request.getRequestURI());
+                resolveCategory(request);
+
+        if (category == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String clientIp = extractClientIp(request);
 
@@ -65,9 +74,21 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                 clientIp
         );
 
-        rateLimitingService.validateRateLimit(bucketKey);
+        try {
 
-        filterChain.doFilter(request, response);
+            rateLimitingService.validateRateLimit(bucketKey);
+
+            filterChain.doFilter(request, response);
+
+        } catch (RateLimitExceededException ex) {
+
+            handlerExceptionResolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    ex
+            );
+        }
     }
 
     private EndpointCategory resolveCategory(HttpServletRequest request) {

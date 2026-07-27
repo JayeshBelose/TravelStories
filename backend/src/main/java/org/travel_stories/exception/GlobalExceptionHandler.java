@@ -159,20 +159,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("Validation failed", errors));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
-
-        log.error(
-                "Unexpected server error occurred",
-                ex
-        );
-
-        return error(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred"
-        );
-    }
-
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(
             MaxUploadSizeExceededException ex) {
@@ -207,6 +193,20 @@ public class GlobalExceptionHandler {
                                 "Too many requests. Please try again later."
                         )
                 );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
+
+        log.error(
+                "Unexpected server error occurred",
+                ex
+        );
+
+        return error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred"
+        );
     }
 
     private ResponseEntity<ApiResponse<Void>> error(

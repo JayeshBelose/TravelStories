@@ -1,7 +1,6 @@
 package org.travel_stories.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import org.slf4j.Logger;
@@ -12,10 +11,8 @@ import org.travel_stories.exception.RateLimitExceededException;
 import org.travel_stories.security.ratelimit.BucketKey;
 import org.travel_stories.security.ratelimit.RateLimitConfigurationRegistry;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Service
 public class RateLimitingService {

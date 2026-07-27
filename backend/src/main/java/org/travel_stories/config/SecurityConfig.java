@@ -64,7 +64,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(
                         rateLimitingFilter,
-                        JwtFilter.class
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         jwtFilter,
