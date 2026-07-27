@@ -1,6 +1,7 @@
 package org.travel_stories.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import org.slf4j.Logger;
@@ -12,7 +13,9 @@ import org.travel_stories.security.ratelimit.BucketKey;
 import org.travel_stories.security.ratelimit.RateLimitConfigurationRegistry;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Service
 public class RateLimitingService {
@@ -45,8 +48,9 @@ public class RateLimitingService {
         if (probe.isConsumed()) {
 
             log.debug(
-                    "Rate limit passed for [{}]. Remaining tokens={}",
+                    "Rate limit passed. Client={}, Category={}, RemainingTokens={}",
                     bucketKey.identifier(),
+                    bucketKey.category(),
                     probe.getRemainingTokens()
             );
 
@@ -62,8 +66,9 @@ public class RateLimitingService {
                 );
 
         log.warn(
-                "Rate limit exceeded for [{}]. Retry after {} seconds.",
+                "Rate limit exceeded. Client={}, Category={}, RetryAfter={}s",
                 bucketKey.identifier(),
+                bucketKey.category(),
                 retryAfterSeconds
         );
 
@@ -75,8 +80,9 @@ public class RateLimitingService {
     private Bucket createBucket(BucketKey bucketKey) {
 
         RateLimitProperties.EndpointLimit configuration =
-                configurationRegistry.getLimit(
-                        bucketKey.category()
+                Objects.requireNonNull(
+                        configurationRegistry.getLimit(bucketKey.category()),
+                        "Missing rate limit configuration for " + bucketKey.category()
                 );
 
         return Bucket.builder()

@@ -29,6 +29,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                     "/api/auth/resetPassword", EndpointCategory.RESET_PASSWORD
             );
 
+    private boolean isUploadRequest(String uri) {
+
+        return uri.matches("^/api/users/[^/]+/profilePicture$")
+                || uri.matches("^/api/itineraries/[^/]+/thumbnail$")
+                || uri.matches("^/api/itineraries/days/locations/[^/]+/images$");
+    }
+
     public RateLimitingFilter(
             RateLimitingService rateLimitingService
     ) {
@@ -69,7 +76,19 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return null;
         }
 
-        return RATE_LIMITED_ENDPOINTS.get(request.getRequestURI());
+        String uri = request.getRequestURI();
+
+        EndpointCategory category = RATE_LIMITED_ENDPOINTS.get(uri);
+
+        if (category != null) {
+            return category;
+        }
+
+        if (isUploadRequest(uri)) {
+            return EndpointCategory.UPLOAD;
+        }
+
+        return null;
     }
 
     private String extractClientIp(HttpServletRequest request) {
@@ -106,7 +125,10 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return true;
         }
 
-        return !RATE_LIMITED_ENDPOINTS.containsKey(request.getRequestURI());
+        String uri = request.getRequestURI();
+
+        return !RATE_LIMITED_ENDPOINTS.containsKey(uri)
+                && !isUploadRequest(uri);
     }
 
     @Override

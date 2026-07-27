@@ -20,6 +20,7 @@ public class RateLimitingConfig {
         return Caffeine.newBuilder()
                 .maximumSize(10_000)
                 .expireAfterAccess(Duration.ofMinutes(30))
+                .recordStats()
                 .build();
     }
 
