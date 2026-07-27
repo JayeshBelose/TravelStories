@@ -5,23 +5,29 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.travel_stories.service.RateLimitingService;
 
 import java.io.IOException;
+import java.util.Map;
 
+@Slf4j
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final RateLimitingService rateLimitingService;
 
-    private static final String LOGIN = "/api/auth/login";
-    private static final String SIGNUP = "/api/auth/signup";
-    private static final String REFRESH = "/api/auth/refresh";
-    private static final String FORGOT_PASSWORD = "/api/auth/forgotPassword";
-    private static final String RESET_PASSWORD = "/api/auth/resetPassword";
+    private static final Map<String, EndpointCategory> RATE_LIMITED_ENDPOINTS =
+            Map.of(
+                    "/api/auth/login", EndpointCategory.LOGIN,
+                    "/api/auth/signup", EndpointCategory.SIGNUP,
+                    "/api/auth/refresh", EndpointCategory.REFRESH,
+                    "/api/auth/forgotPassword", EndpointCategory.FORGOT_PASSWORD,
+                    "/api/auth/resetPassword", EndpointCategory.RESET_PASSWORD
+            );
 
     public RateLimitingFilter(
             RateLimitingService rateLimitingService
@@ -35,23 +41,21 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getDispatcherType() == DispatcherType.ERROR) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
-        EndpointCategory category = resolveCategory(request);
-
-        if (category == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        EndpointCategory category =
+                RATE_LIMITED_ENDPOINTS.get(request.getRequestURI());
 
         String clientIp = extractClientIp(request);
 
         BucketKey bucketKey = new BucketKey(
                 "ip:" + clientIp,
                 category
+        );
+
+        log.debug(
+                "Applying rate limit [{}] for [{}]",
+                category,
+                clientIp
         );
 
         rateLimitingService.validateRateLimit(bucketKey);
@@ -61,27 +65,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private EndpointCategory resolveCategory(HttpServletRequest request) {
 
-        String method = request.getMethod();
-        String uri = request.getRequestURI();
-
-        if (!HttpMethod.POST.matches(method)) {
+        if (!HttpMethod.POST.matches(request.getMethod())) {
             return null;
         }
 
-        return switch (uri) {
-
-            case LOGIN -> EndpointCategory.LOGIN;
-
-            case SIGNUP -> EndpointCategory.SIGNUP;
-
-            case REFRESH -> EndpointCategory.REFRESH;
-
-            case FORGOT_PASSWORD -> EndpointCategory.FORGOT_PASSWORD;
-
-            case RESET_PASSWORD -> EndpointCategory.RESET_PASSWORD;
-
-            default -> null;
-        };
+        return RATE_LIMITED_ENDPOINTS.get(request.getRequestURI());
     }
 
     private String extractClientIp(HttpServletRequest request) {
@@ -105,6 +93,25 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         return request.getRemoteAddr();
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        if (request.getDispatcherType() == DispatcherType.ERROR) {
+            return true;
+        }
+
+        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
+            return true;
+        }
+
+        return !RATE_LIMITED_ENDPOINTS.containsKey(request.getRequestURI());
+    }
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return true;
     }
 
 }
