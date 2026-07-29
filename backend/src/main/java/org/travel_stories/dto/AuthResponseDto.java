@@ -9,12 +9,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AuthResponseDto {
 
-    private String accessToken;
-
-    private String refreshToken;
-
-    private long expiresIn;
-
     private UUID userId;
 
     private String username;

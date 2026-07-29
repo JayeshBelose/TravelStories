@@ -47,12 +47,20 @@ public class AuthController {
                         .createRefreshToken(user)
                         .getToken();
 
+        AuthResponseDto authResponseDto =
+                new AuthResponseDto(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
+
 
         AuthTokenResponseDto response =
                 new AuthTokenResponseDto(
                         accessToken,
                         refreshToken,
-                        jwtUtil.getExpiration()
+                        jwtUtil.getExpiration(),
+                        authResponseDto
                 );
 
         return ResponseEntity.ok(
@@ -87,12 +95,19 @@ public class AuthController {
                         .createRefreshToken(user)
                         .getToken();
 
+        AuthResponseDto authResponseDto =
+                new AuthResponseDto(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
 
         AuthTokenResponseDto response =
                 new AuthTokenResponseDto(
                         accessToken,
                         refreshToken,
-                        jwtUtil.getExpiration()
+                        jwtUtil.getExpiration(),
+                        authResponseDto
                 );
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -167,12 +182,19 @@ public class AuthController {
                         user.getRole()
                 );
 
+        AuthResponseDto authResponseDto =
+                new AuthResponseDto(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getRole()
+                );
 
         AuthTokenResponseDto response =
                 new AuthTokenResponseDto(
                         accessToken,
                         newRefreshToken.getToken(),
-                        jwtUtil.getExpiration()
+                        jwtUtil.getExpiration(),
+                        authResponseDto
                 );
 
 

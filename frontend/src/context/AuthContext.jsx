@@ -21,21 +21,18 @@ export function AuthProvider({ children }) {
     }, []);
 
     const login = data => {
-        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("token", data.accessToken);
+        sessionStorage.setItem("refreshToken", data.refreshToken);
 
-        const user = {
-            userId: data.userId,
-            username: data.username,
-            role: data.role,
-        };
+        sessionStorage.setItem("user", JSON.stringify(data.user));
 
-        sessionStorage.setItem("user", JSON.stringify(user));
-        setUser(user);
+        setUser(data.user);
     };
 
     const logout = () => {
-        sessionStorage.removeItem("user");
         sessionStorage.removeItem("token");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
         setUser(null);
         navigate("/login");
     };

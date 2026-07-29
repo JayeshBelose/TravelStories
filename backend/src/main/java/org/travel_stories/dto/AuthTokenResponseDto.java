@@ -13,4 +13,6 @@ public class AuthTokenResponseDto {
 
     private Long expiresIn;
 
+    private AuthResponseDto user;
+
 }
