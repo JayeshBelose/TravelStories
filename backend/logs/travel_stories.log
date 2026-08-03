@@ -1,108 +1,571 @@
-2026-07-29 12:50:25.827
+2026-08-03 19:33:29.375
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Starting Main using Java 24.0.2 with PID 9703 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
-2026-07-29 12:50:25.828
+                - Starting Main using Java 24.0.2 with PID 34964 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
+2026-08-03 19:33:29.377
                 DEBUG
                 [main]
                 org.travel_stories.Main
                 - Running with Spring Boot v4.0.2, Spring v7.0.3
-2026-07-29 12:50:25.829
+2026-08-03 19:33:29.377
                 INFO 
                 [main]
                 org.travel_stories.Main
                 - No active profile set, falling back to 1 default profile: "default"
-2026-07-29 12:50:26.733
+2026-08-03 19:33:30.327
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Initializing ProtocolHandler ["http-nio-8080"]
-2026-07-29 12:50:26.735
+2026-08-03 19:33:30.328
                 INFO 
                 [main]
                 o.a.catalina.core.StandardService
                 - Starting service [Tomcat]
-2026-07-29 12:50:26.735
+2026-08-03 19:33:30.328
                 INFO 
                 [main]
                 o.a.catalina.core.StandardEngine
                 - Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-07-29 12:50:26.959
+2026-08-03 19:33:30.516
                 DEBUG
                 [main]
                 o.t.s.ratelimit.RateLimitingFilter
                 - Filter 'rateLimitingFilter' configured for use
-2026-07-29 12:50:26.959
+2026-08-03 19:33:30.516
                 DEBUG
                 [main]
                 o.travel_stories.security.JwtFilter
                 - Filter 'jwtFilter' configured for use
-2026-07-29 12:50:27.375
+2026-08-03 19:33:30.875
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Starting...
-2026-07-29 12:50:27.491
+2026-08-03 19:33:30.991
                 INFO 
                 [main]
                 com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@49c4118b
-2026-07-29 12:50:27.492
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@238280df
+2026-08-03 19:33:30.992
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Start completed.
-2026-07-29 12:50:29.760
+2026-08-03 19:33:33.201
                 WARN 
                 [main]
                 o.s.b.s.a.UserDetailsServiceAutoConfiguration
                 - 
 
-Using generated security password: 4f9ad5e8-0e79-4cbb-a8c6-97bcda6d0418
+Using generated security password: d9259a09-3db7-40b7-ba8a-9fb047e4f6c7
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-07-29 12:50:29.987
+2026-08-03 19:33:33.394
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Starting ProtocolHandler ["http-nio-8080"]
-2026-07-29 12:50:30.004
+2026-08-03 19:33:33.406
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Started Main in 4.558 seconds (process running for 4.918)
-2026-07-29 12:51:20.027
+                - Started Main in 4.382 seconds (process running for 4.729)
+2026-08-03 19:35:02.036
                 INFO 
                 [http-nio-8080-exec-2]
                 o.a.c.c.C.[Tomcat].[localhost].[/]
                 - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-07-29 12:51:20.271
+2026-08-03 19:35:02.193
                 WARN 
-                [http-nio-8080-exec-1]
+                [http-nio-8080-exec-2]
                 o.t.service.ProfilePictureService
                 - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-07-29 12:51:20.275
+2026-08-03 19:35:02.195
                 WARN 
-                [http-nio-8080-exec-1]
+                [http-nio-8080-exec-2]
                 o.t.exception.GlobalExceptionHandler
                 - Resource not found: Profile picture not found.
-2026-07-29 12:51:20.468
+2026-08-03 19:35:02.441
                 WARN 
-                [http-nio-8080-exec-6]
+                [http-nio-8080-exec-7]
                 o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
                 - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
 	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
 	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
 
-2026-07-29 12:51:21.727
+2026-08-03 19:47:04.603
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-03 19:47:04.606
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-03 19:47:06.853
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 24.0.2 with PID 35473 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
+2026-08-03 19:47:06.855
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-03 19:47:06.855
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-03 19:47:07.686
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-03 19:47:07.688
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-03 19:47:07.688
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-03 19:47:07.900
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-03 19:47:07.901
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-03 19:47:08.280
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-03 19:47:08.397
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@13018f00
+2026-08-03 19:47:08.397
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-03 19:47:10.651
                 WARN 
-                [http-nio-8080-exec-10]
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: ec5cac79-a48a-49ac-a63b-d272c5fa983a
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-03 19:47:10.867
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-03 19:47:10.888
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 4.386 seconds (process running for 4.644)
+2026-08-03 19:47:45.069
+                INFO 
+                [http-nio-8080-exec-3]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-03 19:47:45.182
+                WARN 
+                [http-nio-8080-exec-3]
                 o.t.service.ProfilePictureService
                 - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-07-29 12:51:21.729
+2026-08-03 19:47:45.183
                 WARN 
-                [http-nio-8080-exec-10]
+                [http-nio-8080-exec-3]
                 o.t.exception.GlobalExceptionHandler
                 - Resource not found: Profile picture not found.
+2026-08-03 19:47:45.450
+                WARN 
+                [http-nio-8080-exec-7]
+                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
+                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-08-03 19:47:49.938
+                WARN 
+                [http-nio-8080-exec-6]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:47:49.939
+                WARN 
+                [http-nio-8080-exec-6]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 19:48:12.567
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-03 19:48:12.591
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-03 19:48:12.614
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.service.FileValidationService
+                - Validated file extension: jpg
+2026-08-03 19:48:12.631
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-03 19:48:12.643
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Authenticated user not found.
+2026-08-03 19:48:24.474
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:48:24.477
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 19:48:55.681
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-03 19:48:55.684
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-03 19:48:56.113
+                INFO 
+                [http-nio-8080-exec-2]
+                o.travel_stories.service.UserService
+                - User 'Test_User' authenticated successfully
+2026-08-03 19:48:56.151
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:48:57.704
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:48:57.705
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 19:48:58.832
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:48:58.832
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 19:49:06.818
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-03 19:49:06.827
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=18
+2026-08-03 19:49:06.840
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.FileValidationService
+                - Validated file extension: jpg
+2026-08-03 19:49:06.846
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-03 19:49:06.850
+                WARN 
+                [http-nio-8080-exec-6]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Authenticated user not found.
+2026-08-03 19:57:50.490
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-03 19:57:50.493
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-03 19:57:52.752
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 24.0.2 with PID 35712 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
+2026-08-03 19:57:52.754
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-03 19:57:52.754
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-03 19:57:53.564
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-03 19:57:53.565
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-03 19:57:53.565
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-03 19:57:53.772
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-03 19:57:53.772
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-03 19:57:54.143
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-03 19:57:54.253
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@abf1816
+2026-08-03 19:57:54.254
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-03 19:57:56.269
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 691b720f-4ee2-44c7-9a92-08ae07759ce4
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-03 19:57:56.472
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-03 19:57:56.488
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 4.095 seconds (process running for 4.355)
+2026-08-03 19:58:01.986
+                INFO 
+                [http-nio-8080-exec-2]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-03 19:58:02.149
+                WARN 
+                [http-nio-8080-exec-2]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 19:58:02.150
+                WARN 
+                [http-nio-8080-exec-2]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 19:58:16.656
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-03 19:58:16.667
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-03 19:58:16.725
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.service.FileValidationService
+                - Validated file extension: jpg
+2026-08-03 19:58:16.741
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-03 19:58:16.762
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Authenticated user not found.
+2026-08-03 20:00:00.063
+                INFO 
+                [scheduling-1]
+                o.t.service.RefreshTokenService
+                - Deleted 21 expired refresh tokens.
+2026-08-03 20:08:42.717
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-03 20:08:42.719
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-03 20:08:44.965
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 24.0.2 with PID 35949 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
+2026-08-03 20:08:44.968
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-03 20:08:44.968
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-03 20:08:45.818
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-03 20:08:45.819
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-03 20:08:45.819
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-03 20:08:46.006
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-03 20:08:46.006
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-03 20:08:46.357
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-03 20:08:46.699
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@13018f00
+2026-08-03 20:08:46.699
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-03 20:08:48.771
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: c4002194-82c7-4255-98e8-08d5931b452e
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-03 20:08:49.013
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-03 20:08:49.029
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 4.413 seconds (process running for 4.683)
+2026-08-03 20:08:57.445
+                INFO 
+                [http-nio-8080-exec-1]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-03 20:08:57.588
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 20:08:57.590
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-03 20:09:04.283
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-03 20:09:04.293
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-03 20:09:04.344
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - Validated file extension: jpg
+2026-08-03 20:09:04.359
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-03 20:09:04.396
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.ProfilePictureService
+                - Profile picture uploaded for user 89a22df3-81ed-4e06-b148-1af73d61aba3

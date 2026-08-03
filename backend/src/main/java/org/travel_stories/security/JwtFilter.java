@@ -41,9 +41,12 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         List<String> publicPaths = List.of(
-                "/api/auth",
-                "/api/itineraries",
-                "/api/users"
+                "/api/auth/login",
+                "/api/auth/signup",
+                "/api/auth/logout",
+                "/api/auth/forgotPassword",
+                "/api/auth/resetPassword",
+                "/api/auth/refresh"
         );
 
         if (publicPaths.stream().anyMatch(path::startsWith)) {
