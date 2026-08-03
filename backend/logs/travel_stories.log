@@ -697,3 +697,23 @@ This generated password is for development use only. Your security configuration
                 [HikariPool-1:housekeeper]
                 com.zaxxer.hikari.pool.HikariPool
                 - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m617ms).
+2026-08-03 21:05:35.131
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-03 21:05:35.135
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-03 21:05:35.595
+                INFO 
+                [http-nio-8080-exec-10]
+                o.travel_stories.service.UserService
+                - User 'Test_User' authenticated successfully
+2026-08-03 21:05:35.622
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 89a22df3-81ed-4e06-b148-1af73d61aba3

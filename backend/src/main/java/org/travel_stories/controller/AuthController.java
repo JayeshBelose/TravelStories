@@ -2,6 +2,8 @@ package org.travel_stories.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+
+    private static final CacheControl NO_STORE =
+            CacheControl.noStore();
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthTokenResponseDto>> login(
@@ -63,9 +68,13 @@ public class AuthController {
                         authResponseDto
                 );
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Login successful", response)
-        );
+        return ResponseEntity.ok()
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .body(
+                        ApiResponse.success("Login successful", response)
+                );
     }
 
     @PostMapping("/signup")
@@ -110,7 +119,11 @@ public class AuthController {
                         authResponseDto
                 );
 
+
         return ResponseEntity.status(HttpStatus.CREATED)
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
                 .body(
                         ApiResponse.success("User registered successfully", response)
                 );
@@ -143,9 +156,13 @@ public class AuthController {
                 "token", token
         );
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Use this token to reset password", response)
-        );
+        return ResponseEntity.ok()
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .body(
+                        ApiResponse.success("Use this token to reset password", response)
+                );
     }
 
     @PostMapping("/resetPassword")
@@ -198,12 +215,13 @@ public class AuthController {
                 );
 
 
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Token refreshed successfully",
-                        response
-                )
-        );
+        return ResponseEntity.ok()
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .body(
+                        ApiResponse.success("Token refreshed successfully", response)
+                );
     }
 
 }
