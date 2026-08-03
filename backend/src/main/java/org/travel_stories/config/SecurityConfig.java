@@ -68,6 +68,10 @@ public class SecurityConfig {
                                         "form-action 'none'; " +
                                         "object-src 'none';"
                         ))
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .maxAgeInSeconds(31536000)
+                                .includeSubDomains(true)
+                        )
                 )
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)

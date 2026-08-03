@@ -692,3 +692,8 @@ This generated password is for development use only. Your security configuration
                 [http-nio-8080-exec-9]
                 o.t.service.ProfilePictureService
                 - Profile picture updated for user 89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-03 20:52:03.031
+                WARN 
+                [HikariPool-1:housekeeper]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m617ms).
