@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.travel_stories.security.JwtAuthenticationEntryPoint;
 import org.travel_stories.security.JwtFilter;
 import org.travel_stories.security.ratelimit.RateLimitingFilter;
@@ -47,6 +49,26 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.deny())
+                        .contentTypeOptions(Customizer.withDefaults())
+                        .referrerPolicy(referrer ->
+                                referrer.policy(
+                                        ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
+                                )
+                        )
+                        .addHeaderWriter(new StaticHeadersWriter(
+                                "Permissions-Policy",
+                                "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+                        ))
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                        "default-src 'none'; " +
+                                        "frame-ancestors 'none'; " +
+                                        "base-uri 'none'; " +
+                                        "form-action 'none'; " +
+                                        "object-src 'none';"
+                        ))
+                )
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
