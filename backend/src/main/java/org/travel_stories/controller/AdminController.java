@@ -6,11 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
-import org.travel_stories.dto.AdminStatsDto;
-import org.travel_stories.dto.ItineraryResponseDto;
-import org.travel_stories.dto.ItineraryTypeDto;
-import org.travel_stories.dto.UserResponseDto;
-import org.travel_stories.dto.WeeklyActivityDto;
+import org.travel_stories.dto.*;
 import org.travel_stories.service.AdminService;
 
 import java.util.List;

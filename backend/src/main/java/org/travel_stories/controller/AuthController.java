@@ -22,12 +22,11 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final CacheControl NO_STORE =
+            CacheControl.noStore();
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
-
-    private static final CacheControl NO_STORE =
-            CacheControl.noStore();
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthTokenResponseDto>> login(

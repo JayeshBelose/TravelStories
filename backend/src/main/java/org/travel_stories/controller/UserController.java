@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
-import org.travel_stories.dto.*;
+import org.travel_stories.dto.FollowResponseDto;
+import org.travel_stories.dto.UserRequestDto;
+import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.service.UserService;
 
 import java.util.List;

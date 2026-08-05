@@ -1,6 +1,9 @@
 package org.travel_stories.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -15,18 +18,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    private static final String PASSWORD_RESET_TYPE = "PASSWORD_RESET";
     @Value("${jwt.secret}")
     private String secret;
-
     @Getter
     @Value("${jwt.expiration}")
     private long expiration;
-
     @Value("${jwt.reset-expiration}")
     private long resetExpiration;
-
     private Key key;
-    private static final String PASSWORD_RESET_TYPE = "PASSWORD_RESET";
 
     @PostConstruct
     public void init() {

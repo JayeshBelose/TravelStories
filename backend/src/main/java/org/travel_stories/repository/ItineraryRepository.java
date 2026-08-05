@@ -22,19 +22,19 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
     List<Itinerary> findAllBySavedByUserUserId(UUID userId);
 
     @Query("""
-           SELECT l.itinerary
-           FROM LikedItinerary l
-           GROUP BY l.itinerary
-           ORDER BY COUNT(l) DESC
-           """)
+                SELECT l.itinerary
+                FROM LikedItinerary l
+                GROUP BY l.itinerary
+                ORDER BY COUNT(l) DESC
+            """)
     List<Itinerary> findMostLikedItineraries();
 
     @Query("""
-           SELECT s.itinerary
-           FROM SavedItinerary s
-           GROUP BY s.itinerary
-           ORDER BY COUNT(s) DESC
-           """)
+                SELECT s.itinerary
+                FROM SavedItinerary s
+                GROUP BY s.itinerary
+                ORDER BY COUNT(s) DESC
+            """)
     List<Itinerary> findMostSavedItineraries();
 
     List<Itinerary> findTop5ByOrderByCreatedAtDesc();
@@ -62,12 +62,7 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
                 :type = 'all' OR LOWER(i.type.name) = LOWER(:type)
             )
             """)
-    Page<Itinerary> searchItinerariesAdmin(
-            @Param("search") String search,
-            @Param("filter") String filter,
-            @Param("type") String type,
-            Pageable pageable
-    );
+    Page<Itinerary> searchItinerariesAdmin(@Param("search") String search, @Param("filter") String filter, @Param("type") String type, Pageable pageable);
 
     @Query("""
             SELECT i FROM Itinerary i
@@ -78,10 +73,6 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
             )
             AND (:type = 'all' OR LOWER(i.type.name) = LOWER(:type))
             """)
-    Page<Itinerary> searchItineraries(
-            @Param("search") String search,
-            @Param("type") String type,
-            Pageable pageable
-    );
+    Page<Itinerary> searchItineraries(@Param("search") String search, @Param("type") String type, Pageable pageable);
 
 }

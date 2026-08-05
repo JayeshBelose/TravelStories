@@ -20,12 +20,10 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final RefreshTokenRepository refreshTokenRepository;
-
     @Value("${jwt.refresh.expiration}")
     private long refreshTokenDuration;
-
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Transactional
     public RefreshToken createRefreshToken(User user) {

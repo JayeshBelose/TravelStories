@@ -8,6 +8,7 @@ import java.util.UUID;
 public class MemberResponseDto {
 
     private UUID userId;
+
     private String username;
 
 }

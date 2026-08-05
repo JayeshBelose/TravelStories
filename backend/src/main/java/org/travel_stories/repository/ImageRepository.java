@@ -12,10 +12,10 @@ public interface ImageRepository extends JpaRepository<Image, UUID> {
     List<Image> findByLocationLocationIdOrderByOrderNumber(UUID locationId);
 
     @Query("""
-        SELECT COALESCE(MAX(i.orderNumber), 0)
-        FROM Image i
-        WHERE i.location.locationId = :locationId
-    """)
+                SELECT COALESCE(MAX(i.orderNumber), 0)
+                FROM Image i
+                WHERE i.location.locationId = :locationId
+            """)
     int findNextOrderNumber(UUID locationId);
 
 }

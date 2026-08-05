@@ -1,14 +1,14 @@
 package org.travel_stories.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.travel_stories.exception.InvalidOperationException;
 import org.springframework.stereotype.Service;
+import org.travel_stories.exception.InvalidOperationException;
 
 @Service
 public class PasswordValidationService {
 
     @Value("${security.password.min-length}")
-    private  int MIN_PASSWORD_LENGTH;
+    private int MIN_PASSWORD_LENGTH;
     @Value("${security.password.max-length}")
     private int MAX_PASSWORD_LENGTH;
 

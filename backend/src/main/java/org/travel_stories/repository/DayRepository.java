@@ -12,10 +12,10 @@ public interface DayRepository extends JpaRepository<Day, UUID> {
     List<Day> findByItineraryItineraryIdOrderByDayNumber(UUID itineraryId);
 
     @Query("""
-        SELECT COALESCE(MAX(d.dayNumber), 0)
-        FROM Day d
-        WHERE d.itinerary.itineraryId = :itineraryId
-    """)
+                SELECT COALESCE(MAX(d.dayNumber), 0)
+                FROM Day d
+                WHERE d.itinerary.itineraryId = :itineraryId
+            """)
     int findMaxDayNumber(UUID itineraryId);
 
 }

@@ -20,6 +20,14 @@ import java.util.Map;
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
 
+    private static final Map<String, EndpointCategory> RATE_LIMITED_ENDPOINTS =
+            Map.of(
+                    "/api/auth/login", EndpointCategory.LOGIN,
+                    "/api/auth/signup", EndpointCategory.SIGNUP,
+                    "/api/auth/refresh", EndpointCategory.REFRESH,
+                    "/api/auth/forgotPassword", EndpointCategory.FORGOT_PASSWORD,
+                    "/api/auth/resetPassword", EndpointCategory.RESET_PASSWORD
+            );
     private final RateLimitingService rateLimitingService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
@@ -29,15 +37,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         this.rateLimitingService = rateLimitingService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
-
-    private static final Map<String, EndpointCategory> RATE_LIMITED_ENDPOINTS =
-            Map.of(
-                    "/api/auth/login", EndpointCategory.LOGIN,
-                    "/api/auth/signup", EndpointCategory.SIGNUP,
-                    "/api/auth/refresh", EndpointCategory.REFRESH,
-                    "/api/auth/forgotPassword", EndpointCategory.FORGOT_PASSWORD,
-                    "/api/auth/resetPassword", EndpointCategory.RESET_PASSWORD
-            );
 
     private boolean isUploadRequest(String uri) {
 

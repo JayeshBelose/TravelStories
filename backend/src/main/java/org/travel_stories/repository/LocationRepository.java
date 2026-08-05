@@ -10,10 +10,10 @@ import java.util.UUID;
 public interface LocationRepository extends JpaRepository<Location, UUID> {
 
     @Query("""
-        SELECT COALESCE(MAX(l.locationNumber), 0)
-        FROM Location l
-        WHERE l.day.dayId = :dayId
-    """)
+                SELECT COALESCE(MAX(l.locationNumber), 0)
+                FROM Location l
+                WHERE l.day.dayId = :dayId
+            """)
     int findNextLocationNumber(UUID dayId);
 
     List<Location> findByDayDayIdOrderByLocationNumber(UUID dayId);

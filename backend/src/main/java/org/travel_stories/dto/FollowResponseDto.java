@@ -10,6 +10,7 @@ import java.util.UUID;
 public class FollowResponseDto {
 
     private UUID userId;
+
     private String username;
 
 }

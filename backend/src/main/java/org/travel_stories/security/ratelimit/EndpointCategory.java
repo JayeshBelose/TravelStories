@@ -13,4 +13,5 @@ public enum EndpointCategory {
     RESET_PASSWORD,
 
     UPLOAD
+
 }

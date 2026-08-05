@@ -8,7 +8,9 @@ import java.util.UUID;
 public class DayResponseDto {
 
     private UUID dayId;
+
     private Integer dayNumber;
+
     private String description;
 
 }

@@ -1,7 +1,8 @@
 package org.travel_stories.config;
 
 import jakarta.servlet.DispatcherType;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.*;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
@@ -17,7 +18,6 @@ import org.travel_stories.security.JwtAuthenticationEntryPoint;
 import org.travel_stories.security.JwtFilter;
 import org.travel_stories.security.ratelimit.RateLimitingFilter;
 
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
                         ))
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                        "default-src 'none'; " +
+                                "default-src 'none'; " +
                                         "frame-ancestors 'none'; " +
                                         "base-uri 'none'; " +
                                         "form-action 'none'; " +

@@ -21,15 +21,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     User findByUsername(String username);
 
     @Query("""
-        SELECT u FROM User u
-        WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
-    """)
+                SELECT u FROM User u
+                WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
+            """)
     List<User> searchUsers(String query);
 
     @Query("""
-            SELECT u FROM User u
-             WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+                SELECT u FROM User u
+                WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
             """)
     Page<User> searchUsersForAdmin(@Param("search") String search, Pageable pageable);
 

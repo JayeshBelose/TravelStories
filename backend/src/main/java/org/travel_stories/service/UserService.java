@@ -5,11 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.travel_stories.dto.*;
+import org.travel_stories.dto.FollowResponseDto;
+import org.travel_stories.dto.UserRequestDto;
+import org.travel_stories.dto.UserResponseDto;
 import org.travel_stories.entity.User;
 import org.travel_stories.exception.InvalidCredentialsException;
 import org.travel_stories.exception.InvalidOperationException;
-import org.travel_stories.exception.InvalidTokenException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.FollowRepository;
 import org.travel_stories.repository.LikedItineraryRepository;
@@ -37,7 +38,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public UserResponseDto map(User user){
+    public UserResponseDto map(User user) {
 
         UserResponseDto userResponseDto = new UserResponseDto();
 
@@ -65,7 +66,7 @@ public class UserService {
             String username,
             String email,
             String password
-    ){
+    ) {
 
         User user = new User();
 
@@ -89,7 +90,7 @@ public class UserService {
     }
 
 
-    public UserResponseDto getUserById(UUID userId){
+    public UserResponseDto getUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -107,11 +108,11 @@ public class UserService {
     }
 
 
-    public UserResponseDto getUserByName(String username){
+    public UserResponseDto getUserByName(String username) {
 
         User user = userRepository.findByUsername(username);
 
-        if(user == null){
+        if (user == null) {
 
             log.warn(
                     "Failed to fetch user by username: user not found, username={}",
@@ -127,7 +128,7 @@ public class UserService {
     }
 
 
-    public List<UserResponseDto> getAllUsers(){
+    public List<UserResponseDto> getAllUsers() {
 
         return userRepository.findAll()
                 .stream()
@@ -140,7 +141,7 @@ public class UserService {
     public UserResponseDto updateUser(
             UserRequestDto userRequestDto,
             UUID userId
-    ){
+    ) {
 
         authorizationService.verifyOwnership(userId);
 
@@ -156,11 +157,11 @@ public class UserService {
                     );
                 });
 
-        if(userRequestDto.getUsername() != null){
+        if (userRequestDto.getUsername() != null) {
             user.setUsername(userRequestDto.getUsername());
         }
 
-        if(userRequestDto.getBio() != null){
+        if (userRequestDto.getBio() != null) {
             user.setBio(userRequestDto.getBio());
         }
 
@@ -176,7 +177,7 @@ public class UserService {
     public User authenticate(
             String email,
             String password
-    ){
+    ) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
@@ -226,9 +227,9 @@ public class UserService {
     }
 
 
-    public List<FollowResponseDto> searchUsers(String query){
+    public List<FollowResponseDto> searchUsers(String query) {
 
-        if(query == null || query.trim().isEmpty()){
+        if (query == null || query.trim().isEmpty()) {
 
             return List.of();
         }
@@ -249,7 +250,7 @@ public class UserService {
     }
 
 
-    public String forgotPassword(String email){
+    public String forgotPassword(String email) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
@@ -285,7 +286,7 @@ public class UserService {
     public void resetPassword(
             String token,
             String newPassword
-    ){
+    ) {
 
         jwtUtil.validateResetToken(token);
 
@@ -298,7 +299,7 @@ public class UserService {
                 userRepository.findByUsername(username);
 
 
-        if(user == null){
+        if (user == null) {
 
             log.warn(
                     "Failed password reset: user not found, username={}",

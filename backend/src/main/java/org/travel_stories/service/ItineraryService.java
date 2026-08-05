@@ -37,7 +37,7 @@ public class ItineraryService {
     private final AuthorizationService authorizationService;
 
 
-    public ItineraryResponseDto map(Itinerary itinerary){
+    public ItineraryResponseDto map(Itinerary itinerary) {
 
         ItineraryResponseDto itineraryResponseDto = new ItineraryResponseDto();
 
@@ -279,7 +279,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public ItineraryResponseDto getItineraryById(UUID itineraryId){
+    public ItineraryResponseDto getItineraryById(UUID itineraryId) {
 
         Itinerary itinerary =
                 itineraryRepository.findById(itineraryId)
@@ -294,7 +294,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByType(Long typeId){
+    public List<ItineraryResponseDto> getAllItinerariesByType(Long typeId) {
 
         return itineraryRepository.findAllByTypeTypeId(typeId)
                 .stream()
@@ -304,7 +304,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByUserId(UUID userId){
+    public List<ItineraryResponseDto> getAllItinerariesByUserId(UUID userId) {
 
         return itineraryRepository.findAllByCreatedByUserId(userId)
                 .stream()
@@ -314,7 +314,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByUserMembership(UUID userId){
+    public List<ItineraryResponseDto> getAllItinerariesByUserMembership(UUID userId) {
 
         return itineraryRepository.findAllByMembersUserUserId(userId)
                 .stream()
@@ -324,7 +324,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllSavedItinerariesByUserId(UUID userId){
+    public List<ItineraryResponseDto> getAllSavedItinerariesByUserId(UUID userId) {
 
         return itineraryRepository.findAllBySavedByUserUserId(userId)
                 .stream()
@@ -334,7 +334,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getMostSavedItineraries(){
+    public List<ItineraryResponseDto> getMostSavedItineraries() {
 
         return itineraryRepository.findMostSavedItineraries()
                 .stream()
@@ -344,7 +344,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getMostLikedItineraries(){
+    public List<ItineraryResponseDto> getMostLikedItineraries() {
 
         return itineraryRepository.findMostLikedItineraries()
                 .stream()
