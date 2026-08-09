@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     getItinerariesService,
     getItineraryTypesService,
@@ -292,16 +293,19 @@ export default function Explore() {
 
             {/* Loading Skeleton */}
             {loading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div
+                    aria-busy="true"
+                    aria-label="Loading itineraries"
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <div
                             key={i}
                             className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-                            <div className="h-48 bg-gray-100 animate-pulse" />
+                            <Skeleton className="h-48 w-full rounded-none" />
                             <div className="p-4 space-y-2">
-                                <div className="h-3.5 bg-gray-100 rounded animate-pulse w-3/4" />
-                                <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
-                                <div className="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+                                <Skeleton className="h-3.5 w-3/4" />
+                                <Skeleton className="h-3 w-1/2" />
+                                <Skeleton className="h-3 w-1/3" />
                             </div>
                         </div>
                     ))}

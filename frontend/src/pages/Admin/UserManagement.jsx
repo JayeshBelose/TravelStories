@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Search, Trash, X, ChevronLeft, ChevronRight, Shield, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import { deleteUserByAdminService, getAdminUsersService } from "@/services/adminService";
@@ -34,6 +35,7 @@ export default function UserManagement() {
     const [totalPages, setTotalPages] = useState(0);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
+    const [loadingUsers, setLoadingUsers] = useState(true);
 
     const confirmDelete = userId => {
         toast(
@@ -57,6 +59,8 @@ export default function UserManagement() {
     }, [page, debouncedSearch]);
 
     const fetchUsers = async () => {
+        setLoadingUsers(true);
+
         const result = await getAdminUsersService({
             page,
             size: 10,
@@ -69,6 +73,8 @@ export default function UserManagement() {
         } else {
             console.error(result.message);
         }
+
+        setLoadingUsers(false);
     };
 
     const handleDelete = async userId => {
@@ -150,8 +156,38 @@ export default function UserManagement() {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {users.map(user => (
+                    <tbody aria-busy={loadingUsers} aria-label="Loading users">
+                        {loadingUsers &&
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <tr key={i} className="border-b border-gray-50">
+                                    <td className="px-5 py-3">
+                                        <div className="flex items-center gap-3">
+                                            <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
+                                            <Skeleton className="h-3.5 w-24" />
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-36" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-20" />
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <Skeleton className="h-3.5 w-8 mx-auto" />
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <Skeleton className="h-3.5 w-8 mx-auto" />
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <Skeleton className="h-7 w-7 rounded-full ml-auto" />
+                                    </td>
+                                </tr>
+                            ))}
+                        {!loadingUsers &&
+                            users.map(user => (
                             <tr
                                 key={user.userId}
                                 className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
@@ -239,7 +275,7 @@ export default function UserManagement() {
                     </tbody>
                 </table>
 
-                {users.length === 0 && (
+                {!loadingUsers && users.length === 0 && (
                     <div className="py-16 text-center text-sm text-gray-400">
                         No users found.
                     </div>

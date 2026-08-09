@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, Users, UserCheck, UserPlus, UserMinus, MapIcon } from "lucide-react";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     followUserService,
     getFollowersService,
@@ -32,6 +33,7 @@ export default function Community() {
 
     const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
+    const [loadingConnections, setLoadingConnections] = useState(true);
     const [searchResults, setSearchResults] = useState([]);
     const [activeTab, setActiveTab] = useState("following");
     const [search, setSearch] = useState("");
@@ -57,6 +59,8 @@ export default function Community() {
         if (!loggedInUser?.userId) return;
 
         const fetchData = async () => {
+            setLoadingConnections(true);
+
             const [followingResult, followersResult] = await Promise.all([
                 getFollowingService({ userId: loggedInUser.userId }),
                 getFollowersService({ userId: loggedInUser.userId }),
@@ -73,6 +77,8 @@ export default function Community() {
             } else {
                 console.error(followersResult.message);
             }
+
+            setLoadingConnections(false);
         };
 
         fetchData();
@@ -270,7 +276,27 @@ export default function Community() {
             </div>
 
             {/* User List */}
-            {currentList.length === 0 ? (
+            {loadingConnections ? (
+                <div
+                    aria-busy="true"
+                    aria-label="Loading connections"
+                    className="space-y-2">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <Skeleton className="w-11 h-11 rounded-full flex-shrink-0" />
+                                <div className="min-w-0 space-y-1.5 flex-1">
+                                    <Skeleton className="h-3.5 w-32" />
+                                    <Skeleton className="h-3 w-24" />
+                                </div>
+                            </div>
+                            <Skeleton className="h-7 w-24 rounded-full flex-shrink-0" />
+                        </div>
+                    ))}
+                </div>
+            ) : currentList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                         <Users size={22} className="text-gray-300" />

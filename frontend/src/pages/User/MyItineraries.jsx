@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
 import {
     deleteItineraryService,
@@ -265,19 +266,22 @@ export default function MyItineraries() {
 
                 if (loading)
                     return (
-                        <div className="space-y-4">
+                        <div
+                            aria-busy="true"
+                            aria-label="Loading itineraries"
+                            className="space-y-4">
                             {Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className="flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl animate-pulse">
-                                    <div className="w-36 h-36 rounded-xl bg-gray-100 flex-shrink-0" />
+                                    className="flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl">
+                                    <Skeleton className="w-36 h-36 rounded-xl flex-shrink-0" />
                                     <div className="flex-1 space-y-3 pt-1">
-                                        <div className="h-4 bg-gray-100 rounded w-2/3" />
-                                        <div className="h-3 bg-gray-100 rounded w-1/3" />
-                                        <div className="h-3 bg-gray-100 rounded w-1/4" />
+                                        <Skeleton className="h-4 w-2/3" />
+                                        <Skeleton className="h-3 w-1/3" />
+                                        <Skeleton className="h-3 w-1/4" />
                                         <div className="flex gap-2 mt-4">
-                                            <div className="h-5 w-16 bg-gray-100 rounded-full" />
-                                            <div className="h-5 w-20 bg-gray-100 rounded-full" />
+                                            <Skeleton className="h-5 w-16 rounded-full" />
+                                            <Skeleton className="h-5 w-20 rounded-full" />
                                         </div>
                                     </div>
                                 </div>

@@ -10,6 +10,7 @@ import {
     MapPin,
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import {
     deleteItineraryByAdminService,
@@ -40,16 +41,20 @@ function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
 }
 
 // Stat card
-function StatCard({ title, value, icon: Icon, color }) {
+function StatCard({ title, value, icon: Icon, color, loading }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm">
             <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
                     {title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                    {value.toLocaleString()}
-                </p>
+                {loading ? (
+                    <Skeleton className="h-7 w-16" />
+                ) : (
+                    <p className="text-2xl font-bold text-gray-900">
+                        {value.toLocaleString()}
+                    </p>
+                )}
             </div>
             <div
                 className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}>
@@ -67,6 +72,7 @@ export default function Dashboard() {
     const [stats, setStats] = useState({ users: 0, itineraries: 0, images: 0 });
     const [recentItineraries, setRecentItineraries] = useState([]);
     const [activity, setActivity] = useState([]);
+    const [loadingDashboard, setLoadingDashboard] = useState(true);
 
     // itinerary deletion confirmation
     const confirmDelete = itineraryId => {
@@ -92,6 +98,8 @@ export default function Dashboard() {
     }, [loading, user]);
 
     const fetchDashboard = async () => {
+        setLoadingDashboard(true);
+
         const [statsResult, itinerariesResult, activityResult] = await Promise.all([
             getDashboardStatsService(),
             getRecentItinerariesService(),
@@ -115,6 +123,8 @@ export default function Dashboard() {
         } else {
             console.error(activityResult.message);
         }
+
+        setLoadingDashboard(false);
     };
 
     // Itinerary delete function
@@ -153,18 +163,21 @@ export default function Dashboard() {
                     value={stats.users}
                     icon={Users}
                     color="bg-blue-50 text-blue-500"
+                    loading={loadingDashboard}
                 />
                 <StatCard
                     title="Total Itineraries"
                     value={stats.itineraries}
                     icon={Map}
                     color="bg-emerald-50 text-emerald-500"
+                    loading={loadingDashboard}
                 />
                 <StatCard
                     title="Total Images"
                     value={stats.images}
                     icon={ImageIcon}
                     color="bg-amber-50 text-amber-500"
+                    loading={loadingDashboard}
                 />
             </div>
 
@@ -177,30 +190,48 @@ export default function Dashboard() {
                             Weekly Activity
                         </h2>
                     </div>
-                    <div className="space-y-3">
-                        {activity.map((a, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                                <div className="flex items-center gap-2">
-                                    <CalendarDays
-                                        size={13}
-                                        className="text-gray-300 flex-shrink-0"
-                                    />
-                                    <span className="text-xs font-medium text-gray-600">
-                                        {a.date}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3 text-xs">
-                                    <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                                        <Users size={10} /> {a.newUsers} users
-                                    </span>
-                                    <span className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
-                                        <Map size={10} /> {a.newItineraries} trips
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                    <div
+                        aria-busy={loadingDashboard}
+                        aria-label="Loading weekly activity"
+                        className="space-y-3">
+                        {loadingDashboard
+                            ? Array.from({ length: 5 }).map((_, i) => (
+                                  <div
+                                      key={i}
+                                      className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                      <div className="flex items-center gap-2">
+                                          <Skeleton className="w-3.5 h-3.5 rounded-full" />
+                                          <Skeleton className="h-3 w-20" />
+                                      </div>
+                                      <div className="flex items-center gap-3">
+                                          <Skeleton className="h-5 w-16 rounded-full" />
+                                          <Skeleton className="h-5 w-16 rounded-full" />
+                                      </div>
+                                  </div>
+                              ))
+                            : activity.map((a, index) => (
+                                  <div
+                                      key={index}
+                                      className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                      <div className="flex items-center gap-2">
+                                          <CalendarDays
+                                              size={13}
+                                              className="text-gray-300 flex-shrink-0"
+                                          />
+                                          <span className="text-xs font-medium text-gray-600">
+                                              {a.date}
+                                          </span>
+                                      </div>
+                                      <div className="flex items-center gap-3 text-xs">
+                                          <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                                              <Users size={10} /> {a.newUsers} users
+                                          </span>
+                                          <span className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
+                                              <Map size={10} /> {a.newItineraries} trips
+                                          </span>
+                                      </div>
+                                  </div>
+                              ))}
                     </div>
                 </div>
 
@@ -212,8 +243,27 @@ export default function Dashboard() {
                             Recently Added
                         </h2>
                     </div>
-                    <div className="space-y-2">
-                        {recentItineraries.map(itinerary => (
+                    <div
+                        aria-busy={loadingDashboard}
+                        aria-label="Loading recently added itineraries"
+                        className="space-y-2">
+                        {loadingDashboard &&
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-center justify-between p-2.5 rounded-xl">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
+                                        <div className="min-w-0 space-y-1.5 flex-1">
+                                            <Skeleton className="h-3.5 w-32" />
+                                            <Skeleton className="h-3 w-40" />
+                                        </div>
+                                    </div>
+                                    <Skeleton className="h-5 w-14 rounded-full flex-shrink-0" />
+                                </div>
+                            ))}
+                        {!loadingDashboard &&
+                            recentItineraries.map(itinerary => (
                             <div
                                 key={itinerary.itineraryId}
                                 className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors">

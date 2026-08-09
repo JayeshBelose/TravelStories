@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     addItineraryTypeService,
     deleteItineraryByAdminService,
@@ -67,6 +68,7 @@ export default function ItineraryManagement() {
     const [openSort, setOpenSort] = useState(false);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+    const [loadingItineraries, setLoadingItineraries] = useState(true);
 
     const sortRef = useRef(null);
     const typeRef = useRef(null);
@@ -120,6 +122,8 @@ export default function ItineraryManagement() {
 
     // Fetching itineraries
     const fetchItineraries = async () => {
+        setLoadingItineraries(true);
+
         const result = await getAdminItinerariesService({
             page,
             size: 10,
@@ -135,6 +139,8 @@ export default function ItineraryManagement() {
         } else {
             console.error(result.message);
         }
+
+        setLoadingItineraries(false);
     };
 
     // Fetching itinerary types
@@ -390,8 +396,44 @@ export default function ItineraryManagement() {
                             ))}
                         </tr>
                     </thead>
-                    <tbody>
-                        {itineraries.map(item => (
+                    <tbody aria-busy={loadingItineraries} aria-label="Loading itineraries">
+                        {loadingItineraries &&
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <tr key={i} className="border-b border-gray-50">
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-32" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-24" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-20" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Skeleton className="h-3.5 w-20" />
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <Skeleton className="h-3.5 w-8 mx-auto" />
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <Skeleton className="h-3.5 w-8 mx-auto" />
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="flex items-center justify-end gap-1">
+                                            <Skeleton className="h-7 w-7 rounded-full" />
+                                            <Skeleton className="h-7 w-7 rounded-full" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        {!loadingItineraries &&
+                            itineraries.map(item => (
                             <tr
                                 key={item.itineraryId}
                                 className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
@@ -485,7 +527,7 @@ export default function ItineraryManagement() {
                         ))}
                     </tbody>
                 </table>
-                {itineraries.length === 0 && (
+                {!loadingItineraries && itineraries.length === 0 && (
                     <div className="py-16 text-center text-sm text-gray-400">
                         No itineraries found.
                     </div>

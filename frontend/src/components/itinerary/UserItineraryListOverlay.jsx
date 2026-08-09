@@ -1,6 +1,7 @@
 import { X, MapIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryOverlay from "./ItineraryOverlay";
 import { getUserCreatedItinerariesService } from "@/services/itineraryService";
@@ -12,6 +13,7 @@ export default function UserItineraryListOverlay({
     onSelectItinerary,
 }) {
     const [itineraries, setItineraries] = useState([]);
+    const [loadingItineraries, setLoadingItineraries] = useState(true);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
 
     const currentUser = JSON.parse(sessionStorage.getItem("user"));
@@ -21,6 +23,8 @@ export default function UserItineraryListOverlay({
         if (!open || !user?.userId) return;
 
         const fetchItineraries = async () => {
+            setLoadingItineraries(true);
+
             const result = await getUserCreatedItinerariesService({
                 userId: user.userId,
             });
@@ -36,6 +40,8 @@ export default function UserItineraryListOverlay({
                 console.error(result.message);
                 setItineraries([]);
             }
+
+            setLoadingItineraries(false);
         };
 
         fetchItineraries();
@@ -71,12 +77,16 @@ export default function UserItineraryListOverlay({
                                 <h2 className="text-base font-semibold text-gray-900 font-primary leading-tight">
                                     {user.username}
                                 </h2>
-                                <p className="text-xs text-gray-400 font-medium">
-                                    {itineraries.length}{" "}
-                                    {itineraries.length === 1
-                                        ? "itinerary"
-                                        : "itineraries"}
-                                </p>
+                                {loadingItineraries ? (
+                                    <Skeleton className="h-3 w-20 mt-1" />
+                                ) : (
+                                    <p className="text-xs text-gray-400 font-medium">
+                                        {itineraries.length}{" "}
+                                        {itineraries.length === 1
+                                            ? "itinerary"
+                                            : "itineraries"}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -91,7 +101,25 @@ export default function UserItineraryListOverlay({
 
                     {/* Body */}
                     <div className="flex-1 overflow-y-auto">
-                        {itineraries.length === 0 ? (
+                        {loadingItineraries ? (
+                            <div
+                                aria-busy="true"
+                                aria-label="Loading itineraries"
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                                        <Skeleton className="h-48 w-full rounded-none" />
+                                        <div className="p-4 space-y-2">
+                                            <Skeleton className="h-3.5 w-3/4" />
+                                            <Skeleton className="h-3 w-1/2" />
+                                            <Skeleton className="h-3 w-1/3" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : itineraries.length === 0 ? (
                             // Empty state
                             <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
                                 <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
