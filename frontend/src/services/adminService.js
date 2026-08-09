@@ -10,108 +10,37 @@ import {
     getRecentItinerariesApi,
     getWeeklyActivityApi,
 } from "@/api/adminApi";
+import { executeServiceRequest } from "./serviceUtils";
 
 export const getDashboardStatsService = async () => {
-    try {
-        const response = await getDashboardStatsApi();
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch dashboard statistics.";
-
-        if (err.response?.status >= 500) {
-            message = "Server error. Please try again later.";
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () => getDashboardStatsApi(),
+        "Failed to fetch dashboard statistics.",
+    );
 };
 
 export const getRecentItinerariesService = async () => {
-    try {
-        const response = await getRecentItinerariesApi();
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch recent itineraries.";
-
-        if (err.response?.status >= 500) {
-            message = "Server error. Please try again later.";
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () => getRecentItinerariesApi(),
+        "Failed to fetch recent itineraries.",
+    );
 };
 
 export const getWeeklyActivityService = async () => {
-    try {
-        const response = await getWeeklyActivityApi();
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch weekly activity.";
-
-        if (err.response?.status >= 500) {
-            message = "Server error. Please try again later.";
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () => getWeeklyActivityApi(),
+        "Failed to fetch weekly activity.",
+    );
 };
 
 export const deleteItineraryByAdminService = async ({ itineraryId }) => {
-    try {
-        const response = await deleteItineraryByAdminApi({
-            itineraryId,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to delete itinerary.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 404:
-                    message = "Itinerary not found.";
-                    break;
-
-                case 403:
-                    message = "You are not authorized to delete this itinerary.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            deleteItineraryByAdminApi({
+                itineraryId,
+            }),
+        "Failed to delete itinerary.",
+    );
 };
 
 export const getAdminItinerariesService = async ({
@@ -122,216 +51,65 @@ export const getAdminItinerariesService = async ({
     type,
     sort,
 }) => {
-    try {
-        const response = await getAdminItinerariesApi({
-            page,
-            size,
-            search,
-            filter,
-            type,
-            sort,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch itineraries.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 400:
-                    message = "Invalid request parameters.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            getAdminItinerariesApi({
+                page,
+                size,
+                search,
+                filter,
+                type,
+                sort,
+            }),
+        "Failed to fetch itineraries.",
+    );
 };
 
 export const getItineraryTypesAdminService = async () => {
-    try {
-        const response = await getItineraryTypesAdminApi();
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch itinerary types.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 404:
-                    message = "No itinerary types found.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () => getItineraryTypesAdminApi(),
+        "Failed to fetch itinerary types.",
+    );
 };
 
 export const addItineraryTypeService = async ({ typeName }) => {
-    try {
-        const response = await addItineraryTypeApi({
-            typeName,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to add itinerary type.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 400:
-                    message = "Invalid type name.";
-                    break;
-
-                case 409:
-                    message = "Type already exists.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            addItineraryTypeApi({
+                typeName,
+            }),
+        "Failed to add itinerary type.",
+    );
 };
 
 export const deleteItineraryTypeService = async ({ typeId }) => {
-    try {
-        const response = await deleteItineraryTypeApi({
-            typeId,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to delete itinerary type.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 404:
-                    message = "Type not found.";
-                    break;
-
-                case 409:
-                    message = "This type is currently in use and cannot be deleted.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            deleteItineraryTypeApi({
+                typeId,
+            }),
+        "Failed to delete itinerary type.",
+    );
 };
 
 export const getAdminUsersService = async ({ page, size, search }) => {
-    try {
-        const response = await getAdminUsersApi({
-            page,
-            size,
-            search,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to fetch users.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 400:
-                    message = "Invalid request parameters.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            getAdminUsersApi({
+                page,
+                size,
+                search,
+            }),
+        "Failed to fetch users.",
+    );
 };
 
 export const deleteUserByAdminService = async ({ userId }) => {
-    try {
-        const response = await deleteUserByAdminApi({
-            userId,
-        });
-
-        return {
-            success: true,
-            data: response.data.data,
-        };
-    } catch (err) {
-        let message = "Failed to delete user.";
-
-        if (err.response) {
-            switch (err.response.status) {
-                case 404:
-                    message = "User not found.";
-                    break;
-
-                case 403:
-                    message = "You are not authorized to delete this user.";
-                    break;
-
-                default:
-                    if (err.response.status >= 500) {
-                        message = "Server error. Please try again later.";
-                    }
-            }
-        }
-
-        return {
-            success: false,
-            message,
-        };
-    }
+    return executeServiceRequest(
+        () =>
+            deleteUserByAdminApi({
+                userId,
+            }),
+        "Failed to delete user.",
+    );
 };
