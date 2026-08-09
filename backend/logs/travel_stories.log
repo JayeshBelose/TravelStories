@@ -570,3 +570,23 @@ Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expire
                 [scheduling-1]
                 o.t.service.RefreshTokenService
                 - Deleted 2 expired refresh tokens.
+2026-08-09 16:13:03.178
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-09 16:13:03.191
+                DEBUG
+                [http-nio-8080-exec-1]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-09 16:13:03.542
+                INFO 
+                [http-nio-8080-exec-1]
+                o.travel_stories.service.UserService
+                - User 'TestUser' authenticated successfully
+2026-08-09 16:13:03.550
+                INFO 
+                [http-nio-8080-exec-1]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 89a22df3-81ed-4e06-b148-1af73d61aba3

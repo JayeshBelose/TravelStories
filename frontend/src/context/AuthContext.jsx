@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -20,10 +20,26 @@ export function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("refreshToken");
+            sessionStorage.removeItem("user");
+
+            setUser(null);
+            navigate("/login");
+        };
+
+        window.addEventListener("auth:session-expired", handleSessionExpired);
+
+        return () => {
+            window.removeEventListener("auth:session-expired", handleSessionExpired);
+        };
+    }, [navigate]);
+
     const login = data => {
         sessionStorage.setItem("token", data.accessToken);
         sessionStorage.setItem("refreshToken", data.refreshToken);
-
         sessionStorage.setItem("user", JSON.stringify(data.user));
 
         setUser(data.user);
@@ -33,12 +49,19 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("refreshToken");
         sessionStorage.removeItem("user");
+
         setUser(null);
         navigate("/login");
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                login,
+                logout,
+                loading,
+            }}>
             {children}
         </AuthContext.Provider>
     );

@@ -15,6 +15,10 @@ const clearAuthStorage = () => {
     sessionStorage.removeItem("user");
 };
 
+const notifyAuthenticationFailure = () => {
+    window.dispatchEvent(new Event("auth:session-expired"));
+};
+
 const refreshAccessToken = async () => {
     const refreshToken = sessionStorage.getItem("refreshToken");
 
@@ -76,6 +80,8 @@ api.interceptors.response.use(
 
         if (!refreshToken) {
             clearAuthStorage();
+            notifyAuthenticationFailure();
+
             return Promise.reject(error);
         }
 
@@ -93,6 +99,7 @@ api.interceptors.response.use(
             return api(originalRequest);
         } catch (refreshError) {
             clearAuthStorage();
+            notifyAuthenticationFailure();
 
             return Promise.reject(refreshError);
         } finally {

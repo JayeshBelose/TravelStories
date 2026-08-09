@@ -45,14 +45,9 @@ export default function Signup() {
         });
 
         if (result.success) {
-            const { token, userId, username, role } = result.data;
+            login(result.data);
 
-            login({
-                token,
-                userId,
-                username,
-                role,
-            });
+            const role = result.data.user.role;
 
             toast.update(loadingToast, {
                 render: "Account created! Welcome aboard.",
