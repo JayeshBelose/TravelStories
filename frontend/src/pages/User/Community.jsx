@@ -12,6 +12,7 @@ import {
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import ErrorState from "@/components/ui/ErrorState";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
     followUserService,
@@ -43,6 +44,8 @@ export default function Community() {
     const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
     const [loadingConnections, setLoadingConnections] = useState(true);
+    const [followingError, setFollowingError] = useState(null);
+    const [followersError, setFollowersError] = useState(null);
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [activeTab, setActiveTab] = useState("following");
@@ -68,33 +71,37 @@ export default function Community() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    useEffect(() => {
+    const fetchConnections = async () => {
         if (!loggedInUser?.userId) return;
 
-        const fetchData = async () => {
-            setLoadingConnections(true);
+        setLoadingConnections(true);
+        setFollowingError(null);
+        setFollowersError(null);
 
-            const [followingResult, followersResult] = await Promise.all([
-                getFollowingService({ userId: loggedInUser.userId }),
-                getFollowersService({ userId: loggedInUser.userId }),
-            ]);
+        const [followingResult, followersResult] = await Promise.all([
+            getFollowingService({ userId: loggedInUser.userId }),
+            getFollowersService({ userId: loggedInUser.userId }),
+        ]);
 
-            if (followingResult.success) {
-                setFollowing(followingResult.data);
-            } else {
-                console.error(followingResult.message);
-            }
+        if (followingResult.success) {
+            setFollowing(followingResult.data);
+        } else {
+            setFollowing([]);
+            setFollowingError(followingResult.message);
+        }
 
-            if (followersResult.success) {
-                setFollowers(followersResult.data);
-            } else {
-                console.error(followersResult.message);
-            }
+        if (followersResult.success) {
+            setFollowers(followersResult.data);
+        } else {
+            setFollowers([]);
+            setFollowersError(followersResult.message);
+        }
 
-            setLoadingConnections(false);
-        };
+        setLoadingConnections(false);
+    };
 
-        fetchData();
+    useEffect(() => {
+        fetchConnections();
     }, []);
 
     useEffect(() => {
@@ -182,6 +189,8 @@ export default function Community() {
     };
 
     const currentList = activeTab === "following" ? following : followers;
+
+    const currentError = activeTab === "following" ? followingError : followersError;
 
     return (
         <div>
@@ -294,49 +303,6 @@ export default function Community() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 border-b border-gray-100 mb-6">
-                {[
-                    {
-                        key: "following",
-                        label: "Following",
-                        count: following.length,
-                        icon: UserCheck,
-                    },
-                    {
-                        key: "followers",
-                        label: "Followers",
-                        count: followers.length,
-                        icon: Users,
-                    },
-                ].map(tab => (
-                    <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer
-                        ${
-                            activeTab === tab.key
-                                ? "border-gray-900 text-gray-900"
-                                : "border-transparent text-gray-400 hover:text-gray-600"
-                        }`}>
-                        <tab.icon size={14} />
-
-                        {tab.label}
-
-                        <span
-                            className={`text-xs px-1.5 py-0.5 rounded-full font-semibold
-                        ${
-                            activeTab === tab.key
-                                ? "bg-gray-900 text-white"
-                                : "bg-gray-100 text-gray-400"
-                        }`}>
-                            {tab.count}
-                        </span>
-                    </button>
-                ))}
-            </div>
-
-            {/* User List */}
             {loadingConnections ? (
                 <div
                     aria-busy="true"
@@ -359,6 +325,16 @@ export default function Community() {
                         </div>
                     ))}
                 </div>
+            ) : currentError ? (
+                <ErrorState
+                    title={
+                        activeTab === "following"
+                            ? "Unable to load following"
+                            : "Unable to load followers"
+                    }
+                    message={currentError}
+                    onRetry={fetchConnections}
+                />
             ) : currentList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
@@ -379,6 +355,7 @@ export default function Community() {
                 <div className="space-y-2">
                     {currentList.map(user => {
                         const followingUser = isFollowing(user.userId);
+
                         const followLoading = followActionUserId === user.userId;
 
                         return (
@@ -386,6 +363,7 @@ export default function Community() {
                                 key={user.userId}
                                 className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
                                 {/* User info */}
+
                                 <button
                                     type="button"
                                     onClick={() => setSelectedUser(user)}
@@ -408,11 +386,13 @@ export default function Community() {
                                 </button>
 
                                 {/* Action button */}
+
                                 {activeTab === "following" ? (
                                     <button
                                         type="button"
                                         onClick={e => {
                                             e.stopPropagation();
+
                                             toggleFollow(user);
                                         }}
                                         disabled={followLoading}
@@ -437,10 +417,12 @@ export default function Community() {
                                         type="button"
                                         onClick={e => {
                                             e.stopPropagation();
+
                                             toggleFollow(user);
                                         }}
                                         disabled={followLoading}
                                         className={`flex items-center justify-center gap-1.5 min-w-[92px] px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
+
                                         ${
                                             followingUser
                                                 ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
@@ -452,6 +434,7 @@ export default function Community() {
                                                     size={12}
                                                     className="animate-spin"
                                                 />
+
                                                 {followingUser
                                                     ? "Unfollowing…"
                                                     : "Following…"}
