@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
+import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
 import {
@@ -368,10 +369,10 @@ export default function MyItineraries() {
 
                                     {/* Thumbnail */}
                                     <div className="w-36 h-36 rounded-xl overflow-hidden flex-shrink-0">
-                                        <img
-                                            src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
+                                        <ItineraryThumbnail
+                                            itineraryId={itinerary.itineraryId}
                                             alt={itinerary.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            imgClassName="group-hover:scale-105 transition-transform duration-500"
                                         />
                                     </div>
 

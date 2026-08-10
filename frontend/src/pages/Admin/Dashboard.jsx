@@ -10,6 +10,7 @@ import {
     MapPin,
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
+import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -274,10 +275,9 @@ export default function Dashboard() {
                                     }}
                                     className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer">
                                     <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img
-                                            src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
+                                        <ItineraryThumbnail
+                                            itineraryId={itinerary.itineraryId}
                                             alt={itinerary.title}
-                                            className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="min-w-0">

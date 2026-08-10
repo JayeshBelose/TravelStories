@@ -11,6 +11,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
     deleteUserAccountService,
     updateUserProfileService,
@@ -147,13 +148,12 @@ export default function Profile() {
                     <div className="flex items-center gap-5">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
-                            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-100">
-                                <img
-                                    src={avatarSrc}
-                                    alt={username}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                            <Avatar className="w-20 h-20 ring-2 ring-gray-100">
+                                <AvatarImage src={avatarSrc} alt={username} />
+                                <AvatarFallback className="bg-gray-900 text-white text-xl font-semibold">
+                                    {username?.[0]?.toUpperCase() || "U"}
+                                </AvatarFallback>
+                            </Avatar>
                             {/* Camera overlay trigger */}
                             <label className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 hover:bg-black/30 transition-colors cursor-pointer group">
                                 <Camera

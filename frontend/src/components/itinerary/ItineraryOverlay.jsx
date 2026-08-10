@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import UserItineraryListOverlay from "./UserItineraryListOverlay";
+import ItineraryThumbnail from "./ItineraryThumbnail";
 import { getUserByUsernameService } from "@/services/userService";
 import { getItineraryDaysService } from "@/services/dayService";
 import { getDayLocationsService } from "@/services/locationService";
@@ -18,7 +19,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     const [days, setDays] = useState([]);
     const [locationsByDay, setLocationsByDays] = useState({});
     const [imagesByLocation, setImagesByLocation] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [activeDay, setActiveDay] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -27,8 +28,6 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     // Fetching user info the itinerary creator
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
-
-        setLoading(true);
 
         const fetchCreator = async () => {
             const result = await getUserByUsernameService({
@@ -50,8 +49,6 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     // Fetching itinerary days, locations and images
     useEffect(() => {
         if (!itinerary?.itineraryId) return;
-
-        setLoading(true);
 
         const fetchDays = async () => {
             const result = await getItineraryDaysService({
@@ -153,10 +150,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                     onClick={e => e.stopPropagation()}>
                     {/* Thumbnail */}
                     <div className="relative h-56 flex-shrink-0">
-                        <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
+                        <ItineraryThumbnail
+                            itineraryId={itinerary.itineraryId}
                             alt={itinerary.title}
-                            className="w-full h-full object-cover"
                         />
                         {/* Gradient overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -457,9 +453,6 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                 open={!!selectedUser}
                 user={selectedUser}
                 onClose={() => setSelectedUser(null)}
-                onSelectItinerary={itinerary => {
-                    setSelectedItinerary(itinerary);
-                }}
             />
         </>
     );

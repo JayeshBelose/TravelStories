@@ -6,12 +6,7 @@ import ItineraryCard from "./ItineraryCard";
 import ItineraryOverlay from "./ItineraryOverlay";
 import { getUserCreatedItinerariesService } from "@/services/itineraryService";
 
-export default function UserItineraryListOverlay({
-    open,
-    onClose,
-    user,
-    onSelectItinerary,
-}) {
+export default function UserItineraryListOverlay({ open, onClose, user }) {
     const [itineraries, setItineraries] = useState([]);
     const [loadingItineraries, setLoadingItineraries] = useState(true);
     const [selectedItinerary, setSelectedItinerary] = useState(null);

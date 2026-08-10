@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
+import ItineraryThumbnail from "./ItineraryThumbnail";
 import {
     getLikedStatusService,
     getSavedStatusService,
@@ -93,10 +94,10 @@ export default function ItineraryCard({ itinerary, onClick }) {
             className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 flex flex-col">
             {/* Thumbnail */}
             <div className="relative h-48 overflow-hidden flex-shrink-0">
-                <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}/itineraries/${itinerary.itineraryId}/thumbnail`}
+                <ItineraryThumbnail
+                    itineraryId={itinerary.itineraryId}
                     alt={itinerary.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    imgClassName="transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Visibility */}

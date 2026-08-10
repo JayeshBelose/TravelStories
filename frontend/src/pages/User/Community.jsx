@@ -3,6 +3,7 @@ import { Search, X, Users, UserCheck, UserPlus, UserMinus, MapIcon } from "lucid
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
     followUserService,
     getFollowersService,
@@ -14,17 +15,15 @@ import {
 function UserAvatar({ userId, username, size = "md" }) {
     const sizeClass = size === "sm" ? "w-8 h-8 text-xs" : "w-11 h-11 text-sm";
     return (
-        <div
-            className={`${sizeClass} rounded-full overflow-hidden flex-shrink-0 bg-gray-200`}>
-            <img
+        <Avatar className={`${sizeClass} flex-shrink-0`}>
+            <AvatarImage
                 src={`${import.meta.env.VITE_API_BASE_URL}/users/${userId}/profilePicture`}
                 alt={username}
-                className="w-full h-full object-cover"
-                onError={e => {
-                    e.currentTarget.style.display = "none";
-                }}
             />
-        </div>
+            <AvatarFallback className="bg-gray-900 text-white font-semibold">
+                {username?.[0]?.toUpperCase() || "U"}
+            </AvatarFallback>
+        </Avatar>
     );
 }
 
