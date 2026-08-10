@@ -3,6 +3,7 @@ import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-re
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import ErrorState from "@/components/ui/ErrorState";
 import {
     getItinerariesService,
     getItineraryTypesService,
@@ -19,6 +20,7 @@ export default function Explore() {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [itineraries, setItineraries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [search, setSearch] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [sortFilter, setSortFilter] = useState("random");
@@ -51,8 +53,6 @@ export default function Explore() {
 
             if (result.success) {
                 setItineraryTypes(result.data);
-            } else {
-                console.error(result.message);
             }
         };
 
@@ -61,6 +61,7 @@ export default function Explore() {
 
     const fetchItineraries = async () => {
         setLoading(true);
+        setError(null);
 
         const result = await getItinerariesService({
             search: appliedSearch,
@@ -74,7 +75,9 @@ export default function Explore() {
             setItineraries(result.data.content);
             setTotalPages(result.data.totalPages);
         } else {
-            console.error(result.message);
+            setItineraries([]);
+            setTotalPages(1);
+            setError(result.message);
         }
 
         setLoading(false);
@@ -291,7 +294,7 @@ export default function Explore() {
                 )}
             </div>
 
-            {/* Loading Skeleton */}
+            {/* Loading / Error / Empty / Content */}
             {loading ? (
                 <div
                     aria-busy="true"
@@ -310,6 +313,12 @@ export default function Explore() {
                         </div>
                     ))}
                 </div>
+            ) : error ? (
+                <ErrorState
+                    title="Unable to load itineraries"
+                    message={error}
+                    onRetry={fetchItineraries}
+                />
             ) : itineraries.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
                     <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
@@ -352,7 +361,7 @@ export default function Explore() {
             )}
 
             {/* Pagination */}
-            {!loading && totalPages > 1 && (
+            {!loading && !error && totalPages > 1 && (
                 <div className="flex justify-center items-center gap-1.5 mt-12">
                     <button
                         disabled={currentPage === 1}
