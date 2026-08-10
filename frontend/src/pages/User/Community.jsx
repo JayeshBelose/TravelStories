@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 import {
     Search,
     X,
@@ -161,7 +162,7 @@ export default function Community() {
                 if (result.success) {
                     setFollowing(prev => prev.filter(u => u.userId !== user.userId));
                 } else {
-                    console.error(result.message);
+                    toast.error(result.message);
                 }
             } else {
                 result = await followUserService({
@@ -172,7 +173,7 @@ export default function Community() {
                 if (result.success) {
                     setFollowing(prev => [...prev, user]);
                 } else {
-                    console.error(result.message);
+                    toast.error(result.message);
                 }
             }
         } finally {

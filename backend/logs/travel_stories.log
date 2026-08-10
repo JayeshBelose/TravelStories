@@ -1436,3 +1436,13 @@ This generated password is for development use only. Your security configuration
                 [http-nio-8080-exec-2]
                 o.a.c.c.C.[Tomcat].[localhost].[/]
                 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10 20:17:49.076
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.FollowService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 unfollowed user 7b85c689-7838-42aa-983f-8642014624dd
+2026-08-10 20:17:54.673
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.FollowService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 followed user 7b85c689-7838-42aa-983f-8642014624dd
