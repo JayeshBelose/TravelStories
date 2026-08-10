@@ -48,6 +48,7 @@ export default function Community() {
     const [followersError, setFollowersError] = useState(null);
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState(null);
     const [activeTab, setActiveTab] = useState("following");
     const [search, setSearch] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
@@ -107,12 +108,14 @@ export default function Community() {
     useEffect(() => {
         if (search.trim() === "") {
             setSearchResults([]);
+            setSearchError(null);
             setSearchOpen(false);
             setSearchLoading(false);
             return;
         }
 
         setSearchLoading(true);
+        setSearchError(null);
 
         const delay = setTimeout(async () => {
             const result = await searchUsersService({
@@ -125,11 +128,12 @@ export default function Community() {
                 );
 
                 setSearchResults(filtered);
-                setSearchOpen(filtered.length > 0);
+                setSearchError(null);
+                setSearchOpen(true);
             } else {
-                console.error(result.message);
                 setSearchResults([]);
-                setSearchOpen(false);
+                setSearchError(result.message);
+                setSearchOpen(true);
             }
 
             setSearchLoading(false);
@@ -176,9 +180,35 @@ export default function Community() {
         }
     };
 
+    const retrySearch = async () => {
+        if (!search.trim()) return;
+
+        setSearchError(null);
+        setSearchLoading(true);
+
+        const result = await searchUsersService({
+            query: search,
+        });
+
+        if (result.success) {
+            const filtered = result.data.filter(u => u.userId !== loggedInUser?.userId);
+
+            setSearchResults(filtered);
+            setSearchError(null);
+            setSearchOpen(true);
+        } else {
+            setSearchResults([]);
+            setSearchError(result.message);
+            setSearchOpen(true);
+        }
+
+        setSearchLoading(false);
+    };
+
     const clearSearch = () => {
         setSearch("");
         setSearchResults([]);
+        setSearchError(null);
         setSearchOpen(false);
         inputRef.current?.focus();
     };
@@ -237,67 +267,99 @@ export default function Community() {
                 </div>
 
                 {/* Search Results Dropdown */}
-                {searchOpen && searchResults.length > 0 && (
+                {searchOpen && (
                     <div className="absolute w-full bg-white border border-gray-100 rounded-xl shadow-xl mt-2 max-h-64 overflow-y-auto z-50 py-1">
-                        {searchResults.map(user => {
-                            const followed = isFollowing(user.userId);
-                            const followLoading = followActionUserId === user.userId;
-
-                            return (
-                                <div
-                                    key={user.userId}
-                                    className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSelectSearchUser(user)}
-                                        className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
-                                        <UserAvatar
-                                            userId={user.userId}
-                                            username={user.username}
-                                            size="sm"
-                                        />
-
-                                        <span className="text-sm font-medium text-gray-800 truncate">
-                                            {user.username}
-                                        </span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            toggleFollow(user);
-                                        }}
-                                        disabled={followLoading}
-                                        className={`ml-3 flex items-center justify-center gap-1.5 min-w-[86px] px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
-                                        ${
-                                            followed
-                                                ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
-                                                : "bg-gray-900 text-white hover:bg-gray-700"
-                                        }`}>
-                                        {followLoading ? (
-                                            <>
-                                                <Loader2
-                                                    size={11}
-                                                    className="animate-spin"
-                                                />
-                                                {followed ? "Unfollowing…" : "Following…"}
-                                            </>
-                                        ) : followed ? (
-                                            <>
-                                                <UserMinus size={11} />
-                                                Following
-                                            </>
-                                        ) : (
-                                            <>
-                                                <UserPlus size={11} />
-                                                Follow
-                                            </>
-                                        )}
-                                    </button>
+                        {searchError ? (
+                            <ErrorState
+                                title="Unable to search users"
+                                message={searchError}
+                                onRetry={retrySearch}
+                                retryLabel="Try again"
+                                compact
+                            />
+                        ) : searchResults.length === 0 ? (
+                            <div
+                                role="status"
+                                className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <Users
+                                        size={18}
+                                        className="text-gray-300"
+                                        aria-hidden="true"
+                                    />
                                 </div>
-                            );
-                        })}
+
+                                <p className="text-sm font-medium text-gray-600 mt-3">
+                                    No users found
+                                </p>
+
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Try searching with a different username.
+                                </p>
+                            </div>
+                        ) : (
+                            searchResults.map(user => {
+                                const followed = isFollowing(user.userId);
+                                const followLoading = followActionUserId === user.userId;
+
+                                return (
+                                    <div
+                                        key={user.userId}
+                                        className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSelectSearchUser(user)}
+                                            className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
+                                            <UserAvatar
+                                                userId={user.userId}
+                                                username={user.username}
+                                                size="sm"
+                                            />
+
+                                            <span className="text-sm font-medium text-gray-800 truncate">
+                                                {user.username}
+                                            </span>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                toggleFollow(user);
+                                            }}
+                                            disabled={followLoading}
+                                            className={`ml-3 flex items-center justify-center gap-1.5 min-w-[86px] px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
+                            ${
+                                followed
+                                    ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
+                                    : "bg-gray-900 text-white hover:bg-gray-700"
+                            }`}>
+                                            {followLoading ? (
+                                                <>
+                                                    <Loader2
+                                                        size={11}
+                                                        className="animate-spin"
+                                                    />
+                                                    {followed
+                                                        ? "Unfollowing…"
+                                                        : "Following…"}
+                                                </>
+                                            ) : followed ? (
+                                                <>
+                                                    <UserMinus size={11} />
+                                                    Following
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={11} />
+                                                    Follow
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 )}
             </div>
