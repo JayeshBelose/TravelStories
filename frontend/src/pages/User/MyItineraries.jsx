@@ -14,6 +14,7 @@ import {
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
+import ErrorState from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
 import {
@@ -73,6 +74,8 @@ export default function MyItineraries() {
     const [savedItineraries, setSavedItineraries] = useState([]);
     const [loadingCreated, setLoadingCreated] = useState(true);
     const [loadingSaved, setLoadingSaved] = useState(true);
+    const [createdError, setCreatedError] = useState(null);
+    const [savedError, setSavedError] = useState(null);
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [unsaveLoadingId, setUnsaveLoadingId] = useState(null);
 
@@ -186,61 +189,65 @@ export default function MyItineraries() {
         }
     };
 
-    // Fetch created & shared itineraries
-    useEffect(() => {
+    const fetchCreatedItineraries = async () => {
         if (!user?.userId) return;
 
         setLoadingCreated(true);
+        setCreatedError(null);
 
-        const fetchCreated = async () => {
-            const [createdResult, sharedResult] = await Promise.all([
-                getUserCreatedItinerariesService({
-                    userId: user.userId,
-                }),
-                getSharedItinerariesService({
-                    userId: user.userId,
-                }),
-            ]);
+        const [createdResult, sharedResult] = await Promise.all([
+            getUserCreatedItinerariesService({
+                userId: user.userId,
+            }),
+            getSharedItinerariesService({
+                userId: user.userId,
+            }),
+        ]);
 
-            if (createdResult.success && sharedResult.success) {
-                const combined = [...createdResult.data, ...sharedResult.data];
+        if (createdResult.success && sharedResult.success) {
+            const combined = [...createdResult.data, ...sharedResult.data];
 
-                const unique = Array.from(
-                    new Map(combined.map(item => [item.itineraryId, item])).values(),
-                );
+            const unique = Array.from(
+                new Map(combined.map(item => [item.itineraryId, item])).values(),
+            );
 
-                setCreatedItineraries(unique);
-            } else {
-                console.error(createdResult.message || sharedResult.message);
-            }
+            setCreatedItineraries(unique);
+        } else {
+            setCreatedError(
+                createdResult.success ? sharedResult.message : createdResult.message,
+            );
+        }
 
-            setLoadingCreated(false);
-        };
+        setLoadingCreated(false);
+    };
 
-        fetchCreated();
+    const fetchSavedItineraries = async () => {
+        if (!user?.userId) return;
+
+        setLoadingSaved(true);
+        setSavedError(null);
+
+        const result = await getSavedItinerariesService({
+            userId: user.userId,
+        });
+
+        if (result.success) {
+            setSavedItineraries(result.data);
+        } else {
+            setSavedError(result.message);
+        }
+
+        setLoadingSaved(false);
+    };
+
+    // Fetch created & shared itineraries
+    useEffect(() => {
+        fetchCreatedItineraries();
     }, [user?.userId]);
 
     // Fetch saved itineraries
     useEffect(() => {
-        if (!user?.userId) return;
-
-        setLoadingSaved(true);
-
-        const fetchSaved = async () => {
-            const result = await getSavedItinerariesService({
-                userId: user.userId,
-            });
-
-            if (result.success) {
-                setSavedItineraries(result.data);
-            } else {
-                console.error(result.message);
-            }
-
-            setLoadingSaved(false);
-        };
-
-        fetchSaved();
+        fetchSavedItineraries();
     }, [user?.userId]);
 
     const TABS = [
@@ -339,6 +346,20 @@ export default function MyItineraries() {
                                 </div>
                             ))}
                         </div>
+                    );
+
+                const error = activeTab === "created" ? createdError : savedError;
+
+                if (error)
+                    return (
+                        <ErrorState
+                            message={error}
+                            onRetry={
+                                activeTab === "created"
+                                    ? fetchCreatedItineraries
+                                    : fetchSavedItineraries
+                            }
+                        />
                     );
 
                 if (itineraries.length === 0)
