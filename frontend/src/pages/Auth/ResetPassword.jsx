@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { resetPasswordService } from "@/services/authService";
 
@@ -25,20 +25,30 @@ export default function ResetPassword() {
     const handleSubmit = async e => {
         e.preventDefault();
 
-        if (!isFormValid) return;
+        // Prevent duplicate submissions while the request is in progress.
+        if (!isFormValid || loading) return;
 
         setLoading(true);
 
-        const result = await resetPasswordService({ token, newPassword });
+        try {
+            const result = await resetPasswordService({
+                token,
+                newPassword,
+            });
 
-        if (result.success) {
-            toast.success(result.message);
-            setTimeout(() => navigate("/login"), 1500);
-        } else {
-            toast.error(result.message);
+            if (result.success) {
+                toast.success(result.message);
+
+                setTimeout(() => navigate("/login"), 1500);
+            } else {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error("Password reset failed:", error);
+            toast.error("Unable to reset your password. Please try again.");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     const inputBase =
@@ -54,9 +64,11 @@ export default function ResetPassword() {
                     <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-4">
                         <ShieldCheck size={22} className="text-white" />
                     </div>
+
                     <h1 className="text-2xl font-bold text-gray-900 font-primary tracking-tight mb-1">
                         Reset password
                     </h1>
+
                     <p className="text-sm text-gray-400">Enter your new password below</p>
                 </div>
 
@@ -67,25 +79,36 @@ export default function ResetPassword() {
                         <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest">
                             New Password
                         </label>
+
                         <div className="relative">
                             <Lock
                                 size={14}
                                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
                             />
+
                             <input
                                 type={showNew ? "text" : "password"}
                                 placeholder="8–12 characters"
                                 value={newPassword}
                                 onChange={e => setNewPassword(e.target.value)}
-                                className={`${inputBase} ${passwordHint ? inputError : inputIdle}`}
+                                disabled={loading}
+                                className={`${inputBase} ${
+                                    passwordHint ? inputError : inputIdle
+                                } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
+
                             <button
                                 type="button"
                                 onClick={() => setShowNew(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                disabled={loading}
+                                aria-label={
+                                    showNew ? "Hide new password" : "Show new password"
+                                }
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
                                 {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
                             </button>
                         </div>
+
                         {passwordHint && (
                             <p className="text-xs text-red-400 mt-1">
                                 Password must be 8–12 characters
@@ -98,25 +121,38 @@ export default function ResetPassword() {
                         <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest">
                             Confirm Password
                         </label>
+
                         <div className="relative">
                             <Lock
                                 size={14}
                                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
                             />
+
                             <input
                                 type={showConfirm ? "text" : "password"}
                                 placeholder="Repeat your password"
                                 value={confirmPassword}
                                 onChange={e => setConfirmPassword(e.target.value)}
-                                className={`${inputBase} ${mismatchHint ? inputError : inputIdle}`}
+                                disabled={loading}
+                                className={`${inputBase} ${
+                                    mismatchHint ? inputError : inputIdle
+                                } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
+
                             <button
                                 type="button"
                                 onClick={() => setShowConfirm(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                disabled={loading}
+                                aria-label={
+                                    showConfirm
+                                        ? "Hide confirm password"
+                                        : "Show confirm password"
+                                }
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
                                 {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                             </button>
                         </div>
+
                         {mismatchHint && (
                             <p className="text-xs text-red-400 mt-1">
                                 Passwords do not match
@@ -126,16 +162,31 @@ export default function ResetPassword() {
 
                     {/* Submit */}
                     <button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={!isFormValid || loading}
+                        aria-busy={loading}
                         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2
                             ${
                                 isFormValid && !loading
                                     ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                                     : "bg-gray-100 text-gray-300 cursor-not-allowed"
                             }`}>
-                        {loading ? "Updating…" : "Update password"}
-                        {!loading && <ArrowRight size={14} />}
+                        {loading ? (
+                            <>
+                                <Loader2
+                                    size={14}
+                                    className="animate-spin"
+                                    aria-hidden="true"
+                                />
+                                Updating…
+                            </>
+                        ) : (
+                            <>
+                                Update password
+                                <ArrowRight size={14} aria-hidden="true" />
+                            </>
+                        )}
                     </button>
                 </div>
 
@@ -144,7 +195,8 @@ export default function ResetPassword() {
                     Remember your password?{" "}
                     <button
                         onClick={() => navigate("/login")}
-                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer">
+                        disabled={loading}
+                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
                         Sign in
                     </button>
                 </p>

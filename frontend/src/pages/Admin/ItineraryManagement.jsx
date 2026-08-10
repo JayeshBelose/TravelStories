@@ -69,6 +69,8 @@ export default function ItineraryManagement() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loadingItineraries, setLoadingItineraries] = useState(true);
+    const [itineraryError, setItineraryError] = useState("");
+    const [typeError, setTypeError] = useState("");
 
     const sortRef = useRef(null);
     const typeRef = useRef(null);
@@ -80,7 +82,9 @@ export default function ItineraryManagement() {
             if (typeRef.current && !typeRef.current.contains(e.target))
                 setOpenType(false);
         };
+
         document.addEventListener("mousedown", handler);
+
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
@@ -123,6 +127,7 @@ export default function ItineraryManagement() {
     // Fetching itineraries
     const fetchItineraries = async () => {
         setLoadingItineraries(true);
+        setItineraryError("");
 
         const result = await getAdminItinerariesService({
             page,
@@ -137,6 +142,9 @@ export default function ItineraryManagement() {
             setItineraries(result.data.content || []);
             setTotalPages(result.data.totalPages || 0);
         } else {
+            setItineraries([]);
+            setTotalPages(0);
+            setItineraryError(result.message || "Failed to load itineraries.");
             console.error(result.message);
         }
 
@@ -145,11 +153,15 @@ export default function ItineraryManagement() {
 
     // Fetching itinerary types
     const fetchTypes = async () => {
+        setTypeError("");
+
         const result = await getItineraryTypesAdminService();
 
         if (result.success) {
-            setTypes(result.data);
+            setTypes(result.data || []);
         } else {
+            setTypes([]);
+            setTypeError(result.message || "Failed to load itinerary types.");
             console.error(result.message);
         }
     };
@@ -158,7 +170,7 @@ export default function ItineraryManagement() {
         fetchTypes();
     }, []);
 
-    // Add and delete fucntoins for itinerary types
+    // Add and delete functions for itinerary types
     const addType = async () => {
         if (!newType.trim()) {
             toast.error("Type name cannot be empty");
@@ -204,6 +216,7 @@ export default function ItineraryManagement() {
     // Fetching itineraries after filters or searching
     useEffect(() => {
         const delay = setTimeout(() => fetchItineraries(), 400);
+
         return () => clearTimeout(delay);
     }, [search, filter, typeFilter, sortFilter, page]);
 
@@ -226,9 +239,10 @@ export default function ItineraryManagement() {
 
     const getSortLabel = () =>
         SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
+
     const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
 
-    // Handling itineray saving after edit or viewing
+    // Handling itinerary saving after edit or viewing
     const handleItinerarySaved = updatedItinerary => {
         setItineraries(prev =>
             prev.map(it =>
@@ -301,14 +315,21 @@ export default function ItineraryManagement() {
                                 setFilter(e.target.value);
                             }}
                             className={`appearance-none pl-3 pr-7 py-2.5 text-sm font-medium border rounded-xl shadow-sm focus:outline-none transition-colors cursor-pointer
-                                ${visActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                                ${
+                                    visActive
+                                        ? "bg-gray-900 text-white border-gray-900"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                }`}>
                             <option value="ALL">All</option>
                             <option value="PUBLIC">Public</option>
                             <option value="PRIVATE">Private</option>
                         </select>
+
                         <ChevronDown
                             size={13}
-                            className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${visActive ? "text-white" : "text-gray-400"}`}
+                            className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${
+                                visActive ? "text-white" : "text-gray-400"
+                            }`}
                         />
                     </div>
                 </div>
@@ -321,9 +342,14 @@ export default function ItineraryManagement() {
                             setOpenType(false);
                         }}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
-                            ${sortActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                            ${
+                                sortActive
+                                    ? "bg-gray-900 text-white border-gray-900"
+                                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                            }`}>
                         <Filter size={13} /> {getSortLabel()}
                     </button>
+
                     {openSort && (
                         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1">
                             {SORT_OPTIONS.map(opt => (
@@ -334,7 +360,11 @@ export default function ItineraryManagement() {
                                         setOpenSort(false);
                                     }}
                                     className={`block w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer
-                                        ${sortFilter === opt.value ? "bg-gray-50 text-gray-900 font-medium" : "text-gray-600 hover:bg-gray-50"}`}>
+                                        ${
+                                            sortFilter === opt.value
+                                                ? "bg-gray-50 text-gray-900 font-medium"
+                                                : "text-gray-600 hover:bg-gray-50"
+                                        }`}>
                                     {opt.label}
                                 </button>
                             ))}
@@ -350,9 +380,14 @@ export default function ItineraryManagement() {
                             setOpenSort(false);
                         }}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
-                            ${typeActive ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
+                            ${
+                                typeActive
+                                    ? "bg-gray-900 text-white border-gray-900"
+                                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                            }`}>
                         <Filter size={13} /> {getTypeLabel()}
                     </button>
+
                     {openType && (
                         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1 max-h-56 overflow-y-auto">
                             {itineraryTypes.map(type => (
@@ -363,7 +398,11 @@ export default function ItineraryManagement() {
                                         setOpenType(false);
                                     }}
                                     className={`block w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer
-                                        ${typeFilter === type ? "bg-gray-50 text-gray-900 font-medium" : "text-gray-600 hover:bg-gray-50"}`}>
+                                        ${
+                                            typeFilter === type
+                                                ? "bg-gray-50 text-gray-900 font-medium"
+                                                : "text-gray-600 hover:bg-gray-50"
+                                        }`}>
                                     {type === "all" ? "All Types" : type}
                                 </button>
                             ))}
@@ -390,13 +429,18 @@ export default function ItineraryManagement() {
                             ].map(h => (
                                 <th
                                     key={h}
-                                    className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${h === "Actions" ? "text-right" : ""}`}>
+                                    className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
+                                        h === "Actions" ? "text-right" : ""
+                                    }`}>
                                     {h}
                                 </th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody aria-busy={loadingItineraries} aria-label="Loading itineraries">
+
+                    <tbody
+                        aria-busy={loadingItineraries}
+                        aria-label="Loading itineraries">
                         {loadingItineraries &&
                             Array.from({ length: 6 }).map((_, i) => (
                                 <tr key={i} className="border-b border-gray-50">
@@ -432,102 +476,117 @@ export default function ItineraryManagement() {
                                     </td>
                                 </tr>
                             ))}
+
                         {!loadingItineraries &&
+                            !itineraryError &&
                             itineraries.map(item => (
-                            <tr
-                                key={item.itineraryId}
-                                className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                                {/* Title */}
-                                <td className="px-4 py-3">
-                                    <button
-                                        onClick={e => handleView(e, item)}
-                                        className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
-                                        {item.title}
-                                    </button>
-                                </td>
+                                <tr
+                                    key={item.itineraryId}
+                                    className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                                    {/* Title */}
+                                    <td className="px-4 py-3">
+                                        <button
+                                            onClick={e => handleView(e, item)}
+                                            className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
+                                            {item.title}
+                                        </button>
+                                    </td>
 
-                                {/* Place */}
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                    {item.place}
-                                </td>
+                                    {/* Place */}
+                                    <td className="px-4 py-3 text-sm text-gray-500">
+                                        {item.place}
+                                    </td>
 
-                                {/* Creator */}
-                                <td className="px-4 py-3 text-sm text-gray-600 capitalize">
-                                    {item.createdBy}
-                                </td>
+                                    {/* Creator */}
+                                    <td className="px-4 py-3 text-sm text-gray-600 capitalize">
+                                        {item.createdBy}
+                                    </td>
 
-                                {/* Type */}
-                                <td className="px-4 py-3">
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
-                                        <Tag size={9} /> {item.type || "—"}
-                                    </span>
-                                </td>
+                                    {/* Type */}
+                                    <td className="px-4 py-3">
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
+                                            <Tag size={9} /> {item.type || "—"}
+                                        </span>
+                                    </td>
 
-                                {/* Visibility */}
-                                <td className="px-4 py-3">
-                                    <span
-                                        className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
+                                    {/* Visibility */}
+                                    <td className="px-4 py-3">
+                                        <span
+                                            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
                                         ${
                                             item.public
                                                 ? "bg-emerald-50 border-emerald-200 text-emerald-600"
                                                 : "bg-red-50 border-red-200 text-red-500"
                                         }`}>
-                                        {item.public ? (
-                                            <>
-                                                <Globe size={9} /> Public
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Lock size={9} /> Private
-                                            </>
+                                            {item.public ? (
+                                                <>
+                                                    <Globe size={9} /> Public
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Lock size={9} /> Private
+                                                </>
+                                            )}
+                                        </span>
+                                    </td>
+
+                                    {/* Date */}
+                                    <td className="px-4 py-3 text-sm text-gray-400">
+                                        {new Date(item.createdAt).toLocaleDateString(
+                                            "en-GB",
+                                            {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            },
                                         )}
-                                    </span>
-                                </td>
+                                    </td>
 
-                                {/* Date */}
-                                <td className="px-4 py-3 text-sm text-gray-400">
-                                    {new Date(item.createdAt).toLocaleDateString(
-                                        "en-GB",
-                                        {
-                                            day: "2-digit",
-                                            month: "short",
-                                            year: "numeric",
-                                        },
-                                    )}
-                                </td>
+                                    {/* Likes */}
+                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                        {item.likeCount}
+                                    </td>
 
-                                {/* Likes */}
-                                <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                    {item.likeCount}
-                                </td>
+                                    {/* Saves */}
+                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                        {item.saveCount}
+                                    </td>
 
-                                {/* Saves */}
-                                <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                    {item.saveCount}
-                                </td>
+                                    {/* Actions */}
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="flex items-center justify-end gap-1">
+                                            <button
+                                                onClick={e => handleEdit(e, item)}
+                                                className="w-7 h-7 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+                                                <Pencil size={13} />
+                                            </button>
 
-                                {/* Actions */}
-                                <td className="px-4 py-3 text-right">
-                                    <div className="flex items-center justify-end gap-1">
-                                        <button
-                                            onClick={e => handleEdit(e, item)}
-                                            className="w-7 h-7 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
-                                            <Pencil size={13} />
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                confirmDelete(item.itineraryId)
-                                            }
-                                            className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
-                                            <Trash size={13} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                            <button
+                                                onClick={() =>
+                                                    confirmDelete(item.itineraryId)
+                                                }
+                                                className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
+                                                <Trash size={13} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
-                {!loadingItineraries && itineraries.length === 0 && (
+
+                {!loadingItineraries && itineraryError && (
+                    <div className="py-16 text-center">
+                        <p className="text-sm text-gray-500 mb-3">{itineraryError}</p>
+                        <button
+                            onClick={fetchItineraries}
+                            className="text-sm font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer">
+                            Try again
+                        </button>
+                    </div>
+                )}
+
+                {!loadingItineraries && !itineraryError && itineraries.length === 0 && (
                     <div className="py-16 text-center text-sm text-gray-400">
                         No itineraries found.
                     </div>
@@ -542,10 +601,12 @@ export default function ItineraryManagement() {
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
                     <ChevronLeft size={15} />
                 </button>
+
                 <span className="text-sm text-gray-500">
                     Page <span className="font-semibold text-gray-900">{page + 1}</span>{" "}
                     of {totalPages}
                 </span>
+
                 <button
                     disabled={page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
@@ -565,53 +626,74 @@ export default function ItineraryManagement() {
                     </p>
                 </div>
 
-                {/* Type chips */}
-                <div className="flex flex-wrap gap-2 mb-5">
-                    {[...types]
-                        .sort((a, b) =>
-                            a.name
-                                .trim()
-                                .toLowerCase()
-                                .localeCompare(b.name.trim().toLowerCase(), undefined, {
-                                    sensitivity: "base",
-                                }),
-                        )
-                        .map(type => (
-                            <div
-                                key={type.typeId}
-                                className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors">
-                                <Tag size={12} className="text-gray-400" />
-                                {type.name}
-                                <button
-                                    onClick={() => confirmDeleteType(type.typeId)}
-                                    className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
-                                    <X size={12} />
-                                </button>
-                            </div>
-                        ))}
-                </div>
-
-                {/* Add type input */}
-                <div className="flex items-center gap-2 max-w-sm">
-                    <div className="flex-1 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
-                        <Tag size={14} className="text-gray-300 flex-shrink-0" />
-                        <input
-                            type="text"
-                            value={newType}
-                            placeholder="New type name…"
-                            className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
-                            onChange={e => setNewType(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === "Enter") addType();
-                            }}
-                        />
+                {/* Type error */}
+                {typeError ? (
+                    <div className="mb-5 text-sm text-gray-500">
+                        <p className="mb-2">{typeError}</p>
+                        <button
+                            onClick={fetchTypes}
+                            className="font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer">
+                            Try again
+                        </button>
                     </div>
-                    <button
-                        onClick={addType}
-                        className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0">
-                        <Plus size={14} /> Add
-                    </button>
-                </div>
+                ) : (
+                    <>
+                        {/* Type chips */}
+                        <div className="flex flex-wrap gap-2 mb-5">
+                            {[...types]
+                                .sort((a, b) =>
+                                    a.name
+                                        .trim()
+                                        .toLowerCase()
+                                        .localeCompare(
+                                            b.name.trim().toLowerCase(),
+                                            undefined,
+                                            {
+                                                sensitivity: "base",
+                                            },
+                                        ),
+                                )
+                                .map(type => (
+                                    <div
+                                        key={type.typeId}
+                                        className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors">
+                                        <Tag size={12} className="text-gray-400" />
+                                        {type.name}
+
+                                        <button
+                                            onClick={() => confirmDeleteType(type.typeId)}
+                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                        </div>
+
+                        {/* Add type input */}
+                        <div className="flex items-center gap-2 max-w-sm">
+                            <div className="flex-1 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                                <Tag size={14} className="text-gray-300 flex-shrink-0" />
+
+                                <input
+                                    type="text"
+                                    value={newType}
+                                    placeholder="New type name…"
+                                    className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
+                                    onChange={e => setNewType(e.target.value)}
+                                    onKeyDown={e => {
+                                        if (e.key === "Enter") addType();
+                                    }}
+                                />
+                            </div>
+
+                            <button
+                                onClick={addType}
+                                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0">
+                                <Plus size={14} /> Add
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
 
             {openCreate && (

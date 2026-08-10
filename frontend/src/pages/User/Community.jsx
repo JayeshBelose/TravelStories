@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Users, UserCheck, UserPlus, UserMinus, MapIcon } from "lucide-react";
+import {
+    Search,
+    X,
+    Users,
+    UserCheck,
+    UserPlus,
+    UserMinus,
+    MapIcon,
+    Loader2,
+} from "lucide-react";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +23,7 @@ import {
 
 function UserAvatar({ userId, username, size = "md" }) {
     const sizeClass = size === "sm" ? "w-8 h-8 text-xs" : "w-11 h-11 text-sm";
+
     return (
         <Avatar className={`${sizeClass} flex-shrink-0`}>
             <AvatarImage
@@ -34,11 +44,13 @@ export default function Community() {
     const [followers, setFollowers] = useState([]);
     const [loadingConnections, setLoadingConnections] = useState(true);
     const [searchResults, setSearchResults] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     const [activeTab, setActiveTab] = useState("following");
     const [search, setSearch] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [followActionUserId, setFollowActionUserId] = useState(null);
 
     const searchRef = useRef(null);
     const inputRef = useRef(null);
@@ -50,7 +62,9 @@ export default function Community() {
                 setSearchOpen(false);
             }
         };
+
         document.addEventListener("mousedown", handler);
+
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
@@ -87,8 +101,11 @@ export default function Community() {
         if (search.trim() === "") {
             setSearchResults([]);
             setSearchOpen(false);
+            setSearchLoading(false);
             return;
         }
+
+        setSearchLoading(true);
 
         const delay = setTimeout(async () => {
             const result = await searchUsersService({
@@ -104,7 +121,11 @@ export default function Community() {
                 setSearchOpen(filtered.length > 0);
             } else {
                 console.error(result.message);
+                setSearchResults([]);
+                setSearchOpen(false);
             }
+
+            setSearchLoading(false);
         }, 300);
 
         return () => clearTimeout(delay);
@@ -113,30 +134,38 @@ export default function Community() {
     const isFollowing = userId => following.some(u => u.userId === userId);
 
     const toggleFollow = async user => {
-        let result;
+        if (followActionUserId === user.userId) return;
 
-        if (isFollowing(user.userId)) {
-            result = await unfollowUserService({
-                followerId: loggedInUser.userId,
-                followingId: user.userId,
-            });
+        setFollowActionUserId(user.userId);
 
-            if (result.success) {
-                setFollowing(prev => prev.filter(u => u.userId !== user.userId));
+        try {
+            let result;
+
+            if (isFollowing(user.userId)) {
+                result = await unfollowUserService({
+                    followerId: loggedInUser.userId,
+                    followingId: user.userId,
+                });
+
+                if (result.success) {
+                    setFollowing(prev => prev.filter(u => u.userId !== user.userId));
+                } else {
+                    console.error(result.message);
+                }
             } else {
-                console.error(result.message);
-            }
-        } else {
-            result = await followUserService({
-                followerId: loggedInUser.userId,
-                followingId: user.userId,
-            });
+                result = await followUserService({
+                    followerId: loggedInUser.userId,
+                    followingId: user.userId,
+                });
 
-            if (result.success) {
-                setFollowing(prev => [...prev, user]);
-            } else {
-                console.error(result.message);
+                if (result.success) {
+                    setFollowing(prev => [...prev, user]);
+                } else {
+                    console.error(result.message);
+                }
             }
+        } finally {
+            setFollowActionUserId(null);
         }
     };
 
@@ -168,6 +197,7 @@ export default function Community() {
             <div ref={searchRef} className="relative mb-8">
                 <div className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
                     <Search size={15} className="text-gray-400 flex-shrink-0" />
+
                     <input
                         ref={inputRef}
                         type="text"
@@ -175,11 +205,23 @@ export default function Community() {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
+                        aria-label="Search travelers"
                     />
-                    {search && (
+
+                    {searchLoading && (
+                        <Loader2
+                            size={14}
+                            className="text-gray-400 flex-shrink-0 animate-spin"
+                            aria-label="Searching"
+                        />
+                    )}
+
+                    {!searchLoading && search && (
                         <button
+                            type="button"
                             onClick={clearSearch}
-                            className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                            className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
+                            aria-label="Clear search">
                             <X size={14} />
                         </button>
                     )}
@@ -190,11 +232,14 @@ export default function Community() {
                     <div className="absolute w-full bg-white border border-gray-100 rounded-xl shadow-xl mt-2 max-h-64 overflow-y-auto z-50 py-1">
                         {searchResults.map(user => {
                             const followed = isFollowing(user.userId);
+                            const followLoading = followActionUserId === user.userId;
+
                             return (
                                 <div
                                     key={user.userId}
                                     className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors">
                                     <button
+                                        type="button"
                                         onClick={() => handleSelectSearchUser(user)}
                                         className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
                                         <UserAvatar
@@ -202,28 +247,42 @@ export default function Community() {
                                             username={user.username}
                                             size="sm"
                                         />
+
                                         <span className="text-sm font-medium text-gray-800 truncate">
                                             {user.username}
                                         </span>
                                     </button>
+
                                     <button
+                                        type="button"
                                         onClick={e => {
                                             e.stopPropagation();
                                             toggleFollow(user);
                                         }}
-                                        className={`ml-3 flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0
-                                            ${
-                                                followed
-                                                    ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
-                                                    : "bg-gray-900 text-white hover:bg-gray-700"
-                                            }`}>
-                                        {followed ? (
+                                        disabled={followLoading}
+                                        className={`ml-3 flex items-center justify-center gap-1.5 min-w-[86px] px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
+                                        ${
+                                            followed
+                                                ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
+                                                : "bg-gray-900 text-white hover:bg-gray-700"
+                                        }`}>
+                                        {followLoading ? (
                                             <>
-                                                <UserMinus size={11} /> Following
+                                                <Loader2
+                                                    size={11}
+                                                    className="animate-spin"
+                                                />
+                                                {followed ? "Unfollowing…" : "Following…"}
+                                            </>
+                                        ) : followed ? (
+                                            <>
+                                                <UserMinus size={11} />
+                                                Following
                                             </>
                                         ) : (
                                             <>
-                                                <UserPlus size={11} /> Follow
+                                                <UserPlus size={11} />
+                                                Follow
                                             </>
                                         )}
                                     </button>
@@ -252,22 +311,25 @@ export default function Community() {
                 ].map(tab => (
                     <button
                         key={tab.key}
+                        type="button"
                         onClick={() => setActiveTab(tab.key)}
                         className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer
-                            ${
-                                activeTab === tab.key
-                                    ? "border-gray-900 text-gray-900"
-                                    : "border-transparent text-gray-400 hover:text-gray-600"
-                            }`}>
+                        ${
+                            activeTab === tab.key
+                                ? "border-gray-900 text-gray-900"
+                                : "border-transparent text-gray-400 hover:text-gray-600"
+                        }`}>
                         <tab.icon size={14} />
+
                         {tab.label}
+
                         <span
                             className={`text-xs px-1.5 py-0.5 rounded-full font-semibold
-                            ${
-                                activeTab === tab.key
-                                    ? "bg-gray-900 text-white"
-                                    : "bg-gray-100 text-gray-400"
-                            }`}>
+                        ${
+                            activeTab === tab.key
+                                ? "bg-gray-900 text-white"
+                                : "bg-gray-100 text-gray-400"
+                        }`}>
                             {tab.count}
                         </span>
                     </button>
@@ -286,11 +348,13 @@ export default function Community() {
                             className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <Skeleton className="w-11 h-11 rounded-full flex-shrink-0" />
+
                                 <div className="min-w-0 space-y-1.5 flex-1">
                                     <Skeleton className="h-3.5 w-32" />
                                     <Skeleton className="h-3 w-24" />
                                 </div>
                             </div>
+
                             <Skeleton className="h-7 w-24 rounded-full flex-shrink-0" />
                         </div>
                     ))}
@@ -300,76 +364,114 @@ export default function Community() {
                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                         <Users size={22} className="text-gray-300" />
                     </div>
+
                     <p className="text-sm font-medium text-gray-500">
                         {activeTab === "following"
                             ? "You're not following anyone yet"
                             : "No followers yet"}
                     </p>
+
                     <p className="text-xs text-gray-300">
                         Search for travelers above to connect
                     </p>
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {currentList.map(user => (
-                        <div
-                            key={user.userId}
-                            className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
-                            {/* User info */}
-                            <button
-                                onClick={() => setSelectedUser(user)}
-                                className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
-                                <UserAvatar
-                                    userId={user.userId}
-                                    username={user.username}
-                                />
-                                <div className="min-w-0">
-                                    <p className="text-sm font-semibold text-gray-900 truncate">
-                                        {user.username}
-                                    </p>
-                                    <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                                        <MapIcon size={10} />
-                                        View itineraries
-                                    </p>
-                                </div>
-                            </button>
+                    {currentList.map(user => {
+                        const followingUser = isFollowing(user.userId);
+                        const followLoading = followActionUserId === user.userId;
 
-                            {/* Action button */}
-                            {activeTab === "following" ? (
+                        return (
+                            <div
+                                key={user.userId}
+                                className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
+                                {/* User info */}
                                 <button
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        toggleFollow(user);
-                                    }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0">
-                                    <UserMinus size={12} />
-                                    Unfollow
+                                    type="button"
+                                    onClick={() => setSelectedUser(user)}
+                                    className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
+                                    <UserAvatar
+                                        userId={user.userId}
+                                        username={user.username}
+                                    />
+
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">
+                                            {user.username}
+                                        </p>
+
+                                        <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                            <MapIcon size={10} />
+                                            View itineraries
+                                        </p>
+                                    </div>
                                 </button>
-                            ) : (
-                                <button
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        toggleFollow(user);
-                                    }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0
+
+                                {/* Action button */}
+                                {activeTab === "following" ? (
+                                    <button
+                                        type="button"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            toggleFollow(user);
+                                        }}
+                                        disabled={followLoading}
+                                        className="flex items-center justify-center gap-1.5 min-w-[82px] px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
+                                        {followLoading ? (
+                                            <>
+                                                <Loader2
+                                                    size={12}
+                                                    className="animate-spin"
+                                                />
+                                                Unfollowing…
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserMinus size={12} />
+                                                Unfollow
+                                            </>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            toggleFollow(user);
+                                        }}
+                                        disabled={followLoading}
+                                        className={`flex items-center justify-center gap-1.5 min-w-[92px] px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
                                         ${
-                                            isFollowing(user.userId)
+                                            followingUser
                                                 ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
                                                 : "bg-gray-900 text-white hover:bg-gray-700"
                                         }`}>
-                                    {isFollowing(user.userId) ? (
-                                        <>
-                                            <UserMinus size={12} /> Unfollow
-                                        </>
-                                    ) : (
-                                        <>
-                                            <UserPlus size={12} /> Follow Back
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                                        {followLoading ? (
+                                            <>
+                                                <Loader2
+                                                    size={12}
+                                                    className="animate-spin"
+                                                />
+                                                {followingUser
+                                                    ? "Unfollowing…"
+                                                    : "Following…"}
+                                            </>
+                                        ) : followingUser ? (
+                                            <>
+                                                <UserMinus size={12} />
+                                                Unfollow
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus size={12} />
+                                                Follow Back
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 
@@ -380,6 +482,7 @@ export default function Community() {
                 onClose={() => setSelectedUser(null)}
                 onSelectItinerary={itinerary => setSelectedItinerary(itinerary)}
             />
+
             <ItineraryOverlay
                 open={!!selectedItinerary}
                 itinerary={selectedItinerary}

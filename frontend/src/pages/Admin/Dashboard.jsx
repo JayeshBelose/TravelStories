@@ -25,13 +25,17 @@ function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
     return (
         <div>
             <p className="text-sm text-gray-700 mb-3">{message}</p>
+
             <div className="flex gap-2">
                 <button
+                    type="button"
                     onClick={onConfirm}
                     className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
                     {confirmLabel}
                 </button>
+
                 <button
+                    type="button"
                     onClick={onCancel}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
                     Cancel
@@ -49,16 +53,19 @@ function StatCard({ title, value, icon: Icon, color, loading }) {
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
                     {title}
                 </p>
+
                 {loading ? (
-                    <Skeleton className="h-7 w-16" />
+                    <Skeleton className="h-7 w-16" aria-label={`Loading ${title}`} />
                 ) : (
                     <p className="text-2xl font-bold text-gray-900">
                         {value.toLocaleString()}
                     </p>
                 )}
             </div>
+
             <div
-                className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}>
+                className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}
+                aria-hidden="true">
                 <Icon size={18} />
             </div>
         </div>
@@ -70,63 +77,64 @@ export default function Dashboard() {
 
     const [openView, setOpenView] = useState(false);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
-    const [stats, setStats] = useState({ users: 0, itineraries: 0, images: 0 });
+
+    const [stats, setStats] = useState({
+        users: 0,
+        itineraries: 0,
+        images: 0,
+    });
+
     const [recentItineraries, setRecentItineraries] = useState([]);
     const [activity, setActivity] = useState([]);
     const [loadingDashboard, setLoadingDashboard] = useState(true);
 
-    // itinerary deletion confirmation
-    const confirmDelete = itineraryId => {
-        toast(
-            ({ closeToast }) => (
-                <ConfirmToast
-                    message="Are you sure you want to delete this itinerary? This action cannot be undone."
-                    confirmLabel="Delete"
-                    onConfirm={() => {
-                        handleDelete(itineraryId);
-                        closeToast();
-                    }}
-                    onCancel={closeToast}
-                />
-            ),
-            { autoClose: false },
-        );
-    };
-
-    // Fetching required information for dashboard
-    useEffect(() => {
-        if (!loading && user) fetchDashboard();
-    }, [loading, user]);
-
     const fetchDashboard = async () => {
         setLoadingDashboard(true);
 
-        const [statsResult, itinerariesResult, activityResult] = await Promise.all([
-            getDashboardStatsService(),
-            getRecentItinerariesService(),
-            getWeeklyActivityService(),
-        ]);
+        try {
+            const [statsResult, itinerariesResult, activityResult] = await Promise.all([
+                getDashboardStatsService(),
+                getRecentItinerariesService(),
+                getWeeklyActivityService(),
+            ]);
 
-        if (statsResult.success) {
-            setStats(statsResult.data);
-        } else {
-            console.error(statsResult.message);
+            if (statsResult.success) {
+                setStats(statsResult.data);
+            } else {
+                console.error(
+                    "Failed to load dashboard statistics:",
+                    statsResult.message,
+                );
+            }
+
+            if (itinerariesResult.success) {
+                setRecentItineraries(itinerariesResult.data);
+            } else {
+                console.error(
+                    "Failed to load recent itineraries:",
+                    itinerariesResult.message,
+                );
+            }
+
+            if (activityResult.success) {
+                setActivity(activityResult.data);
+            } else {
+                console.error("Failed to load weekly activity:", activityResult.message);
+            }
+        } catch (error) {
+            console.error("Failed to load dashboard:", error);
+            toast.error("Unable to load dashboard data.");
+        } finally {
+            setLoadingDashboard(false);
         }
-
-        if (itinerariesResult.success) {
-            setRecentItineraries(itinerariesResult.data);
-        } else {
-            console.error(itinerariesResult.message);
-        }
-
-        if (activityResult.success) {
-            setActivity(activityResult.data);
-        } else {
-            console.error(activityResult.message);
-        }
-
-        setLoadingDashboard(false);
     };
+
+    // Fetch dashboard data once authentication is ready.
+    useEffect(() => {
+        if (!loading && user) {
+            fetchDashboard();
+        }
+    }, [loading, user]);
 
     // Itinerary delete function
     const handleDelete = async itineraryId => {
@@ -145,6 +153,26 @@ export default function Dashboard() {
         }
     };
 
+    // Itinerary deletion confirmation
+    const confirmDelete = itineraryId => {
+        toast(
+            ({ closeToast }) => (
+                <ConfirmToast
+                    message="Are you sure you want to delete this itinerary? This action cannot be undone."
+                    confirmLabel="Delete"
+                    onConfirm={() => {
+                        handleDelete(itineraryId);
+                        closeToast();
+                    }}
+                    onCancel={closeToast}
+                />
+            ),
+            {
+                autoClose: false,
+            },
+        );
+    };
+
     return (
         <div>
             {/* Header */}
@@ -152,6 +180,7 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold text-gray-900 font-primary tracking-tight mb-1">
                     Dashboard
                 </h1>
+
                 <p className="text-sm text-gray-400">
                     Overview of Travel Stories platform
                 </p>
@@ -166,6 +195,7 @@ export default function Dashboard() {
                     color="bg-blue-50 text-blue-500"
                     loading={loadingDashboard}
                 />
+
                 <StatCard
                     title="Total Itineraries"
                     value={stats.itineraries}
@@ -173,6 +203,7 @@ export default function Dashboard() {
                     color="bg-emerald-50 text-emerald-500"
                     loading={loadingDashboard}
                 />
+
                 <StatCard
                     title="Total Images"
                     value={stats.images}
@@ -186,137 +217,175 @@ export default function Dashboard() {
                 {/* Weekly Activity */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        <TrendingUp size={14} className="text-gray-400" />
+                        <TrendingUp
+                            size={14}
+                            className="text-gray-400"
+                            aria-hidden="true"
+                        />
+
                         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
                             Weekly Activity
                         </h2>
                     </div>
+
                     <div
                         aria-busy={loadingDashboard}
-                        aria-label="Loading weekly activity"
+                        aria-label="Weekly activity"
                         className="space-y-3">
-                        {loadingDashboard
-                            ? Array.from({ length: 5 }).map((_, i) => (
-                                  <div
-                                      key={i}
-                                      className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                                      <div className="flex items-center gap-2">
-                                          <Skeleton className="w-3.5 h-3.5 rounded-full" />
-                                          <Skeleton className="h-3 w-20" />
-                                      </div>
-                                      <div className="flex items-center gap-3">
-                                          <Skeleton className="h-5 w-16 rounded-full" />
-                                          <Skeleton className="h-5 w-16 rounded-full" />
-                                      </div>
-                                  </div>
-                              ))
-                            : activity.map((a, index) => (
-                                  <div
-                                      key={index}
-                                      className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                                      <div className="flex items-center gap-2">
-                                          <CalendarDays
-                                              size={13}
-                                              className="text-gray-300 flex-shrink-0"
-                                          />
-                                          <span className="text-xs font-medium text-gray-600">
-                                              {a.date}
-                                          </span>
-                                      </div>
-                                      <div className="flex items-center gap-3 text-xs">
-                                          <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                                              <Users size={10} /> {a.newUsers} users
-                                          </span>
-                                          <span className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
-                                              <Map size={10} /> {a.newItineraries} trips
-                                          </span>
-                                      </div>
-                                  </div>
-                              ))}
+                        {loadingDashboard ? (
+                            Array.from({ length: 5 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="w-3.5 h-3.5 rounded-full" />
+                                        <Skeleton className="h-3 w-20" />
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : activity.length > 0 ? (
+                            activity.map((item, index) => (
+                                <div
+                                    key={`${item.date}-${index}`}
+                                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays
+                                            size={13}
+                                            className="text-gray-300 flex-shrink-0"
+                                            aria-hidden="true"
+                                        />
+
+                                        <span className="text-xs font-medium text-gray-600">
+                                            {item.date}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 text-xs">
+                                        <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                                            <Users size={10} aria-hidden="true" />
+                                            {item.newUsers} users
+                                        </span>
+
+                                        <span className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
+                                            <Map size={10} aria-hidden="true" />
+                                            {item.newItineraries} trips
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-400 py-4 text-center">
+                                No activity data available.
+                            </p>
+                        )}
                     </div>
                 </div>
 
                 {/* Recent Itineraries */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        <Map size={14} className="text-gray-400" />
+                        <Map size={14} className="text-gray-400" aria-hidden="true" />
+
                         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
                             Recently Added
                         </h2>
                     </div>
+
                     <div
                         aria-busy={loadingDashboard}
-                        aria-label="Loading recently added itineraries"
+                        aria-label="Recently added itineraries"
                         className="space-y-2">
-                        {loadingDashboard &&
-                            Array.from({ length: 4 }).map((_, i) => (
+                        {loadingDashboard ? (
+                            Array.from({ length: 4 }).map((_, index) => (
                                 <div
-                                    key={i}
+                                    key={index}
                                     className="flex items-center justify-between p-2.5 rounded-xl">
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
                                         <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
+
                                         <div className="min-w-0 space-y-1.5 flex-1">
                                             <Skeleton className="h-3.5 w-32" />
                                             <Skeleton className="h-3 w-40" />
                                         </div>
                                     </div>
+
                                     <Skeleton className="h-5 w-14 rounded-full flex-shrink-0" />
                                 </div>
-                            ))}
-                        {!loadingDashboard &&
+                            ))
+                        ) : recentItineraries.length > 0 ? (
                             recentItineraries.map(itinerary => (
-                            <div
-                                key={itinerary.itineraryId}
-                                className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-                                <button
-                                    onClick={() => {
-                                        setSelectedItinerary(itinerary);
-                                        setOpenView(true);
-                                    }}
-                                    className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer">
-                                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                                        <ItineraryThumbnail
-                                            itineraryId={itinerary.itineraryId}
-                                            alt={itinerary.title}
-                                        />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-semibold text-gray-900 truncate font-primary">
-                                            {itinerary.title}
-                                        </p>
-                                        <p className="text-xs text-gray-400 flex items-center gap-1">
-                                            <MapPin size={10} className="flex-shrink-0" />
-                                            {itinerary.place} · {itinerary.createdBy}
-                                        </p>
-                                    </div>
-                                </button>
-
-                                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                                    <span
-                                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border
-                                        ${
-                                            itinerary.public
-                                                ? "border-emerald-200 text-emerald-600 bg-emerald-50"
-                                                : "border-red-200 text-red-500 bg-red-50"
-                                        }`}>
-                                        {itinerary.public ? "Public" : "Private"}
-                                    </span>
+                                <div
+                                    key={itinerary.itineraryId}
+                                    className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
                                     <button
-                                        onClick={() =>
-                                            confirmDelete(itinerary.itineraryId)
-                                        }
-                                        className="w-7 h-7 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer">
-                                        <Trash size={13} />
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedItinerary(itinerary);
+                                            setOpenView(true);
+                                        }}
+                                        className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
+                                        aria-label={`View itinerary ${itinerary.title}`}>
+                                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                                            <ItineraryThumbnail
+                                                itineraryId={itinerary.itineraryId}
+                                                alt={itinerary.title}
+                                            />
+                                        </div>
+
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-gray-900 truncate font-primary">
+                                                {itinerary.title}
+                                            </p>
+
+                                            <p className="text-xs text-gray-400 flex items-center gap-1">
+                                                <MapPin
+                                                    size={10}
+                                                    className="flex-shrink-0"
+                                                    aria-hidden="true"
+                                                />
+                                                {itinerary.place} · {itinerary.createdBy}
+                                            </p>
+                                        </div>
                                     </button>
+
+                                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                                        <span
+                                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                                itinerary.public
+                                                    ? "border-emerald-200 text-emerald-600 bg-emerald-50"
+                                                    : "border-red-200 text-red-500 bg-red-50"
+                                            }`}>
+                                            {itinerary.public ? "Public" : "Private"}
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                confirmDelete(itinerary.itineraryId)
+                                            }
+                                            className="w-7 h-7 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer focus:opacity-100"
+                                            aria-label={`Delete itinerary ${itinerary.title}`}>
+                                            <Trash size={13} aria-hidden="true" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-400 py-4 text-center">
+                                No itineraries found.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Itinerary Details Overlay */}
-            {openView && (
+            {openView && selectedItinerary && (
                 <ItineraryOverlay
                     itinerary={selectedItinerary}
                     onClose={() => {

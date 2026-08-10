@@ -17,124 +17,198 @@ import { getLocationImagesService } from "@/services/imageService";
 
 export default function ItineraryOverlay({ itinerary, onClose }) {
     const [days, setDays] = useState([]);
-    const [locationsByDay, setLocationsByDays] = useState({});
+    const [locationsByDay, setLocationsByDay] = useState({});
     const [imagesByLocation, setImagesByLocation] = useState({});
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [activeDay, setActiveDay] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [itineraryCreator, setItineraryCreator] = useState([]);
+    const [itineraryCreator, setItineraryCreator] = useState(null);
 
-    // Fetching user info the itinerary creator
+    /*
+     * Load itinerary creator and days.
+     * The component intentionally keeps the existing API → Service architecture.
+     */
     useEffect(() => {
-        if (!itinerary?.itineraryId) return;
+        if (!itinerary?.itineraryId) {
+            setDays([]);
+            setLocationsByDay({});
+            setImagesByLocation({});
+            setActiveDay(null);
+            setItineraryCreator(null);
+            return;
+        }
 
-        const fetchCreator = async () => {
-            const result = await getUserByUsernameService({
-                username: itinerary.createdBy,
-            });
+        let cancelled = false;
 
-            if (result.success) {
-                setItineraryCreator(result.data);
-            } else {
-                console.error(result.message);
+        const loadItineraryData = async () => {
+            setLoading(true);
+            setDays([]);
+            setLocationsByDay({});
+            setImagesByLocation({});
+            setActiveDay(null);
+            setSelectedImage(null);
+            setSelectedUser(null);
+            setItineraryCreator(null);
+
+            try {
+                const [creatorResult, daysResult] = await Promise.all([
+                    getUserByUsernameService({
+                        username: itinerary.createdBy,
+                    }),
+                    getItineraryDaysService({
+                        itineraryId: itinerary.itineraryId,
+                    }),
+                ]);
+
+                if (cancelled) return;
+
+                if (creatorResult.success) {
+                    setItineraryCreator(creatorResult.data);
+                } else {
+                    console.error(creatorResult.message);
+                }
+
+                if (daysResult.success) {
+                    setDays(daysResult.data);
+
+                    if (daysResult.data.length > 0) {
+                        setActiveDay(daysResult.data[0].dayId);
+                    }
+                } else {
+                    console.error(daysResult.message);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    console.error("Failed to load itinerary data:", error);
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
-
-            setLoading(false);
         };
 
-        fetchCreator();
+        loadItineraryData();
+
+        return () => {
+            cancelled = true;
+        };
     }, [itinerary]);
 
-    // Fetching itinerary days, locations and images
+    /*
+     * Load locations for all itinerary days.
+     */
     useEffect(() => {
-        if (!itinerary?.itineraryId) return;
+        if (!days.length) {
+            setLocationsByDay({});
+            return;
+        }
 
-        const fetchDays = async () => {
-            const result = await getItineraryDaysService({
-                itineraryId: itinerary.itineraryId,
-            });
+        let cancelled = false;
 
-            if (result.success) {
-                setDays(result.data);
+        const loadLocations = async () => {
+            try {
+                const results = await Promise.all(
+                    days.map(day =>
+                        getDayLocationsService({
+                            dayId: day.dayId,
+                        }),
+                    ),
+                );
 
-                if (result.data.length > 0) {
-                    setActiveDay(result.data[0].dayId);
+                if (cancelled) return;
+
+                const locations = {};
+
+                results.forEach((result, index) => {
+                    const dayId = days[index].dayId;
+
+                    if (result.success) {
+                        locations[dayId] = result.data;
+                    } else {
+                        console.error(result.message);
+                        locations[dayId] = [];
+                    }
+                });
+
+                setLocationsByDay(locations);
+            } catch (error) {
+                if (!cancelled) {
+                    console.error("Failed to load itinerary locations:", error);
                 }
-            } else {
-                console.error(result.message);
             }
-
-            setLoading(false);
         };
 
-        fetchDays();
-    }, [itinerary?.itineraryId]);
+        loadLocations();
 
-    useEffect(() => {
-        if (!days?.length) return;
-
-        const fetchLocationsForAllDays = async () => {
-            const results = await Promise.all(
-                days.map(day =>
-                    getDayLocationsService({
-                        dayId: day.dayId,
-                    }),
-                ),
-            );
-
-            const locations = {};
-
-            results.forEach((result, index) => {
-                if (result.success) {
-                    locations[days[index].dayId] = result.data;
-                } else {
-                    console.error(result.message);
-                    locations[days[index].dayId] = [];
-                }
-            });
-
-            setLocationsByDays(locations);
+        return () => {
+            cancelled = true;
         };
-
-        fetchLocationsForAllDays();
     }, [days]);
 
+    /*
+     * Load images for every location.
+     */
     useEffect(() => {
-        if (!Object.keys(locationsByDay).length) return;
+        if (!Object.keys(locationsByDay).length) {
+            setImagesByLocation({});
+            return;
+        }
 
-        const fetchImagesForAllLocations = async () => {
+        let cancelled = false;
+
+        const loadImages = async () => {
             const allLocations = Object.values(locationsByDay).flat();
 
-            const results = await Promise.all(
-                allLocations.map(location =>
-                    getLocationImagesService({
-                        locationId: location.locationId,
-                    }),
-                ),
-            );
+            if (!allLocations.length) {
+                setImagesByLocation({});
+                return;
+            }
 
-            const images = {};
+            try {
+                const results = await Promise.all(
+                    allLocations.map(location =>
+                        getLocationImagesService({
+                            locationId: location.locationId,
+                        }),
+                    ),
+                );
 
-            results.forEach((result, index) => {
-                if (result.success) {
-                    images[allLocations[index].locationId] = result.data;
-                } else {
-                    console.error(result.message);
-                    images[allLocations[index].locationId] = [];
+                if (cancelled) return;
+
+                const images = {};
+
+                results.forEach((result, index) => {
+                    const locationId = allLocations[index].locationId;
+
+                    if (result.success) {
+                        images[locationId] = result.data;
+                    } else {
+                        console.error(result.message);
+                        images[locationId] = [];
+                    }
+                });
+
+                setImagesByLocation(images);
+            } catch (error) {
+                if (!cancelled) {
+                    console.error("Failed to load location images:", error);
                 }
-            });
-
-            setImagesByLocation(images);
+            }
         };
 
-        fetchImagesForAllLocations();
+        loadImages();
+
+        return () => {
+            cancelled = true;
+        };
     }, [locationsByDay]);
 
     if (!itinerary) return null;
 
     const totalLocations = Object.values(locationsByDay).reduce(
-        (acc, locs) => acc + locs.length,
+        (total, locations) => total + locations.length,
         0,
     );
 
@@ -154,6 +228,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             itineraryId={itinerary.itineraryId}
                             alt={itinerary.title}
                         />
+
                         {/* Gradient overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
@@ -173,6 +248,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                 )}
                                 {itinerary.public ? "Public" : "Private"}
                             </span>
+
                             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/25 backdrop-blur-sm">
                                 {itinerary.type}
                             </span>
@@ -181,7 +257,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                         {/* Close button */}
                         <button
                             onClick={onClose}
-                            aria-label="Close"
+                            aria-label="Close itinerary details"
                             className="absolute top-3 right-4 w-8 h-8 rounded-full bg-white/15 border border-white/25 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors cursor-pointer">
                             <X size={15} />
                         </button>
@@ -191,10 +267,13 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             <h2 className="text-xl font-bold text-white mb-1.5 leading-tight font-primary">
                                 {itinerary.title}
                             </h2>
+
                             <div className="flex flex-wrap gap-3">
                                 <span className="inline-flex items-center gap-1 text-xs text-white/80">
-                                    <MapPin size={12} /> {itinerary.place}
+                                    <MapPin size={12} />
+                                    {itinerary.place}
                                 </span>
+
                                 <span className="inline-flex items-center gap-1 text-xs text-white/80">
                                     <Calendar size={12} />
                                     {itinerary.startDate} – {itinerary.endDate}
@@ -213,7 +292,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                 Days
                             </span>
                         </div>
+
                         <div className="w-px h-7 bg-gray-200" />
+
                         <div className="flex-1 flex flex-col items-center gap-0.5">
                             <span className="text-sm font-bold text-gray-900">
                                 {totalLocations}
@@ -222,7 +303,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                 Locations
                             </span>
                         </div>
+
                         <div className="w-px h-7 bg-gray-200" />
+
                         <div className="flex-1 flex flex-col items-center gap-0.5">
                             <span className="text-sm font-bold text-gray-900">
                                 {itinerary.members?.length ?? 0}
@@ -231,16 +314,25 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                 Members
                             </span>
                         </div>
+
                         <div className="w-px h-7 bg-gray-200" />
+
                         <div className="flex-[1.4] flex flex-col items-center gap-0.5 px-1">
                             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">
                                 By
                             </span>
-                            <span
-                                onClick={() => setSelectedUser(itineraryCreator)}
-                                className="text-sm font-bold text-gray-900 truncate max-w-full cursor-pointer">
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (itineraryCreator) {
+                                        setSelectedUser(itineraryCreator);
+                                    }
+                                }}
+                                disabled={!itineraryCreator}
+                                className="text-sm font-bold text-gray-900 truncate max-w-full cursor-pointer disabled:cursor-default">
                                 {itinerary.createdBy}
-                            </span>
+                            </button>
                         </div>
                     </div>
 
@@ -248,14 +340,17 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                     {loading ? (
                         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
                             <div className="flex gap-1.5">
-                                {[0, 1, 2].map(i => (
+                                {[0, 1, 2].map(index => (
                                     <span
-                                        key={i}
+                                        key={index}
                                         className="w-2 h-2 rounded-full bg-gray-300 animate-bounce"
-                                        style={{ animationDelay: `${i * 0.15}s` }}
+                                        style={{
+                                            animationDelay: `${index * 0.15}s`,
+                                        }}
                                     />
                                 ))}
                             </div>
+
                             <p className="text-sm">Loading itinerary…</p>
                         </div>
                     ) : (
@@ -268,6 +363,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                             {days.map(day => (
                                                 <button
                                                     key={day.dayId}
+                                                    type="button"
                                                     onClick={() =>
                                                         setActiveDay(day.dayId)
                                                     }
@@ -276,7 +372,11 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                             activeDay === day.dayId
                                                                 ? "border-gray-900 text-gray-900"
                                                                 : "border-transparent text-gray-400 hover:text-gray-600"
-                                                        }`}>
+                                                        }`}
+                                                    aria-selected={
+                                                        activeDay === day.dayId
+                                                    }
+                                                    role="tab">
                                                     Day {day.dayNumber}
                                                 </button>
                                             ))}
@@ -285,7 +385,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
 
                                     {/* Active Day Content */}
                                     {days
-                                        .filter(d => d.dayId === activeDay)
+                                        .filter(day => day.dayId === activeDay)
                                         .map(day => (
                                             <div key={day.dayId} className="px-5 pt-5">
                                                 {day.description && (
@@ -298,7 +398,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                 {locationsByDay[day.dayId]?.length > 0 ? (
                                                     <div className="flex flex-col">
                                                         {locationsByDay[day.dayId].map(
-                                                            (location, idx) => (
+                                                            (location, index) => (
                                                                 <div
                                                                     key={
                                                                         location.locationId
@@ -307,9 +407,10 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                     {/* Timeline marker */}
                                                                     <div className="flex flex-col items-center flex-shrink-0 pt-3.5">
                                                                         <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-                                                                            {idx + 1}
+                                                                            {index + 1}
                                                                         </span>
-                                                                        {idx <
+
+                                                                        {index <
                                                                             locationsByDay[
                                                                                 day.dayId
                                                                             ].length -
@@ -325,6 +426,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                                 location.locationName
                                                                             }
                                                                         </h5>
+
                                                                         {location.locationAddress && (
                                                                             <p className="inline-flex items-center gap-1 text-xs text-gray-400">
                                                                                 <MapPin
@@ -348,26 +450,30 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                                     location
                                                                                         .locationId
                                                                                 ].map(
-                                                                                    img => {
-                                                                                        const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`;
+                                                                                    image => {
+                                                                                        const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${image.imageId}`;
+
                                                                                         return (
                                                                                             <button
                                                                                                 key={
-                                                                                                    img.imageId
+                                                                                                    image.imageId
                                                                                                 }
+                                                                                                type="button"
                                                                                                 onClick={() =>
                                                                                                     setSelectedImage(
                                                                                                         imageUrl,
                                                                                                     )
                                                                                                 }
+                                                                                                aria-label={`View image from ${location.locationName}`}
                                                                                                 className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group border-0 p-0 cursor-pointer">
                                                                                                 <img
                                                                                                     src={
                                                                                                         imageUrl
                                                                                                     }
-                                                                                                    alt="location"
+                                                                                                    alt={`Photo from ${location.locationName}`}
                                                                                                     className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
                                                                                                 />
+
                                                                                                 <div className="absolute inset-0 bg-black/35 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                                                                     <ImageIcon
                                                                                                         size={
@@ -405,21 +511,24 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                             Members
                                         </h4>
                                     </div>
+
                                     <div className="flex flex-wrap gap-2">
                                         {itinerary.members.map(member => (
-                                            <div
+                                            <button
                                                 key={member.userId}
+                                                type="button"
                                                 onClick={() => setSelectedUser(member)}
-                                                className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-full pl-1.5 pr-3 py-1">
+                                                className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-full pl-1.5 pr-3 py-1 cursor-pointer hover:bg-gray-200 transition-colors">
                                                 <div className="w-5 h-5 rounded-full bg-gray-900 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">
                                                     {member.username
-                                                        .charAt(0)
-                                                        .toUpperCase()}
+                                                        ?.charAt(0)
+                                                        .toUpperCase() || "U"}
                                                 </div>
-                                                <span className="text-xs text-gray-700 font-medium cursor-pointer">
+
+                                                <span className="text-xs text-gray-700 font-medium">
                                                     {member.username}
                                                 </span>
-                                            </div>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -433,15 +542,21 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
             {selectedImage && (
                 <div
                     className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] cursor-zoom-out"
-                    onClick={() => setSelectedImage(null)}>
+                    onClick={() => setSelectedImage(null)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Image preview">
                     <button
+                        type="button"
                         onClick={() => setSelectedImage(null)}
+                        aria-label="Close image preview"
                         className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
                         <X size={17} />
                     </button>
+
                     <img
                         src={selectedImage}
-                        alt="preview"
+                        alt="Location preview"
                         className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain"
                         onClick={e => e.stopPropagation()}
                     />

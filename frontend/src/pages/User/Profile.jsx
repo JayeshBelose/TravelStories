@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Camera, Save, Trash, X, AlertTriangle, Check } from "lucide-react";
+import { Camera, Save, Trash, X, AlertTriangle, Check, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     deleteUserAccountService,
     updateUserProfileService,
@@ -27,9 +28,12 @@ export default function Profile() {
     const [bio, setBio] = useState("");
     const [profileImage, setProfileImage] = useState(null);
     const [previewPicture, setPreviewPicture] = useState(null);
+    const [profileImageLoading, setProfileImageLoading] = useState(true);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [savingProfile, setSavingProfile] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [deletingAccount, setDeletingAccount] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -40,13 +44,16 @@ export default function Profile() {
 
     const handleImageChange = e => {
         const file = e.target.files[0];
+
         if (!file) return;
+
         setProfileImage(file);
         setPreviewPicture(URL.createObjectURL(file));
+        setProfileImageLoading(false);
     };
 
     const handleImageUpload = async () => {
-        if (!profileImage) return;
+        if (!profileImage || uploadingImage) return;
 
         setUploadingImage(true);
 
@@ -61,6 +68,8 @@ export default function Profile() {
         if (result.success) {
             toast.success("Profile picture updated!");
             setProfileImage(null);
+            setPreviewPicture(null);
+            setProfileImageLoading(true);
         } else {
             toast.error(result.message);
         }
@@ -69,6 +78,8 @@ export default function Profile() {
     };
 
     const handleSave = async () => {
+        if (savingProfile) return;
+
         setSavingProfile(true);
 
         const result = await updateUserProfileService({
@@ -96,6 +107,10 @@ export default function Profile() {
     };
 
     const handleDelete = async () => {
+        if (deletingAccount) return;
+
+        setDeletingAccount(true);
+
         const loadingToast = toast.loading("Deleting account...");
 
         const result = await deleteUserAccountService({
@@ -120,9 +135,17 @@ export default function Profile() {
                 isLoading: false,
                 autoClose: 3000,
             });
+
+            setDeletingAccount(false);
         }
 
         setConfirmOpen(false);
+    };
+
+    const handleCancelImage = () => {
+        setProfileImage(null);
+        setPreviewPicture(null);
+        setProfileImageLoading(true);
     };
 
     const avatarSrc =
@@ -145,21 +168,34 @@ export default function Profile() {
                     <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
                         Profile Picture
                     </p>
+
                     <div className="flex items-center gap-5">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
+                            {profileImageLoading && (
+                                <Skeleton className="absolute inset-0 w-20 h-20 rounded-full z-10" />
+                            )}
+
                             <Avatar className="w-20 h-20 ring-2 ring-gray-100">
-                                <AvatarImage src={avatarSrc} alt={username} />
+                                <AvatarImage
+                                    src={avatarSrc}
+                                    alt={username}
+                                    onLoad={() => setProfileImageLoading(false)}
+                                    onError={() => setProfileImageLoading(false)}
+                                />
+
                                 <AvatarFallback className="bg-gray-900 text-white text-xl font-semibold">
                                     {username?.[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                             </Avatar>
+
                             {/* Camera overlay trigger */}
                             <label className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 hover:bg-black/30 transition-colors cursor-pointer group">
                                 <Camera
                                     size={18}
                                     className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
                                 />
+
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -173,6 +209,7 @@ export default function Profile() {
                             <p className="text-sm font-semibold text-gray-900 truncate">
                                 {username}
                             </p>
+
                             <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer mt-1 transition-colors">
                                 <Camera size={12} />
                                 Change photo
@@ -190,19 +227,32 @@ export default function Profile() {
                                     <span className="text-xs text-gray-500 truncate max-w-[160px]">
                                         {profileImage.name}
                                     </span>
+
                                     <button
                                         onClick={handleImageUpload}
                                         disabled={uploadingImage}
-                                        className="flex items-center gap-1.5 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50">
-                                        <Check size={11} />
-                                        {uploadingImage ? "Uploading…" : "Upload"}
+                                        className="flex items-center gap-1.5 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                        {uploadingImage ? (
+                                            <>
+                                                <Loader2
+                                                    size={11}
+                                                    className="animate-spin"
+                                                />
+                                                Uploading…
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Check size={11} />
+                                                Upload
+                                            </>
+                                        )}
                                     </button>
+
                                     <button
-                                        onClick={() => {
-                                            setProfileImage(null);
-                                            setPreviewPicture(null);
-                                        }}
-                                        className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                        onClick={handleCancelImage}
+                                        disabled={uploadingImage}
+                                        aria-label="Cancel selected image"
+                                        className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                         <X size={14} />
                                     </button>
                                 </div>
@@ -222,11 +272,13 @@ export default function Profile() {
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
                             Username
                         </label>
+
                         <input
                             type="text"
                             value={username}
                             onChange={e => setUsername(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors"
+                            disabled={savingProfile}
+                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-400"
                         />
                     </div>
 
@@ -235,13 +287,16 @@ export default function Profile() {
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
                             Bio
                         </label>
+
                         <textarea
                             rows={4}
                             placeholder="Tell us about yourself…"
                             value={bio}
                             onChange={e => setBio(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors resize-none"
+                            disabled={savingProfile}
+                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors resize-none disabled:bg-gray-50 disabled:text-gray-400"
                         />
+
                         <p className="text-xs text-gray-300 mt-1 text-right">
                             {bio.length} / 300
                         </p>
@@ -252,9 +307,18 @@ export default function Profile() {
                         <button
                             onClick={handleSave}
                             disabled={savingProfile}
-                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50">
-                            <Save size={14} />
-                            {savingProfile ? "Saving…" : "Save Changes"}
+                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            {savingProfile ? (
+                                <>
+                                    <Loader2 size={14} className="animate-spin" />
+                                    Saving…
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={14} />
+                                    Save Changes
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -265,19 +329,23 @@ export default function Profile() {
                         <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <AlertTriangle size={14} className="text-red-500" />
                         </div>
+
                         <div>
                             <h2 className="text-sm font-semibold text-red-600 mb-0.5">
                                 Danger Zone
                             </h2>
+
                             <p className="text-xs text-gray-400 leading-relaxed">
                                 Once you delete your account, all your data will be
                                 permanently removed. This cannot be undone.
                             </p>
                         </div>
                     </div>
+
                     <button
                         onClick={() => setConfirmOpen(true)}
-                        className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 border border-red-200 text-sm font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer">
+                        disabled={deletingAccount}
+                        className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 border border-red-200 text-sm font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <Trash size={13} />
                         Delete Account
                     </button>
@@ -291,26 +359,39 @@ export default function Profile() {
                         <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mb-3">
                             <AlertTriangle size={18} className="text-red-500" />
                         </div>
+
                         <DialogTitle className="text-base font-semibold text-gray-900">
                             Delete your account?
                         </DialogTitle>
                     </DialogHeader>
+
                     <p className="text-sm text-gray-400 mt-1">
                         This action is permanent and cannot be undone. All your
                         itineraries, saves, and followers will be lost.
                     </p>
+
                     <DialogFooter className="mt-5 flex gap-2">
                         <Button
                             variant="outline"
                             onClick={() => setConfirmOpen(false)}
-                            className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 text-sm">
+                            disabled={deletingAccount}
+                            className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 text-sm disabled:opacity-50">
                             Cancel
                         </Button>
+
                         <Button
                             variant="destructive"
                             onClick={handleDelete}
-                            className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-sm">
-                            Yes, Delete
+                            disabled={deletingAccount}
+                            className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-sm disabled:opacity-50">
+                            {deletingAccount ? (
+                                <>
+                                    <Loader2 size={14} className="mr-2 animate-spin" />
+                                    Deleting…
+                                </>
+                            ) : (
+                                "Yes, Delete"
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -7,11 +7,7 @@
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/travel_stories.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/travel_stories.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryCard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryOverlay.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryOverlay.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/itinerary/UserItineraryListOverlay.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/itinerary/UserItineraryListOverlay.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Admin/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Admin/Dashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Auth/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Auth/Login.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/src/pages/User/Community.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/User/Community.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/src/pages/User/MyItineraries.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/User/MyItineraries.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/src/pages/User/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/User/Profile.jsx" afterDir="false" />

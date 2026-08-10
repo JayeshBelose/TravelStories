@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
@@ -13,6 +13,7 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
@@ -22,8 +23,10 @@ export default function Login() {
     const handleLogin = async e => {
         e.preventDefault();
 
-        if (!isFormValid) {
-            toast.warning("Please enter valid credentials.");
+        if (!isFormValid || loading || forgotPasswordLoading) {
+            if (!isFormValid) {
+                toast.warning("Please enter valid credentials.");
+            }
             return;
         }
 
@@ -31,33 +34,35 @@ export default function Login() {
 
         const loadingToast = toast.loading("Logging in...");
 
-        const result = await loginService({ email, password });
+        try {
+            const result = await loginService({ email, password });
 
-        if (result.success) {
-            login(result.data);
+            if (result.success) {
+                login(result.data);
 
-            const role = result.data.user.role;
+                const role = result.data.user.role;
 
-            toast.update(loadingToast, {
-                render: "Welcome back!",
-                type: "success",
-                isLoading: false,
-                autoClose: 1000,
-            });
+                toast.update(loadingToast, {
+                    render: "Welcome back!",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 1000,
+                });
 
-            setTimeout(() => {
-                navigate(role === "admin" ? "/admin" : "/user");
-            }, 1500);
-        } else {
-            toast.update(loadingToast, {
-                render: result.message,
-                type: "error",
-                isLoading: false,
-                autoClose: 3000,
-            });
+                setTimeout(() => {
+                    navigate(role === "admin" ? "/admin" : "/user");
+                }, 1500);
+            } else {
+                toast.update(loadingToast, {
+                    render: result.message,
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+            }
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     const handleForgotPassword = async () => {
@@ -66,35 +71,39 @@ export default function Login() {
             return;
         }
 
-        setLoading(true);
+        if (loading || forgotPasswordLoading) return;
+
+        setForgotPasswordLoading(true);
 
         const loadingToast = toast.loading("Generating link...");
 
-        const result = await forgotPasswordService({ email });
+        try {
+            const result = await forgotPasswordService({ email });
 
-        if (result.success) {
-            const { token } = result.data;
+            if (result.success) {
+                const { token } = result.data;
 
-            toast.update(loadingToast, {
-                render: "Reset link generated!",
-                type: "success",
-                isLoading: false,
-                autoClose: 1000,
-            });
+                toast.update(loadingToast, {
+                    render: "Reset link generated!",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 1000,
+                });
 
-            setTimeout(() => {
-                navigate(`/reset-password?token=${token}`);
-            }, 1500);
-        } else {
-            toast.update(loadingToast, {
-                render: result.message,
-                type: "error",
-                isLoading: false,
-                autoClose: 3000,
-            });
+                setTimeout(() => {
+                    navigate(`/reset-password?token=${token}`);
+                }, 1500);
+            } else {
+                toast.update(loadingToast, {
+                    render: result.message,
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+            }
+        } finally {
+            setForgotPasswordLoading(false);
         }
-
-        setLoading(false);
     };
 
     const inputBase =
@@ -135,7 +144,8 @@ export default function Login() {
                                 placeholder="you@example.com"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
-                                className={`${inputBase} ${emailError ? inputError : inputIdle}`}
+                                disabled={loading || forgotPasswordLoading}
+                                className={`${inputBase} ${emailError ? inputError : inputIdle} disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
                         {emailError && (
@@ -160,12 +170,14 @@ export default function Login() {
                                 placeholder="8–12 characters"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                className={`${inputBase} pr-10 ${passwordHint ? inputError : inputIdle}`}
+                                disabled={loading || forgotPasswordLoading}
+                                className={`${inputBase} pr-10 ${passwordHint ? inputError : inputIdle} disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                disabled={loading || forgotPasswordLoading}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed">
                                 {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                             </button>
                         </div>
@@ -181,23 +193,40 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={handleForgotPassword}
-                            className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-                            Forgot Password?
+                            disabled={loading || forgotPasswordLoading}
+                            className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                            {forgotPasswordLoading ? (
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Loader2 size={12} className="animate-spin" />
+                                    Generating…
+                                </span>
+                            ) : (
+                                "Forgot Password?"
+                            )}
                         </button>
                     </div>
 
                     {/* Submit */}
                     <button
                         onClick={handleLogin}
-                        disabled={!isFormValid || loading}
+                        disabled={!isFormValid || loading || forgotPasswordLoading}
                         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2
                             ${
-                                isFormValid && !loading
+                                isFormValid && !loading && !forgotPasswordLoading
                                     ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                                     : "bg-gray-100 text-gray-300 cursor-not-allowed"
                             }`}>
-                        {loading ? "Signing in…" : "Sign in"}
-                        {!loading && <ArrowRight size={14} />}
+                        {loading ? (
+                            <>
+                                <Loader2 size={14} className="animate-spin" />
+                                Signing in…
+                            </>
+                        ) : (
+                            <>
+                                Sign in
+                                <ArrowRight size={14} />
+                            </>
+                        )}
                     </button>
                 </div>
 
@@ -206,7 +235,8 @@ export default function Login() {
                     Don't have an account?{" "}
                     <button
                         onClick={() => navigate("/signup")}
-                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer">
+                        disabled={loading || forgotPasswordLoading}
+                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
                         Sign up
                     </button>
                 </p>

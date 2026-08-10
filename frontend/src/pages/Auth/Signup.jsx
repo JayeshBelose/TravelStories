@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
@@ -29,8 +29,10 @@ export default function Signup() {
     const handleSignup = async e => {
         e.preventDefault();
 
-        if (!isFormValid) {
-            toast.warning("Please fill all fields correctly.");
+        if (!isFormValid || loading) {
+            if (!isFormValid) {
+                toast.warning("Please fill all fields correctly.");
+            }
             return;
         }
 
@@ -38,37 +40,39 @@ export default function Signup() {
 
         const loadingToast = toast.loading("Creating your account...");
 
-        const result = await signupService({
-            username: name,
-            email,
-            password,
-        });
-
-        if (result.success) {
-            login(result.data);
-
-            const role = result.data.user.role;
-
-            toast.update(loadingToast, {
-                render: "Account created! Welcome aboard.",
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
+        try {
+            const result = await signupService({
+                username: name,
+                email,
+                password,
             });
 
-            setTimeout(() => {
-                navigate(role === "ADMIN" ? "/admin" : "/user");
-            }, 1000);
-        } else {
-            toast.update(loadingToast, {
-                render: result.message,
-                type: "error",
-                isLoading: false,
-                autoClose: 3000,
-            });
+            if (result.success) {
+                login(result.data);
+
+                const role = result.data.user.role;
+
+                toast.update(loadingToast, {
+                    render: "Account created! Welcome aboard.",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+
+                setTimeout(() => {
+                    navigate(role === "ADMIN" ? "/admin" : "/user");
+                }, 1000);
+            } else {
+                toast.update(loadingToast, {
+                    render: result.message,
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+            }
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     const inputBase =
@@ -106,7 +110,8 @@ export default function Signup() {
                                 placeholder="Min. 4 characters"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                className={`${inputBase} ${nameError ? inputError : inputIdle}`}
+                                disabled={loading}
+                                className={`${inputBase} ${nameError ? inputError : inputIdle} disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
                         {nameError && (
@@ -131,7 +136,8 @@ export default function Signup() {
                                 placeholder="you@example.com"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
-                                className={`${inputBase} ${emailError ? inputError : inputIdle}`}
+                                disabled={loading}
+                                className={`${inputBase} ${emailError ? inputError : inputIdle} disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
                         {emailError && (
@@ -156,12 +162,14 @@ export default function Signup() {
                                 placeholder="8–12 characters"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                className={`${inputBase} pr-10 ${passwordHint ? inputError : inputIdle}`}
+                                disabled={loading}
+                                className={`${inputBase} pr-10 ${passwordHint ? inputError : inputIdle} disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                disabled={loading}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed">
                                 {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                             </button>
                         </div>
@@ -182,8 +190,17 @@ export default function Signup() {
                                     ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                                     : "bg-gray-100 text-gray-300 cursor-not-allowed"
                             }`}>
-                        {loading ? "Creating account…" : "Create account"}
-                        {!loading && <ArrowRight size={14} />}
+                        {loading ? (
+                            <>
+                                <Loader2 size={14} className="animate-spin" />
+                                Creating account…
+                            </>
+                        ) : (
+                            <>
+                                Create account
+                                <ArrowRight size={14} />
+                            </>
+                        )}
                     </button>
                 </div>
 
@@ -192,7 +209,8 @@ export default function Signup() {
                     Already have an account?{" "}
                     <button
                         onClick={() => navigate("/login")}
-                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer">
+                        disabled={loading}
+                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
                         Sign in
                     </button>
                 </p>
