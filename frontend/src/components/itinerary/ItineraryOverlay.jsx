@@ -35,7 +35,20 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
     const [itineraryCreator, setItineraryCreator] = useState(null);
 
     /*
+     * Retry keys for the three independent data-loading sections.
+     */
+    const [retryKey, setRetryKey] = useState(0);
+    const [locationsRetryKey, setLocationsRetryKey] = useState(0);
+    const [imagesRetryKey, setImagesRetryKey] = useState(0);
+
+    /*
      * Load itinerary creator and days.
+     *
+     * Creator loading is secondary:
+     * if it fails, the itinerary can still be displayed.
+     *
+     * Days are required for the itinerary detail view:
+     * if they fail, the primary itinerary content enters ErrorState.
      */
     useEffect(() => {
         if (!itinerary?.itineraryId) {
@@ -43,10 +56,18 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
             setLocationsByDay({});
             setImagesByLocation({});
             setActiveDay(null);
+            setSelectedImage(null);
+            setSelectedUser(null);
             setItineraryCreator(null);
+
             setError(null);
             setLocationsError(null);
             setImagesError(null);
+
+            setLoading(false);
+            setLocationsLoading(false);
+            setImagesLoading(false);
+
             return;
         }
 
@@ -64,6 +85,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
             setSelectedUser(null);
             setItineraryCreator(null);
 
+            setLocationsError(null);
+            setImagesError(null);
+
             try {
                 const [creatorResult, daysResult] = await Promise.all([
                     getUserByUsernameService({
@@ -77,18 +101,22 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                 if (cancelled) return;
 
                 /*
-                 * Creator failure should not prevent the itinerary
-                 * itself from being displayed.
+                 * Creator information is secondary to the itinerary itself.
+                 * Keep the diagnostic log because this is useful for
+                 * investigating why the creator button is unavailable.
                  */
                 if (creatorResult.success) {
                     setItineraryCreator(creatorResult.data);
                 } else {
-                    console.error(creatorResult.message);
+                    console.error(
+                        "Failed to load itinerary creator:",
+                        creatorResult.message,
+                    );
                 }
 
                 /*
-                 * Days are essential to the itinerary view.
-                 * Treat a failure here as a real page-level error.
+                 * Days are required to render the itinerary details.
+                 * Treat this as a primary data-loading failure.
                  */
                 if (!daysResult.success) {
                     throw new Error(
@@ -109,6 +137,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                         error.message ||
                             "We couldn't load this itinerary. Please try again.",
                     );
+
+                    setDays([]);
+                    setActiveDay(null);
                 }
             } finally {
                 if (!cancelled) {
@@ -122,30 +153,21 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
         return () => {
             cancelled = true;
         };
-    }, [itinerary]);
+    }, [itinerary, retryKey]);
 
     /*
      * Retry the primary itinerary request.
-     *
-     * Changing this key causes the main loading effect to run again
-     * without changing the itinerary itself.
      */
-    const [retryKey, setRetryKey] = useState(0);
-
-    useEffect(() => {
-        if (!itinerary?.itineraryId) return;
-
-        /*
-         * retryKey is intentionally used only as a dependency trigger.
-         */
-    }, [retryKey, itinerary?.itineraryId]);
-
     const handleRetry = () => {
         setRetryKey(prev => prev + 1);
     };
 
     /*
      * Load locations for all itinerary days.
+     *
+     * Location failures are treated as partial failures because
+     * one day's locations failing should not prevent other days
+     * from being displayed.
      */
     useEffect(() => {
         if (!days.length) {
@@ -181,7 +203,15 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                     if (result.success) {
                         locations[dayId] = result.data;
                     } else {
-                        console.error(result.message);
+                        /*
+                         * Keep the error diagnostic because this tells us
+                         * which individual service call failed.
+                         */
+                        console.error(
+                            `Failed to load locations for day ${dayId}:`,
+                            result.message,
+                        );
+
                         locations[dayId] = [];
                         failedDays.push(dayId);
                     }
@@ -195,6 +225,8 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
             } catch (error) {
                 if (!cancelled) {
                     console.error("Failed to load itinerary locations:", error);
+
+                    setLocationsByDay({});
 
                     setLocationsError(
                         error.message || "We couldn't load the itinerary locations.",
@@ -212,10 +244,14 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
         return () => {
             cancelled = true;
         };
-    }, [days]);
+    }, [days, locationsRetryKey]);
 
     /*
      * Load images for every location.
+     *
+     * Image failures are intentionally treated separately from the
+     * itinerary/location data because the itinerary remains usable
+     * without its optional images.
      */
     useEffect(() => {
         if (!Object.keys(locationsByDay).length) {
@@ -260,7 +296,15 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                     if (result.success) {
                         images[locationId] = result.data;
                     } else {
-                        console.error(result.message);
+                        /*
+                         * Keep diagnostic logging for service failures.
+                         * The UI still remains usable without those images.
+                         */
+                        console.error(
+                            `Failed to load images for location ${locationId}:`,
+                            result.message,
+                        );
+
                         images[locationId] = [];
                         failed = true;
                     }
@@ -274,6 +318,8 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
             } catch (error) {
                 if (!cancelled) {
                     console.error("Failed to load location images:", error);
+
+                    setImagesByLocation({});
 
                     setImagesError(
                         error.message || "We couldn't load the location images.",
@@ -291,24 +337,20 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
         return () => {
             cancelled = true;
         };
-    }, [locationsByDay]);
+    }, [locationsByDay, imagesRetryKey]);
 
     /*
-     * Retry locations.
+     * Retry locations independently.
      */
     const handleLocationsRetry = () => {
-        /*
-         * Re-setting days creates a new reference and intentionally
-         * triggers the locations effect again.
-         */
-        setDays(prev => [...prev]);
+        setLocationsRetryKey(prev => prev + 1);
     };
 
     /*
-     * Retry images.
+     * Retry images independently.
      */
     const handleImagesRetry = () => {
-        setLocationsByDay(prev => ({ ...prev }));
+        setImagesRetryKey(prev => prev + 1);
     };
 
     if (!itinerary) return null;
@@ -327,7 +369,10 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                 {/* Panel */}
                 <div
                     className="bg-white w-full max-w-lg h-[calc(100vh-2rem)] rounded-2xl overflow-hidden flex flex-col shadow-2xl"
-                    onClick={e => e.stopPropagation()}>
+                    onClick={e => e.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="itinerary-overlay-title">
                     {/* Thumbnail */}
                     <div className="relative h-56 flex-shrink-0">
                         <ItineraryThumbnail
@@ -347,9 +392,9 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                             : "bg-red-500/15 text-red-400 border-red-400/25"
                                     }`}>
                                 {itinerary.public ? (
-                                    <Globe size={11} />
+                                    <Globe size={11} aria-hidden="true" />
                                 ) : (
-                                    <Lock size={11} />
+                                    <Lock size={11} aria-hidden="true" />
                                 )}
                                 {itinerary.public ? "Public" : "Private"}
                             </span>
@@ -370,18 +415,20 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
 
                         {/* Title */}
                         <div className="absolute bottom-4 left-4 right-4">
-                            <h2 className="text-xl font-bold text-white mb-1.5 leading-tight font-primary">
+                            <h2
+                                id="itinerary-overlay-title"
+                                className="text-xl font-bold text-white mb-1.5 leading-tight font-primary">
                                 {itinerary.title}
                             </h2>
 
                             <div className="flex flex-wrap gap-3">
                                 <span className="inline-flex items-center gap-1 text-xs text-white/80">
-                                    <MapPin size={12} />
+                                    <MapPin size={12} aria-hidden="true" />
                                     {itinerary.place}
                                 </span>
 
                                 <span className="inline-flex items-center gap-1 text-xs text-white/80">
-                                    <Calendar size={12} />
+                                    <Calendar size={12} aria-hidden="true" />
                                     {itinerary.startDate} – {itinerary.endDate}
                                 </span>
                             </div>
@@ -480,19 +527,21 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                             {days.map(day => (
                                                 <button
                                                     key={day.dayId}
+                                                    id={`itinerary-day-tab-${day.dayId}`}
                                                     type="button"
                                                     onClick={() =>
                                                         setActiveDay(day.dayId)
                                                     }
                                                     className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer bg-transparent
-                                                        ${
-                                                            activeDay === day.dayId
-                                                                ? "border-gray-900 text-gray-900"
-                                                                : "border-transparent text-gray-400 hover:text-gray-600"
-                                                        }`}
+        ${
+            activeDay === day.dayId
+                ? "border-gray-900 text-gray-900"
+                : "border-transparent text-gray-400 hover:text-gray-600"
+        }`}
                                                     aria-selected={
                                                         activeDay === day.dayId
                                                     }
+                                                    aria-controls={`itinerary-day-panel-${day.dayId}`}
                                                     role="tab">
                                                     Day {day.dayNumber}
                                                 </button>
@@ -577,6 +626,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                                     size={
                                                                                         10
                                                                                     }
+                                                                                    aria-hidden="true"
                                                                                 />
                                                                                 {
                                                                                     location.locationAddress
@@ -629,7 +679,7 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                                                                                                         )
                                                                                                     }
                                                                                                     aria-label={`View image from ${location.locationName}`}
-                                                                                                    className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group border-0 p-0 cursor-pointer">
+                                                                                                    className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
                                                                                                     <img
                                                                                                         src={
                                                                                                             imageUrl
@@ -672,7 +722,11 @@ export default function ItineraryOverlay({ itinerary, onClose }) {
                             {itinerary.members?.length > 0 && (
                                 <div className="px-5 pt-5 mt-2 border-t border-gray-100">
                                     <div className="flex items-center gap-1.5 mb-3">
-                                        <Users size={13} className="text-gray-400" />
+                                        <Users
+                                            size={13}
+                                            aria-hidden="true"
+                                            className="text-gray-400"
+                                        />
 
                                         <h4 className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">
                                             Members
