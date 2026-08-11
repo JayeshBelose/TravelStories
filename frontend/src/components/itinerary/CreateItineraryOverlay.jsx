@@ -69,8 +69,9 @@ export default function CreateItineraryOverlay({
 }) {
     const user = JSON.parse(sessionStorage.getItem("user"));
 
-    // Allowing edit mode to both creator and the Admin
+    // Allowing edit mode to both creator and Admin
     const isEditMode = !!existingItinerary || user?.role === "admin";
+
     const isCreator =
         existingItinerary?.createdBy === user?.username || user?.role === "admin";
 
@@ -95,9 +96,25 @@ export default function CreateItineraryOverlay({
     const [deletedLocations, setDeletedLocations] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
 
-    // Fetch itinerary data if in edit mode
+    /*
+     * Cleanup thumbnail preview URL whenever it changes or
+     * when the component unmounts.
+     */
+    useEffect(() => {
+        return () => {
+            if (thumbnailPreview) {
+                URL.revokeObjectURL(thumbnailPreview);
+            }
+        };
+    }, [thumbnailPreview]);
+
+    /*
+     * Fetch itinerary data if in edit mode.
+     */
     useEffect(() => {
         if (!open) return;
+
+        let cancelled = false;
 
         const loadData = async () => {
             const [typesResult, followingResult] = await Promise.all([
@@ -107,12 +124,18 @@ export default function CreateItineraryOverlay({
                 }),
             ]);
 
+            if (cancelled) return;
+
             if (typesResult.success) {
                 setTypes(typesResult.data);
+            } else {
+                console.error(typesResult.message);
             }
 
             if (followingResult.success) {
                 setFollowingList(followingResult.data);
+            } else {
+                console.error(followingResult.message);
             }
 
             if (!isEditMode || !existingItinerary) {
@@ -120,13 +143,20 @@ export default function CreateItineraryOverlay({
                 return;
             }
 
-            const itineraryId = existingItinerary.itineraryId;
-            setItineraryId(itineraryId);
+            const id = existingItinerary.itineraryId;
+
+            setItineraryId(id);
 
             const [itineraryResult, daysResult] = await Promise.all([
-                getItineraryDetailsService({ itineraryId }),
-                getItineraryDaysService({ itineraryId }),
+                getItineraryDetailsService({
+                    itineraryId: id,
+                }),
+                getItineraryDaysService({
+                    itineraryId: id,
+                }),
             ]);
+
+            if (cancelled) return;
 
             if (!itineraryResult.success) {
                 console.error(itineraryResult.message);
@@ -157,6 +187,7 @@ export default function CreateItineraryOverlay({
 
                     if (!locationsResult.success) {
                         console.error(locationsResult.message);
+
                         return {
                             ...day,
                             locations: [],
@@ -200,10 +231,16 @@ export default function CreateItineraryOverlay({
                 }),
             );
 
+            if (cancelled) return;
+
             setDays(loadedDays);
         };
 
         loadData();
+
+        return () => {
+            cancelled = true;
+        };
     }, [open, existingItinerary]);
 
     const resetForm = () => {
@@ -217,7 +254,17 @@ export default function CreateItineraryOverlay({
         setIsPublic(true);
         setDays([]);
         setMembers([]);
+        setMemberSearch("");
         setThumbnailFile(null);
+
+        /*
+         * Revoke the currently active thumbnail preview before
+         * clearing the state reference.
+         */
+        if (thumbnailPreview) {
+            URL.revokeObjectURL(thumbnailPreview);
+        }
+
         setThumbnailPreview(null);
         setDeletedDays([]);
         setDeletedLocations([]);
@@ -231,6 +278,13 @@ export default function CreateItineraryOverlay({
             toast.error("Please fill all required fields.");
             return;
         }
+
+        if (endDate < startDate) {
+            toast.error("End date cannot be before start date.");
+            return;
+        }
+
+        if (saving) return;
 
         setSaving(true);
 
@@ -247,6 +301,10 @@ export default function CreateItineraryOverlay({
 
             let result;
 
+            /*
+             * Step 1:
+             * Create or update the itinerary itself.
+             */
             if (isEditMode && isCreator) {
                 result = await updateItineraryService({
                     itineraryId,
@@ -268,13 +326,23 @@ export default function CreateItineraryOverlay({
 
             setItineraryId(id);
 
-            onSaved?.(result.data);
-
+            /*
+             * Step 2:
+             * Delete resources that were removed from the editor.
+             */
             await Promise.all([
-                ...deletedImages.map(imageId => deleteLocationImageService({ imageId })),
-                ...deletedLocations.map(locationId =>
-                    deleteLocationService({ locationId }),
+                ...deletedImages.map(imageId =>
+                    deleteLocationImageService({
+                        imageId,
+                    }),
                 ),
+
+                ...deletedLocations.map(locationId =>
+                    deleteLocationService({
+                        locationId,
+                    }),
+                ),
+
                 ...deletedDays.map(dayId =>
                     deleteDayService({
                         itineraryId: id,
@@ -283,19 +351,38 @@ export default function CreateItineraryOverlay({
                 ),
             ]);
 
+            /*
+             * Step 3:
+             * Upload the itinerary thumbnail if a new one was selected.
+             */
             if (thumbnailFile) {
                 const formData = new FormData();
                 formData.append("file", thumbnailFile);
 
-                await uploadThumbnailService({
+                const thumbnailResult = await uploadThumbnailService({
                     itineraryId: id,
                     formData,
                 });
+
+                if (!thumbnailResult.success) {
+                    toast.error(thumbnailResult.message);
+                    return;
+                }
             }
 
+            /*
+             * Step 4:
+             * Create/update days, locations and images.
+             *
+             * These operations remain sequential because later
+             * operations depend on IDs created by earlier operations.
+             */
             for (const day of days) {
                 let dayId = day.dayId;
 
+                /*
+                 * Create or update day.
+                 */
                 if (!dayId) {
                     const dayResult = await createDayService({
                         itineraryId: id,
@@ -325,7 +412,10 @@ export default function CreateItineraryOverlay({
                     }
                 }
 
-                for (const location of day.locations) {
+                /*
+                 * Create/update locations belonging to this day.
+                 */
+                for (const location of day.locations || []) {
                     let locationId = location.locationId;
 
                     if (!locationId) {
@@ -359,7 +449,10 @@ export default function CreateItineraryOverlay({
                         }
                     }
 
-                    for (const image of location.images) {
+                    /*
+                     * Upload newly-added location images.
+                     */
+                    for (const image of location.images || []) {
                         if (!image.isNew || !image.file) continue;
 
                         const formData = new FormData();
@@ -378,6 +471,10 @@ export default function CreateItineraryOverlay({
                 }
             }
 
+            /*
+             * Step 5:
+             * Synchronize itinerary members.
+             */
             const existingMembers = existingItinerary?.members || [];
 
             await Promise.all([
@@ -408,15 +505,25 @@ export default function CreateItineraryOverlay({
                     ),
             ]);
 
-            toast.success(isEditMode ? "Itinerary updated!" : "Itinerary created!");
+            /*
+             * All mutations succeeded.
+             *
+             * Only now notify the parent component.
+             */
+            onSaved?.(result.data);
 
+            /*
+             * Clear mutation tracking after successful save.
+             */
             setDeletedDays([]);
             setDeletedLocations([]);
             setDeletedImages([]);
 
+            toast.success(isEditMode ? "Itinerary updated!" : "Itinerary created!");
+
             onClose();
         } catch (err) {
-            console.error(err);
+            console.error("Failed to save itinerary:", err);
             toast.error("Something went wrong. Please try again.");
         } finally {
             setSaving(false);
@@ -426,23 +533,48 @@ export default function CreateItineraryOverlay({
     // Remove functions
     const removeDay = index => {
         const day = days[index];
-        if (day.dayId) setDeletedDays(prev => [...prev, day.dayId]);
+
+        if (day.dayId) {
+            setDeletedDays(prev => [...prev, day.dayId]);
+        }
+
         setDays(prev => prev.filter((_, i) => i !== index));
     };
 
     const removeLocation = (dayIndex, locIndex) => {
         const loc = days[dayIndex].locations[locIndex];
-        if (loc.locationId) setDeletedLocations(prev => [...prev, loc.locationId]);
+
+        if (loc.locationId) {
+            setDeletedLocations(prev => [...prev, loc.locationId]);
+        }
+
         const updated = [...days];
-        updated[dayIndex].locations.splice(locIndex, 1);
+
+        updated[dayIndex].locations = updated[dayIndex].locations.filter(
+            (_, index) => index !== locIndex,
+        );
+
         setDays(updated);
     };
 
     const removeImage = (dayIndex, locIndex, imgIndex) => {
         const updated = [...days];
+
         const img = updated[dayIndex].locations[locIndex].images[imgIndex];
-        if (!img.isNew && img.imageId) setDeletedImages(prev => [...prev, img.imageId]);
-        updated[dayIndex].locations[locIndex].images.splice(imgIndex, 1);
+
+        if (!img.isNew && img.imageId) {
+            setDeletedImages(prev => [...prev, img.imageId]);
+        }
+
+        /*
+         * If this is a newly-selected local file, no server deletion
+         * is necessary. Its object URL is generated only during render
+         * and does not need to be stored.
+         */
+        updated[dayIndex].locations[locIndex].images = updated[dayIndex].locations[
+            locIndex
+        ].images.filter((_, index) => index !== imgIndex);
+
         setDays(updated);
     };
 
@@ -468,9 +600,12 @@ export default function CreateItineraryOverlay({
                     <h2 className="text-base font-semibold text-gray-900 font-primary">
                         {isEditMode ? "Edit Itinerary" : "New Itinerary"}
                     </h2>
+
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+                        disabled={saving}
+                        aria-label="Close"
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <X size={16} />
                     </button>
                 </div>
@@ -486,26 +621,46 @@ export default function CreateItineraryOverlay({
                                         thumbnailPreview ||
                                         `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`
                                     }
-                                    alt="thumbnail"
+                                    alt="Itinerary thumbnail"
                                     className="w-full h-full object-cover"
                                 />
+
                                 <div className="absolute inset-0 bg-black/20" />
                             </div>
                         )}
+
                         <label className="flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors">
                             <Upload size={14} className="text-gray-400" />
-                            <span className="text-sm text-gray-500">
+
+                            <span className="text-sm text-gray-500 truncate">
                                 {thumbnailFile ? thumbnailFile.name : "Upload thumbnail"}
                             </span>
+
                             <input
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
+                                disabled={saving}
                                 onChange={e => {
-                                    const file = e.target.files[0];
+                                    const file = e.target.files?.[0];
+
                                     if (!file) return;
+
+                                    /*
+                                     * Revoke the previous preview before
+                                     * replacing it.
+                                     */
+                                    if (thumbnailPreview) {
+                                        URL.revokeObjectURL(thumbnailPreview);
+                                    }
+
                                     setThumbnailFile(file);
                                     setThumbnailPreview(URL.createObjectURL(file));
+
+                                    /*
+                                     * Allows selecting the same file again.
+                                     */
+                                    e.target.value = "";
                                 }}
                             />
                         </label>
@@ -517,38 +672,46 @@ export default function CreateItineraryOverlay({
 
                         <div>
                             <FieldLabel required>Title</FieldLabel>
+
                             <input
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                                 placeholder="e.g. Summer in Tokyo"
                                 className={inputClass}
+                                disabled={saving}
                             />
                         </div>
 
                         <div>
                             <FieldLabel required>Place</FieldLabel>
+
                             <div className="relative">
                                 <MapPin
                                     size={14}
                                     className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
                                 />
+
                                 <input
                                     value={place}
                                     onChange={e => setPlace(e.target.value)}
                                     placeholder="City, Country"
                                     className={`${inputClass} pl-9`}
+                                    disabled={saving}
                                 />
                             </div>
                         </div>
 
                         <div>
                             <FieldLabel required>Type</FieldLabel>
+
                             <div className="relative">
                                 <select
                                     value={type}
                                     onChange={e => setType(e.target.value)}
+                                    disabled={saving}
                                     className={`${inputClass} appearance-none pr-8`}>
                                     <option value="">Select a type</option>
+
                                     {[...types]
                                         .sort((a, b) =>
                                             a.name
@@ -568,6 +731,7 @@ export default function CreateItineraryOverlay({
                                             </option>
                                         ))}
                                 </select>
+
                                 <ChevronDown
                                     size={14}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
@@ -578,32 +742,39 @@ export default function CreateItineraryOverlay({
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <FieldLabel required>Start Date</FieldLabel>
+
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={e => setStartDate(e.target.value)}
                                     className={inputClass}
+                                    disabled={saving}
                                 />
                             </div>
+
                             <div>
                                 <FieldLabel required>End Date</FieldLabel>
+
                                 <input
                                     type="date"
                                     value={endDate}
                                     onChange={e => setEndDate(e.target.value)}
                                     className={inputClass}
+                                    disabled={saving}
                                 />
                             </div>
                         </div>
 
                         <div>
                             <FieldLabel>Description</FieldLabel>
+
                             <textarea
                                 value={description}
                                 rows={3}
                                 placeholder="What's this trip about?"
                                 onChange={e => setDescription(e.target.value)}
                                 className={`${inputClass} resize-none`}
+                                disabled={saving}
                             />
                         </div>
                     </div>
@@ -617,11 +788,13 @@ export default function CreateItineraryOverlay({
                                 size={14}
                                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
                             />
+
                             <input
                                 placeholder="Search people you follow…"
                                 value={memberSearch}
                                 onChange={e => setMemberSearch(e.target.value)}
                                 className={`${inputClass} pl-9`}
+                                disabled={saving}
                             />
                         </div>
 
@@ -630,11 +803,13 @@ export default function CreateItineraryOverlay({
                                 {filteredMembers.map(member => (
                                     <button
                                         key={member.userId}
+                                        type="button"
                                         onClick={() => {
                                             setMembers([...members, member]);
                                             setMemberSearch("");
                                         }}
-                                        className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left">
+                                        disabled={saving}
+                                        className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left disabled:opacity-50 disabled:cursor-not-allowed">
                                         <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
                                             <img
                                                 src={`${import.meta.env.VITE_API_BASE_URL}/users/${member.userId}/profilePicture`}
@@ -642,6 +817,7 @@ export default function CreateItineraryOverlay({
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
+
                                         {member.username}
                                     </button>
                                 ))}
@@ -655,7 +831,9 @@ export default function CreateItineraryOverlay({
                                         key={member.userId}
                                         className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                         {member.username}
+
                                         <button
+                                            type="button"
                                             onClick={() =>
                                                 setMembers(
                                                     members.filter(
@@ -663,7 +841,9 @@ export default function CreateItineraryOverlay({
                                                     ),
                                                 )
                                             }
-                                            className="text-gray-400 hover:text-gray-700 cursor-pointer">
+                                            disabled={saving}
+                                            aria-label={`Remove ${member.username}`}
+                                            className="text-gray-400 hover:text-gray-700 cursor-pointer disabled:cursor-not-allowed">
                                             <X size={11} />
                                         </button>
                                     </span>
@@ -676,12 +856,22 @@ export default function CreateItineraryOverlay({
                     <div>
                         <div className="flex items-center justify-between mb-3">
                             <SectionLabel>Itinerary Days</SectionLabel>
+
                             <button
+                                type="button"
                                 onClick={() =>
-                                    setDays([...days, { description: "", locations: [] }])
+                                    setDays([
+                                        ...days,
+                                        {
+                                            description: "",
+                                            locations: [],
+                                        },
+                                    ])
                                 }
-                                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-                                <Plus size={12} /> Add Day
+                                disabled={saving}
+                                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                <Plus size={12} />
+                                Add Day
                             </button>
                         </div>
 
@@ -695,9 +885,13 @@ export default function CreateItineraryOverlay({
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
                                             Day {dayIndex + 1}
                                         </span>
+
                                         <button
+                                            type="button"
                                             onClick={() => removeDay(dayIndex)}
-                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer">
+                                            disabled={saving}
+                                            aria-label={`Remove day ${dayIndex + 1}`}
+                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                             <Trash size={12} />
                                         </button>
                                     </div>
@@ -709,11 +903,16 @@ export default function CreateItineraryOverlay({
                                             rows={2}
                                             onChange={e => {
                                                 const updated = [...days];
-                                                updated[dayIndex].description =
-                                                    e.target.value;
+
+                                                updated[dayIndex] = {
+                                                    ...updated[dayIndex],
+                                                    description: e.target.value,
+                                                };
+
                                                 setDays(updated);
                                             }}
                                             className={`${inputClass} resize-none`}
+                                            disabled={saving}
                                         />
 
                                         {/* Locations */}
@@ -729,43 +928,75 @@ export default function CreateItineraryOverlay({
                                                         <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
                                                             {locIndex + 1}
                                                         </span>
+
                                                         <input
                                                             placeholder="Location name"
                                                             value={loc.name || ""}
                                                             onChange={e => {
                                                                 const updated = [...days];
+
                                                                 updated[
                                                                     dayIndex
-                                                                ].locations[
-                                                                    locIndex
-                                                                ].name = e.target.value;
+                                                                ].locations = updated[
+                                                                    dayIndex
+                                                                ].locations.map(
+                                                                    (item, index) =>
+                                                                        index === locIndex
+                                                                            ? {
+                                                                                  ...item,
+                                                                                  name: e
+                                                                                      .target
+                                                                                      .value,
+                                                                              }
+                                                                            : item,
+                                                                );
+
                                                                 setDays(updated);
                                                             }}
                                                             className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
+                                                            disabled={saving}
                                                         />
+
                                                         <input
                                                             placeholder="Address"
                                                             value={loc.address || ""}
                                                             onChange={e => {
                                                                 const updated = [...days];
+
                                                                 updated[
                                                                     dayIndex
-                                                                ].locations[
-                                                                    locIndex
-                                                                ].address =
-                                                                    e.target.value;
+                                                                ].locations = updated[
+                                                                    dayIndex
+                                                                ].locations.map(
+                                                                    (item, index) =>
+                                                                        index === locIndex
+                                                                            ? {
+                                                                                  ...item,
+                                                                                  address:
+                                                                                      e
+                                                                                          .target
+                                                                                          .value,
+                                                                              }
+                                                                            : item,
+                                                                );
+
                                                                 setDays(updated);
                                                             }}
                                                             className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
+                                                            disabled={saving}
                                                         />
+
                                                         <button
+                                                            type="button"
                                                             onClick={() =>
                                                                 removeLocation(
                                                                     dayIndex,
                                                                     locIndex,
                                                                 )
                                                             }
-                                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer">
+                                                            disabled={saving}
+                                                            aria-label={`Remove ${loc.name || "location"}`}
+                                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                                             <Trash size={11} />
                                                         </button>
                                                     </div>
@@ -792,7 +1023,9 @@ export default function CreateItineraryOverlay({
                                                                             alt=""
                                                                             className="w-full h-full object-cover"
                                                                         />
+
                                                                         <button
+                                                                            type="button"
                                                                             onClick={() =>
                                                                                 removeImage(
                                                                                     dayIndex,
@@ -800,7 +1033,11 @@ export default function CreateItineraryOverlay({
                                                                                     imgIndex,
                                                                                 )
                                                                             }
-                                                                            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                                            disabled={
+                                                                                saving
+                                                                            }
+                                                                            aria-label="Remove image"
+                                                                            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed">
                                                                             <Trash
                                                                                 size={12}
                                                                                 className="text-white"
@@ -820,20 +1057,32 @@ export default function CreateItineraryOverlay({
                                                             type="file"
                                                             accept="image/*"
                                                             className="hidden"
+                                                            disabled={saving}
                                                             onChange={e => {
                                                                 const file =
-                                                                    e.target.files[0];
+                                                                    e.target.files?.[0];
+
                                                                 if (!file) return;
+
                                                                 const updated = [...days];
+
                                                                 updated[
                                                                     dayIndex
                                                                 ].locations[
                                                                     locIndex
-                                                                ].images.push({
-                                                                    isNew: true,
-                                                                    file,
-                                                                });
+                                                                ].images = [
+                                                                    ...updated[dayIndex]
+                                                                        .locations[
+                                                                        locIndex
+                                                                    ].images,
+                                                                    {
+                                                                        isNew: true,
+                                                                        file,
+                                                                    },
+                                                                ];
+
                                                                 setDays(updated);
+
                                                                 e.target.value = "";
                                                             }}
                                                         />
@@ -843,17 +1092,26 @@ export default function CreateItineraryOverlay({
                                         </div>
 
                                         <button
+                                            type="button"
                                             onClick={() => {
                                                 const updated = [...days];
-                                                updated[dayIndex].locations.push({
-                                                    name: "",
-                                                    address: "",
-                                                    images: [],
-                                                });
+
+                                                updated[dayIndex].locations = [
+                                                    ...(updated[dayIndex].locations ||
+                                                        []),
+                                                    {
+                                                        name: "",
+                                                        address: "",
+                                                        images: [],
+                                                    },
+                                                ];
+
                                                 setDays(updated);
                                             }}
-                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1">
-                                            <Plus size={11} /> Add location
+                                            disabled={saving}
+                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <Plus size={11} />
+                                            Add location
                                         </button>
                                     </div>
                                 </div>
@@ -866,8 +1124,10 @@ export default function CreateItineraryOverlay({
                 <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white">
                     {/* Visibility toggle */}
                     <button
+                        type="button"
                         onClick={() => setIsPublic(!isPublic)}
-                        className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-xl border transition-colors cursor-pointer
+                        disabled={saving}
+                        className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-xl border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
                             ${
                                 isPublic
                                     ? "bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100"
@@ -875,25 +1135,31 @@ export default function CreateItineraryOverlay({
                             }`}>
                         {isPublic ? (
                             <>
-                                <Globe size={12} /> Public
+                                <Globe size={12} />
+                                Public
                             </>
                         ) : (
                             <>
-                                <Lock size={12} /> Private
+                                <Lock size={12} />
+                                Private
                             </>
                         )}
                     </button>
 
                     <div className="flex items-center gap-2">
                         <button
+                            type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer">
+                            disabled={saving}
+                            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             Cancel
                         </button>
+
                         <button
+                            type="button"
                             onClick={createOrUpdateItinerary}
                             disabled={saving}
-                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50">
+                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             {saving ? "Saving…" : isEditMode ? "Update" : "Create"}
                         </button>
                     </div>

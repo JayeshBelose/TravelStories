@@ -9,17 +9,14 @@ import { getUserCreatedItinerariesService } from "@/services/itineraryService";
 
 export default function UserItineraryListOverlay({ open, onClose, user }) {
     const [itineraries, setItineraries] = useState([]);
-    const [loadingItineraries, setLoadingItineraries] = useState(true);
+    const [loadingItineraries, setLoadingItineraries] = useState(false);
     const [error, setError] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [retryKey, setRetryKey] = useState(0);
 
     const currentUser = JSON.parse(sessionStorage.getItem("user"));
+    const isAdmin = currentUser?.role === "admin";
 
-    /*
-     * Fetch user's itineraries whenever the overlay opens
-     * or the selected user changes.
-     */
     useEffect(() => {
         if (!open || !user?.userId) {
             return;
@@ -31,6 +28,7 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
             setLoadingItineraries(true);
             setError(null);
             setItineraries([]);
+            setSelectedItinerary(null);
 
             try {
                 const result = await getUserCreatedItinerariesService({
@@ -45,22 +43,19 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                     );
                 }
 
-                const visibleItineraries =
-                    currentUser?.role === "admin"
-                        ? result.data
-                        : result.data.filter(itinerary => itinerary.public);
+                const visibleItineraries = isAdmin
+                    ? result.data
+                    : result.data.filter(itinerary => itinerary.public);
 
                 setItineraries(visibleItineraries);
             } catch (error) {
-                if (!cancelled) {
-                    console.error("Failed to load user itineraries:", error);
+                if (cancelled) return;
 
-                    setError(
-                        error.message || "We couldn't load this user's itineraries.",
-                    );
+                console.error("Failed to load user itineraries:", error);
 
-                    setItineraries([]);
-                }
+                setError(error.message || "We couldn't load this user's itineraries.");
+
+                setItineraries([]);
             } finally {
                 if (!cancelled) {
                     setLoadingItineraries(false);
@@ -73,52 +68,71 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
         return () => {
             cancelled = true;
         };
-    }, [open, user?.userId, currentUser?.role, retryKey]);
+    }, [open, user?.userId, isAdmin, retryKey]);
+
+    useEffect(() => {
+        if (!open) {
+            setSelectedItinerary(null);
+        }
+    }, [open]);
 
     const handleRetry = () => {
         setRetryKey(prev => prev + 1);
     };
 
-    if (!open || !user) return null;
+    if (!open || !user) {
+        return null;
+    }
+
+    const itineraryCount = itineraries.length;
 
     return (
         <>
-            {/* Backdrop */}
+            {/* User Itinerary Dialog */}
             <div
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-                onClick={onClose}>
+                onClick={onClose}
+                role="presentation">
                 <div
                     className="bg-white w-full max-w-5xl max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-                    onClick={e => e.stopPropagation()}>
+                    onClick={event => event.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="user-itinerary-overlay-title">
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-                        <div className="flex items-center gap-3">
-                            <Avatar className="w-10 h-10 ring-2 ring-gray-100">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <Avatar className="w-10 h-10 ring-2 ring-gray-100 flex-shrink-0">
                                 <AvatarImage
                                     src={`${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`}
-                                    alt={user?.username}
+                                    alt=""
                                 />
 
                                 <AvatarFallback className="bg-gray-900 text-white text-sm font-semibold">
-                                    {user?.username?.[0]?.toUpperCase() || "U"}
+                                    {user.username?.[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                             </Avatar>
 
-                            <div>
-                                <h2 className="text-base font-semibold text-gray-900 font-primary leading-tight">
+                            <div className="min-w-0">
+                                <h2
+                                    id="user-itinerary-overlay-title"
+                                    className="text-base font-semibold text-gray-900 font-primary leading-tight truncate">
                                     {user.username}
                                 </h2>
 
                                 {loadingItineraries ? (
-                                    <Skeleton className="h-3 w-20 mt-1" />
+                                    <Skeleton
+                                        className="h-3 w-20 mt-1"
+                                        aria-hidden="true"
+                                    />
                                 ) : error ? (
                                     <p className="text-xs text-red-400 font-medium">
                                         Unable to load
                                     </p>
                                 ) : (
                                     <p className="text-xs text-gray-400 font-medium">
-                                        {itineraries.length}{" "}
-                                        {itineraries.length === 1
+                                        {itineraryCount}{" "}
+                                        {itineraryCount === 1
                                             ? "itinerary"
                                             : "itineraries"}
                                     </p>
@@ -126,27 +140,28 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                             </div>
                         </div>
 
-                        {/* Close */}
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                            aria-label="Close">
-                            <X size={17} />
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer flex-shrink-0"
+                            aria-label={`Close ${user.username}'s itineraries`}>
+                            <X size={17} aria-hidden="true" />
                         </button>
                     </div>
 
                     {/* Body */}
-                    <div className="flex-1 overflow-y-auto">
+                    <div
+                        className="flex-1 overflow-y-auto"
+                        aria-busy={loadingItineraries}>
                         {loadingItineraries ? (
                             <div
-                                aria-busy="true"
                                 aria-label="Loading itineraries"
                                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
-                                {Array.from({ length: 3 }).map((_, i) => (
+                                {Array.from({ length: 3 }).map((_, index) => (
                                     <div
-                                        key={i}
-                                        className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                                        key={index}
+                                        className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+                                        aria-hidden="true">
                                         <Skeleton className="h-48 w-full rounded-none" />
 
                                         <div className="p-4 space-y-2">
@@ -163,16 +178,22 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                                 message={error}
                                 onRetry={handleRetry}
                             />
-                        ) : itineraries.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
-                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                        ) : itineraryCount === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 px-6 gap-3 text-gray-400">
+                                <div
+                                    className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center"
+                                    aria-hidden="true">
                                     <MapIcon size={22} className="text-gray-300" />
                                 </div>
 
-                                <p className="text-sm font-medium">No itineraries yet</p>
+                                <p className="text-sm font-medium text-gray-500">
+                                    No itineraries yet
+                                </p>
 
-                                <p className="text-xs text-gray-300">
-                                    {user.username} hasn't shared any trips.
+                                <p className="text-xs text-gray-300 text-center">
+                                    {isAdmin
+                                        ? `${user.username} hasn't created any itineraries.`
+                                        : `${user.username} hasn't shared any public trips.`}
                                 </p>
                             </div>
                         ) : (
