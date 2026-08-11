@@ -700,3 +700,228 @@ Caused by: java.lang.IllegalArgumentException: Invalid UUID string: null
                 [http-nio-8080-exec-4]
                 o.t.exception.GlobalExceptionHandler
                 - Resource not found: User not found.
+2026-08-11 20:31:17.068
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:31:17.083
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-11 20:31:17.100
+                WARN 
+                [http-nio-8080-exec-8]
+                o.s.s.c.bcrypt.BCryptPasswordEncoder
+                - Encoded password does not look like BCrypt
+2026-08-11 20:31:17.101
+                WARN 
+                [http-nio-8080-exec-8]
+                o.travel_stories.service.UserService
+                - Failed login attempt: invalid password, email=travelstoriesadmin@gmail.com
+2026-08-11 20:31:17.101
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Authentication failed: Invalid email or password
+2026-08-11 20:31:38.188
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:31:38.189
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-11 20:31:38.195
+                WARN 
+                [http-nio-8080-exec-7]
+                o.s.s.c.bcrypt.BCryptPasswordEncoder
+                - Encoded password does not look like BCrypt
+2026-08-11 20:31:38.196
+                WARN 
+                [http-nio-8080-exec-7]
+                o.travel_stories.service.UserService
+                - Failed login attempt: invalid password, email=travelstoriesadmin@gmail.com
+2026-08-11 20:31:38.196
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Authentication failed: Invalid email or password
+2026-08-11 20:33:11.184
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:33:11.187
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-11 20:33:11.202
+                WARN 
+                [http-nio-8080-exec-8]
+                o.s.s.c.bcrypt.BCryptPasswordEncoder
+                - Encoded password does not look like BCrypt
+2026-08-11 20:33:11.202
+                WARN 
+                [http-nio-8080-exec-8]
+                o.travel_stories.service.UserService
+                - Failed login attempt: invalid password, email=travelstoriesadmin@gmail.com
+2026-08-11 20:33:11.203
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Authentication failed: Invalid email or password
+2026-08-11 20:33:37.630
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [FORGOT_PASSWORD] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:33:37.632
+                DEBUG
+                [http-nio-8080-exec-7]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=FORGOT_PASSWORD, RemainingTokens=2
+2026-08-11 20:33:37.657
+                INFO 
+                [http-nio-8080-exec-7]
+                o.travel_stories.service.UserService
+                - Password reset token generated for user 'Admin'
+2026-08-11 20:33:54.994
+                DEBUG
+                [http-nio-8080-exec-9]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [RESET_PASSWORD] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:33:54.995
+                DEBUG
+                [http-nio-8080-exec-9]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=RESET_PASSWORD, RemainingTokens=4
+2026-08-11 20:33:55.029
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.exception.GlobalExceptionHandler
+                - Invalid operation attempted: Password must be at least 12 characters long.
+2026-08-11 20:34:38.012
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [RESET_PASSWORD] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:34:38.013
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=RESET_PASSWORD, RemainingTokens=3
+2026-08-11 20:34:38.021
+                WARN 
+                [http-nio-8080-exec-10]
+                o.s.s.c.bcrypt.BCryptPasswordEncoder
+                - Encoded password does not look like BCrypt
+2026-08-11 20:34:38.341
+                INFO 
+                [http-nio-8080-exec-10]
+                o.travel_stories.service.UserService
+                - Password reset completed for user 'Admin'
+2026-08-11 20:35:11.398
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-11 20:35:11.399
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-11 20:35:11.721
+                INFO 
+                [http-nio-8080-exec-2]
+                o.travel_stories.service.UserService
+                - User 'Admin' authenticated successfully
+2026-08-11 20:35:11.723
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:35:13.261
+                WARN 
+                [http-nio-8080-exec-5]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:35:13.263
+                WARN 
+                [http-nio-8080-exec-5]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:35:16.498
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:35:16.499
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:35:37.475
+                WARN 
+                [http-nio-8080-exec-10]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:35:37.475
+                WARN 
+                [http-nio-8080-exec-10]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:39:08.793
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:39:08.796
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:45:12.984
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:45:12.987
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:45:13.176
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
+2026-08-11 20:45:13.176
+                WARN 
+                [http-nio-8080-exec-7]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:45:13.176
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
+2026-08-11 20:45:13.177
+                WARN 
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-11 20:45:13.197
+                WARN 
+                [http-nio-8080-exec-5]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-11 20:45:13.198
+                WARN 
+                [http-nio-8080-exec-5]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.

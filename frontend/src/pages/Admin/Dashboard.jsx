@@ -12,6 +12,7 @@ import {
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
+import ErrorState from "@/components/common/ErrorState";
 import { useAuth } from "@/context/AuthContext";
 import {
     deleteItineraryByAdminService,
@@ -46,7 +47,7 @@ function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
 }
 
 // Stat card
-function StatCard({ title, value, icon: Icon, color, loading }) {
+function StatCard({ title, value, icon: Icon, color, loading, error }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm">
             <div>
@@ -56,6 +57,8 @@ function StatCard({ title, value, icon: Icon, color, loading }) {
 
                 {loading ? (
                     <Skeleton className="h-7 w-16" aria-label={`Loading ${title}`} />
+                ) : error ? (
+                    <p className="text-xs font-medium text-red-400">Unavailable</p>
                 ) : (
                     <p className="text-2xl font-bold text-gray-900">
                         {value.toLocaleString()}
@@ -88,8 +91,24 @@ export default function Dashboard() {
     const [activity, setActivity] = useState([]);
     const [loadingDashboard, setLoadingDashboard] = useState(true);
 
+    const [loadingStats, setLoadingStats] = useState(true);
+    const [loadingItineraries, setLoadingItineraries] = useState(true);
+    const [loadingActivity, setLoadingActivity] = useState(true);
+
+    const [statsError, setStatsError] = useState(null);
+    const [itinerariesError, setItinerariesError] = useState(null);
+    const [activityError, setActivityError] = useState(null);
+
     const fetchDashboard = async () => {
         setLoadingDashboard(true);
+
+        setLoadingStats(true);
+        setLoadingItineraries(true);
+        setLoadingActivity(true);
+
+        setStatsError(null);
+        setItinerariesError(null);
+        setActivityError(null);
 
         try {
             const [statsResult, itinerariesResult, activityResult] = await Promise.all([
@@ -105,6 +124,10 @@ export default function Dashboard() {
                     "Failed to load dashboard statistics:",
                     statsResult.message,
                 );
+
+                setStatsError(
+                    statsResult.message || "We couldn't load the dashboard statistics.",
+                );
             }
 
             if (itinerariesResult.success) {
@@ -114,27 +137,125 @@ export default function Dashboard() {
                     "Failed to load recent itineraries:",
                     itinerariesResult.message,
                 );
+
+                setItinerariesError(
+                    itinerariesResult.message || "We couldn't load recent itineraries.",
+                );
             }
 
             if (activityResult.success) {
                 setActivity(activityResult.data);
             } else {
                 console.error("Failed to load weekly activity:", activityResult.message);
+
+                setActivityError(
+                    activityResult.message || "We couldn't load the weekly activity.",
+                );
             }
         } catch (error) {
             console.error("Failed to load dashboard:", error);
-            toast.error("Unable to load dashboard data.");
+
+            const message =
+                error.message || "We couldn't load the dashboard data. Please try again.";
+
+            setStatsError(message);
+            setItinerariesError(message);
+            setActivityError(message);
         } finally {
             setLoadingDashboard(false);
+            setLoadingStats(false);
+            setLoadingItineraries(false);
+            setLoadingActivity(false);
         }
     };
 
     // Fetch dashboard data once authentication is ready.
     useEffect(() => {
-        if (!loading && user) {
-            fetchDashboard();
-        }
+        if (loading || !user) return;
+
+        fetchDashboard();
     }, [loading, user]);
+
+    const handleStatsRetry = () => {
+        setLoadingStats(true);
+        setStatsError(null);
+
+        getDashboardStatsService()
+            .then(result => {
+                if (result.success) {
+                    setStats(result.data);
+                    setStatsError(null);
+                } else {
+                    setStatsError(
+                        result.message || "We couldn't load the dashboard statistics.",
+                    );
+                }
+            })
+            .catch(error => {
+                console.error("Failed to reload dashboard statistics:", error);
+
+                setStatsError(
+                    "We couldn't load the dashboard statistics. Please try again.",
+                );
+            })
+            .finally(() => {
+                setLoadingStats(false);
+            });
+    };
+
+    const handleActivityRetry = () => {
+        setLoadingActivity(true);
+        setActivityError(null);
+
+        getWeeklyActivityService()
+            .then(result => {
+                if (result.success) {
+                    setActivity(result.data);
+                    setActivityError(null);
+                } else {
+                    setActivityError(
+                        result.message || "We couldn't load the weekly activity.",
+                    );
+                }
+            })
+            .catch(error => {
+                console.error("Failed to reload weekly activity:", error);
+
+                setActivityError(
+                    "We couldn't load the weekly activity. Please try again.",
+                );
+            })
+            .finally(() => {
+                setLoadingActivity(false);
+            });
+    };
+
+    const handleItinerariesRetry = () => {
+        setLoadingItineraries(true);
+        setItinerariesError(null);
+
+        getRecentItinerariesService()
+            .then(result => {
+                if (result.success) {
+                    setRecentItineraries(result.data);
+                    setItinerariesError(null);
+                } else {
+                    setItinerariesError(
+                        result.message || "We couldn't load recent itineraries.",
+                    );
+                }
+            })
+            .catch(error => {
+                console.error("Failed to reload recent itineraries:", error);
+
+                setItinerariesError(
+                    "We couldn't load recent itineraries. Please try again.",
+                );
+            })
+            .finally(() => {
+                setLoadingItineraries(false);
+            });
+    };
 
     // Itinerary delete function
     const handleDelete = async itineraryId => {
@@ -193,7 +314,8 @@ export default function Dashboard() {
                     value={stats.users}
                     icon={Users}
                     color="bg-blue-50 text-blue-500"
-                    loading={loadingDashboard}
+                    loading={loadingStats}
+                    error={statsError}
                 />
 
                 <StatCard
@@ -201,7 +323,8 @@ export default function Dashboard() {
                     value={stats.itineraries}
                     icon={Map}
                     color="bg-emerald-50 text-emerald-500"
-                    loading={loadingDashboard}
+                    loading={loadingStats}
+                    error={statsError}
                 />
 
                 <StatCard
@@ -209,7 +332,8 @@ export default function Dashboard() {
                     value={stats.images}
                     icon={ImageIcon}
                     color="bg-amber-50 text-amber-500"
-                    loading={loadingDashboard}
+                    loading={loadingStats}
+                    error={statsError}
                 />
             </div>
 
@@ -229,10 +353,10 @@ export default function Dashboard() {
                     </div>
 
                     <div
-                        aria-busy={loadingDashboard}
+                        aria-busy={loadingActivity}
                         aria-label="Weekly activity"
                         className="space-y-3">
-                        {loadingDashboard ? (
+                        {loadingActivity ? (
                             Array.from({ length: 5 }).map((_, index) => (
                                 <div
                                     key={index}
@@ -248,6 +372,13 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                             ))
+                        ) : activityError ? (
+                            <ErrorState
+                                compact
+                                title="Unable to load activity"
+                                message={activityError}
+                                onRetry={handleActivityRetry}
+                            />
                         ) : activity.length > 0 ? (
                             activity.map((item, index) => (
                                 <div
@@ -297,10 +428,10 @@ export default function Dashboard() {
                     </div>
 
                     <div
-                        aria-busy={loadingDashboard}
+                        aria-busy={loadingItineraries}
                         aria-label="Recently added itineraries"
                         className="space-y-2">
-                        {loadingDashboard ? (
+                        {loadingItineraries ? (
                             Array.from({ length: 4 }).map((_, index) => (
                                 <div
                                     key={index}
@@ -317,6 +448,13 @@ export default function Dashboard() {
                                     <Skeleton className="h-5 w-14 rounded-full flex-shrink-0" />
                                 </div>
                             ))
+                        ) : itinerariesError ? (
+                            <ErrorState
+                                compact
+                                title="Unable to load itineraries"
+                                message={itinerariesError}
+                                onRetry={handleItinerariesRetry}
+                            />
                         ) : recentItineraries.length > 0 ? (
                             recentItineraries.map(itinerary => (
                                 <div
