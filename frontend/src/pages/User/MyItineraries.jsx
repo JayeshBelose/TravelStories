@@ -14,7 +14,7 @@ import {
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
-import ErrorState from "@/components/ui/ErrorState";
+import ErrorState from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
 import {

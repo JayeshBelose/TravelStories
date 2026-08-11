@@ -13,7 +13,7 @@ import {
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
-import ErrorState from "@/components/ui/ErrorState";
+import ErrorState from "@/components/common/ErrorState";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
     followUserService,

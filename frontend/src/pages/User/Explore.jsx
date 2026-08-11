@@ -3,7 +3,7 @@ import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-re
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
-import ErrorState from "@/components/ui/ErrorState";
+import ErrorState from "@/components/common/ErrorState";
 import {
     getItinerariesService,
     getItineraryTypesService,
