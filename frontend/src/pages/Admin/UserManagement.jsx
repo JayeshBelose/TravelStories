@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { Search, Trash, X, ChevronLeft, ChevronRight, Shield, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import ErrorState from "@/components/common/ErrorState";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import { deleteUserByAdminService, getAdminUsersService } from "@/services/adminService";
@@ -36,6 +37,8 @@ export default function UserManagement() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [loadingUsers, setLoadingUsers] = useState(true);
+    const [usersError, setUsersError] = useState(null);
+    const [deletingUserId, setDeletingUserId] = useState(null);
 
     const confirmDelete = userId => {
         toast(
@@ -60,34 +63,67 @@ export default function UserManagement() {
 
     const fetchUsers = async () => {
         setLoadingUsers(true);
+        setUsersError(null);
 
-        const result = await getAdminUsersService({
-            page,
-            size: 10,
-            search: debouncedSearch,
-        });
+        try {
+            const result = await getAdminUsersService({
+                page,
+                size: 10,
+                search: debouncedSearch,
+            });
 
-        if (result.success) {
+            if (!result.success) {
+                console.error("Failed to load admin users:", result.message);
+
+                setUsersError(
+                    result.message || "We couldn't load the users. Please try again.",
+                );
+
+                setUsers([]);
+                setTotalPages(0);
+                return;
+            }
+
             setUsers(result.data.content);
             setTotalPages(result.data.totalPages);
-        } else {
-            console.error(result.message);
-        }
+        } catch (error) {
+            console.error("Failed to load admin users:", error);
 
-        setLoadingUsers(false);
+            setUsersError(
+                error.message || "We couldn't load the users. Please try again.",
+            );
+
+            setUsers([]);
+            setTotalPages(0);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
+
+    const handleUsersRetry = () => {
+        fetchUsers();
     };
 
     const handleDelete = async userId => {
-        const result = await deleteUserByAdminService({
-            userId,
-        });
+        setDeletingUserId(userId);
 
-        if (result.success) {
-            setUsers(prev => prev.filter(user => user.userId !== userId));
+        try {
+            const result = await deleteUserByAdminService({
+                userId,
+            });
 
-            toast.success("User deleted successfully.");
-        } else {
-            toast.error(result.message);
+            if (result.success) {
+                setUsers(prev => prev.filter(user => user.userId !== userId));
+
+                toast.success("User deleted successfully.");
+            } else {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error("Failed to delete user:", error);
+            toast.error("Unable to delete user. Please try again.");
+        } finally {
+            setDeletingUserId(null);
         }
     };
 
@@ -186,7 +222,22 @@ export default function UserManagement() {
                                     </td>
                                 </tr>
                             ))}
+
+                        {!loadingUsers && usersError && (
+                            <tr>
+                                <td colSpan={7}>
+                                    <ErrorState
+                                        compact
+                                        title="Unable to load users"
+                                        message={usersError}
+                                        onRetry={handleUsersRetry}
+                                    />
+                                </td>
+                            </tr>
+                        )}
+
                         {!loadingUsers &&
+                            !usersError &&
                             users.map(user => (
                                 <tr
                                     key={user.userId}
@@ -269,7 +320,11 @@ export default function UserManagement() {
                                                     onClick={() =>
                                                         confirmDelete(user.userId)
                                                     }
-                                                    className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
+                                                    disabled={
+                                                        deletingUserId === user.userId
+                                                    }
+                                                    className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                                    aria-label={`Delete user ${user.username}`}>
                                                     <Trash size={14} />
                                                 </button>
                                             )}
@@ -279,7 +334,7 @@ export default function UserManagement() {
                     </tbody>
                 </table>
 
-                {!loadingUsers && users.length === 0 && (
+                {!loadingUsers && !usersError && users.length === 0 && (
                     <div className="py-16 text-center text-sm text-gray-400">
                         No users found.
                     </div>
@@ -289,7 +344,7 @@ export default function UserManagement() {
             {/* Pagination */}
             <div className="flex items-center justify-center gap-3 mt-5">
                 <button
-                    disabled={page === 0}
+                    disabled={page === 0 || loadingUsers || !!usersError}
                     onClick={() => setPage(p => p - 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
                     <ChevronLeft size={15} />
@@ -299,7 +354,7 @@ export default function UserManagement() {
                     of {totalPages}
                 </span>
                 <button
-                    disabled={page >= totalPages - 1}
+                    disabled={page >= totalPages - 1 || loadingUsers || !!usersError}
                     onClick={() => setPage(p => p + 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
                     <ChevronRight size={15} />

@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/logs/travel_stories.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/travel_stories.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Admin/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Admin/Dashboard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Admin/UserManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Admin/UserManagement.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
