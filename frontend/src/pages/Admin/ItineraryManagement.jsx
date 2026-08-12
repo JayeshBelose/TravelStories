@@ -303,12 +303,13 @@ export default function ItineraryManagement() {
             </div>
 
             {/* Filters Row */}
-            <div className="flex flex-wrap gap-3 mb-5">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-5">
                 {/* Search */}
-                <div className="flex-1 min-w-52 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                <div className="w-full sm:flex-1 sm:min-w-52 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
                     <Search size={15} className="text-gray-400 flex-shrink-0" />
                     <input
                         type="text"
+                        aria-label="Search itineraries by title, place or creator"
                         placeholder="Search by title, place or creator…"
                         className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                         value={search}
@@ -319,9 +320,11 @@ export default function ItineraryManagement() {
                     />
                     {search && (
                         <button
+                            type="button"
                             onClick={() => setSearch("")}
-                            className="text-gray-300 hover:text-gray-500 cursor-pointer">
-                            <X size={14} />
+                            aria-label="Clear itinerary search"
+                            className="text-gray-300 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 rounded cursor-pointer">
+                            <X size={14} aria-hidden="true" />
                         </button>
                     )}
                 </div>
@@ -438,171 +441,173 @@ export default function ItineraryManagement() {
 
             {/* Table */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden mb-5">
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b border-gray-100 text-left">
-                            {[
-                                "Title",
-                                "Location",
-                                "Creator",
-                                "Type",
-                                "Visibility",
-                                "Created",
-                                "Likes",
-                                "Saves",
-                                "Actions",
-                            ].map(h => (
-                                <th
-                                    key={h}
-                                    className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
-                                        h === "Actions" ? "text-right" : ""
-                                    }`}>
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[1000px] text-sm">
+                        <thead>
+                            <tr className="border-b border-gray-100 text-left">
+                                {[
+                                    "Title",
+                                    "Location",
+                                    "Creator",
+                                    "Type",
+                                    "Visibility",
+                                    "Created",
+                                    "Likes",
+                                    "Saves",
+                                    "Actions",
+                                ].map(h => (
+                                    <th
+                                        key={h}
+                                        className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
+                                            h === "Actions" ? "text-right" : ""
+                                        }`}>
+                                        {h}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
 
-                    <tbody
-                        aria-busy={loadingItineraries}
-                        aria-label="Loading itineraries">
-                        {loadingItineraries &&
-                            Array.from({ length: 6 }).map((_, i) => (
-                                <tr key={i} className="border-b border-gray-50">
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-3.5 w-32" />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-3.5 w-24" />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-3.5 w-20" />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-5 w-16 rounded-full" />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-5 w-16 rounded-full" />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Skeleton className="h-3.5 w-20" />
-                                    </td>
-                                    <td className="px-4 py-3 text-center">
-                                        <Skeleton className="h-3.5 w-8 mx-auto" />
-                                    </td>
-                                    <td className="px-4 py-3 text-center">
-                                        <Skeleton className="h-3.5 w-8 mx-auto" />
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <Skeleton className="h-7 w-7 rounded-full" />
-                                            <Skeleton className="h-7 w-7 rounded-full" />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                        <tbody
+                            aria-busy={loadingItineraries}
+                            aria-label="Loading itineraries">
+                            {loadingItineraries &&
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-gray-50">
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-3.5 w-32" />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-3.5 w-24" />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-3.5 w-20" />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-5 w-16 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-5 w-16 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Skeleton className="h-3.5 w-20" />
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <Skeleton className="h-3.5 w-8 mx-auto" />
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <Skeleton className="h-3.5 w-8 mx-auto" />
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Skeleton className="h-7 w-7 rounded-full" />
+                                                <Skeleton className="h-7 w-7 rounded-full" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
 
-                        {!loadingItineraries &&
-                            !itineraryError &&
-                            itineraries.map(item => (
-                                <tr
-                                    key={item.itineraryId}
-                                    className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                                    {/* Title */}
-                                    <td className="px-4 py-3">
-                                        <button
-                                            onClick={e => handleView(e, item)}
-                                            className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
-                                            {item.title}
-                                        </button>
-                                    </td>
+                            {!loadingItineraries &&
+                                !itineraryError &&
+                                itineraries.map(item => (
+                                    <tr
+                                        key={item.itineraryId}
+                                        className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                                        {/* Title */}
+                                        <td className="px-4 py-3">
+                                            <button
+                                                onClick={e => handleView(e, item)}
+                                                className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
+                                                {item.title}
+                                            </button>
+                                        </td>
 
-                                    {/* Place */}
-                                    <td className="px-4 py-3 text-sm text-gray-500">
-                                        {item.place}
-                                    </td>
+                                        {/* Place */}
+                                        <td className="px-4 py-3 text-sm text-gray-500">
+                                            {item.place}
+                                        </td>
 
-                                    {/* Creator */}
-                                    <td className="px-4 py-3 text-sm text-gray-600 capitalize">
-                                        {item.createdBy}
-                                    </td>
+                                        {/* Creator */}
+                                        <td className="px-4 py-3 text-sm text-gray-600 capitalize">
+                                            {item.createdBy}
+                                        </td>
 
-                                    {/* Type */}
-                                    <td className="px-4 py-3">
-                                        <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
-                                            <Tag size={9} /> {item.type || "—"}
-                                        </span>
-                                    </td>
+                                        {/* Type */}
+                                        <td className="px-4 py-3">
+                                            <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
+                                                <Tag size={9} /> {item.type || "—"}
+                                            </span>
+                                        </td>
 
-                                    {/* Visibility */}
-                                    <td className="px-4 py-3">
-                                        <span
-                                            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
+                                        {/* Visibility */}
+                                        <td className="px-4 py-3">
+                                            <span
+                                                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
                                         ${
                                             item.public
                                                 ? "bg-emerald-50 border-emerald-200 text-emerald-600"
                                                 : "bg-red-50 border-red-200 text-red-500"
                                         }`}>
-                                            {item.public ? (
-                                                <>
-                                                    <Globe size={9} /> Public
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Lock size={9} /> Private
-                                                </>
+                                                {item.public ? (
+                                                    <>
+                                                        <Globe size={9} /> Public
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Lock size={9} /> Private
+                                                    </>
+                                                )}
+                                            </span>
+                                        </td>
+
+                                        {/* Date */}
+                                        <td className="px-4 py-3 text-sm text-gray-400">
+                                            {new Date(item.createdAt).toLocaleDateString(
+                                                "en-GB",
+                                                {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                },
                                             )}
-                                        </span>
-                                    </td>
+                                        </td>
 
-                                    {/* Date */}
-                                    <td className="px-4 py-3 text-sm text-gray-400">
-                                        {new Date(item.createdAt).toLocaleDateString(
-                                            "en-GB",
-                                            {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            },
-                                        )}
-                                    </td>
+                                        {/* Likes */}
+                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                            {item.likeCount}
+                                        </td>
 
-                                    {/* Likes */}
-                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                        {item.likeCount}
-                                    </td>
+                                        {/* Saves */}
+                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                            {item.saveCount}
+                                        </td>
 
-                                    {/* Saves */}
-                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                        {item.saveCount}
-                                    </td>
+                                        {/* Actions */}
+                                        <td className="px-4 py-3 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={e => handleEdit(e, item)}
+                                                    aria-label={`Edit itinerary ${item.title}`}
+                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+                                                    <Pencil size={14} />
+                                                </button>
 
-                                    {/* Actions */}
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <button
-                                                type="button"
-                                                onClick={e => handleEdit(e, item)}
-                                                aria-label={`Edit itinerary ${item.title}`}
-                                                className="w-7 h-7 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
-                                                <Pencil size={13} />
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    confirmDelete(item.itineraryId)
-                                                }
-                                                aria-label={`Delete itinerary ${item.title}`}
-                                                className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
-                                                <Trash size={13} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        confirmDelete(item.itineraryId)
+                                                    }
+                                                    aria-label={`Delete itinerary ${item.title}`}
+                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
+                                                    <Trash size={14} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                        </tbody>
+                    </table>
+                </div>
 
                 {!loadingItineraries && itineraryError && (
                     <div className="py-16 text-center">
@@ -626,6 +631,7 @@ export default function ItineraryManagement() {
             <div className="flex items-center justify-center gap-3 mb-12">
                 <button
                     type="button"
+                    aria-label="Go to previous page"
                     disabled={page === 0 || totalPages === 0}
                     onClick={() => setPage(p => p - 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
@@ -648,6 +654,7 @@ export default function ItineraryManagement() {
 
                 <button
                     type="button"
+                    aria-label="Go to next page"
                     disabled={totalPages === 0 || page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">

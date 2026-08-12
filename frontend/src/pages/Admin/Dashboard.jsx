@@ -31,14 +31,14 @@ function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
                 <button
                     type="button"
                     onClick={onConfirm}
-                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1">
                     {confirmLabel}
                 </button>
 
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1">
                     Cancel
                 </button>
             </div>
@@ -383,7 +383,7 @@ export default function Dashboard() {
                             activity.map((item, index) => (
                                 <div
                                     key={`${item.date}-${index}`}
-                                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    className="flex items-start sm:items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
                                     <div className="flex items-center gap-2">
                                         <CalendarDays
                                             size={13}
@@ -396,7 +396,7 @@ export default function Dashboard() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center gap-3 text-xs">
+                                    <div className="flex items-center justify-end gap-2 flex-wrap text-xs">
                                         <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
                                             <Users size={10} aria-hidden="true" />
                                             {item.newUsers} users
@@ -466,7 +466,7 @@ export default function Dashboard() {
                                             setSelectedItinerary(itinerary);
                                             setOpenView(true);
                                         }}
-                                        className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
+                                        className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
                                         aria-label={`View itinerary ${itinerary.title}`}>
                                         <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                                             <ItineraryThumbnail
@@ -506,7 +506,7 @@ export default function Dashboard() {
                                             onClick={() =>
                                                 confirmDelete(itinerary.itineraryId)
                                             }
-                                            className="w-7 h-7 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer focus:opacity-100"
+                                            className="w-9 h-9 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
                                             aria-label={`Delete itinerary ${itinerary.title}`}>
                                             <Trash size={13} aria-hidden="true" />
                                         </button>
