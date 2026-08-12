@@ -739,7 +739,7 @@ export default function CreateItineraryOverlay({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                             <div>
                                 <FieldLabel required>Start Date</FieldLabel>
 
@@ -924,7 +924,7 @@ export default function CreateItineraryOverlay({
                                                         `loc-${locIndex}`
                                                     }
                                                     className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2">
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col lg:flex-row lg:items-center gap-2">
                                                         <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
                                                             {locIndex + 1}
                                                         </span>
@@ -1121,7 +1121,7 @@ export default function CreateItineraryOverlay({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white">
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 lg:px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white">
                     {/* Visibility toggle */}
                     <button
                         type="button"

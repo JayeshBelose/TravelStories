@@ -18,7 +18,7 @@ export default function MainLayout() {
                 <Sidebar user={user} onLogout={handleLogout} />
             </div>
 
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-6 lg:p-8">
                 <Outlet />
             </main>
         </div>
