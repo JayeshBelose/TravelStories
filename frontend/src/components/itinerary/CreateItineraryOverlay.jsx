@@ -12,6 +12,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import ErrorState from "@/components/common/ErrorState";
 import {
     addMemberService,
     createItineraryService,
@@ -92,6 +93,10 @@ export default function CreateItineraryOverlay({
     const [types, setTypes] = useState([]);
     const [saving, setSaving] = useState(false);
 
+    const [loadingData, setLoadingData] = useState(open);
+    const [loadError, setLoadError] = useState(null);
+    const [loadAttempt, setLoadAttempt] = useState(0);
+
     const [deletedDays, setDeletedDays] = useState([]);
     const [deletedLocations, setDeletedLocations] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
@@ -117,123 +122,191 @@ export default function CreateItineraryOverlay({
         let cancelled = false;
 
         const loadData = async () => {
-            const [typesResult, followingResult] = await Promise.all([
-                getItineraryTypesService(),
-                getFollowingService({
-                    userId: user.userId,
-                }),
-            ]);
+            setLoadingData(true);
+            setLoadError(null);
 
-            if (cancelled) return;
+            try {
+                const [typesResult, followingResult] = await Promise.all([
+                    getItineraryTypesService(),
+                    getFollowingService({
+                        userId: user.userId,
+                    }),
+                ]);
 
-            if (typesResult.success) {
-                setTypes(typesResult.data);
-            } else {
-                console.error(typesResult.message);
-            }
+                if (cancelled) return;
 
-            if (followingResult.success) {
-                setFollowingList(followingResult.data);
-            } else {
-                console.error(followingResult.message);
-            }
-
-            if (!isEditMode || !existingItinerary) {
-                resetForm();
-                return;
-            }
-
-            const id = existingItinerary.itineraryId;
-
-            setItineraryId(id);
-
-            const [itineraryResult, daysResult] = await Promise.all([
-                getItineraryDetailsService({
-                    itineraryId: id,
-                }),
-                getItineraryDaysService({
-                    itineraryId: id,
-                }),
-            ]);
-
-            if (cancelled) return;
-
-            if (!itineraryResult.success) {
-                console.error(itineraryResult.message);
-                return;
-            }
-
-            if (!daysResult.success) {
-                console.error(daysResult.message);
-                return;
-            }
-
-            const itinerary = itineraryResult.data;
-
-            setTitle(itinerary.title);
-            setPlace(itinerary.place);
-            setType(itinerary.type);
-            setStartDate(itinerary.startDate);
-            setEndDate(itinerary.endDate);
-            setDescription(itinerary.description);
-            setIsPublic(itinerary.public);
-            setMembers(itinerary.members || []);
-
-            const loadedDays = await Promise.all(
-                daysResult.data.map(async day => {
-                    const locationsResult = await getDayLocationsService({
-                        dayId: day.dayId,
+                /*
+                 * Itinerary types are required for the form.
+                 * Without them, the user cannot reliably select the
+                 * itinerary type.
+                 */
+                if (!typesResult.success) {
+                    setLoadError({
+                        title: "Unable to load itinerary types",
+                        message:
+                            typesResult.message ||
+                            "We couldn't load the available itinerary types. Please try again.",
                     });
 
-                    if (!locationsResult.success) {
-                        console.error(locationsResult.message);
+                    return;
+                }
 
-                        return {
-                            ...day,
-                            locations: [],
-                        };
-                    }
+                setTypes(typesResult.data);
 
-                    const loadedLocations = await Promise.all(
-                        locationsResult.data.map(async location => {
-                            const imagesResult = await getLocationImagesService({
-                                locationId: location.locationId,
-                            });
+                /*
+                 * Following users are optional.
+                 * A failure here should not prevent the user from
+                 * creating or editing the itinerary.
+                 */
+                if (followingResult.success) {
+                    setFollowingList(followingResult.data);
+                } else {
+                    console.error(
+                        "Failed to load following users:",
+                        followingResult.message,
+                    );
+                    setFollowingList([]);
+                }
 
-                            if (!imagesResult.success) {
-                                console.error(imagesResult.message);
+                /*
+                 * Create mode does not require any additional API data.
+                 */
+                if (!isEditMode || !existingItinerary) {
+                    resetForm();
+                    return;
+                }
+
+                const id = existingItinerary.itineraryId;
+
+                setItineraryId(id);
+
+                /*
+                 * Edit mode requires both the itinerary itself and
+                 * its days before the form can be populated safely.
+                 */
+                const [itineraryResult, daysResult] = await Promise.all([
+                    getItineraryDetailsService({
+                        itineraryId: id,
+                    }),
+                    getItineraryDaysService({
+                        itineraryId: id,
+                    }),
+                ]);
+
+                if (cancelled) return;
+
+                if (!itineraryResult.success) {
+                    setLoadError({
+                        title: "Unable to load itinerary",
+                        message:
+                            itineraryResult.message ||
+                            "We couldn't load this itinerary. Please try again.",
+                    });
+
+                    return;
+                }
+
+                if (!daysResult.success) {
+                    setLoadError({
+                        title: "Unable to load itinerary days",
+                        message:
+                            daysResult.message ||
+                            "We couldn't load the itinerary days. Please try again.",
+                    });
+
+                    return;
+                }
+
+                const itinerary = itineraryResult.data;
+
+                setTitle(itinerary.title);
+                setPlace(itinerary.place);
+                setType(itinerary.type);
+                setStartDate(itinerary.startDate);
+                setEndDate(itinerary.endDate);
+                setDescription(itinerary.description);
+                setIsPublic(itinerary.public);
+                setMembers(itinerary.members || []);
+
+                /*
+                 * Locations and images are secondary resources.
+                 * Their failures should not prevent the main itinerary
+                 * from being displayed/edited.
+                 */
+                const loadedDays = await Promise.all(
+                    daysResult.data.map(async day => {
+                        const locationsResult = await getDayLocationsService({
+                            dayId: day.dayId,
+                        });
+
+                        if (cancelled) return null;
+
+                        if (!locationsResult.success) {
+                            console.error(
+                                `Failed to load locations for day ${day.dayId}:`,
+                                locationsResult.message,
+                            );
+
+                            return {
+                                ...day,
+                                locations: [],
+                                locationsLoadError: true,
+                            };
+                        }
+
+                        const loadedLocations = await Promise.all(
+                            locationsResult.data.map(async location => {
+                                const imagesResult = await getLocationImagesService({
+                                    locationId: location.locationId,
+                                });
+
+                                if (cancelled) return null;
+
+                                if (!imagesResult.success) {
+                                    console.error(
+                                        `Failed to load images for location ${location.locationId}:`,
+                                        imagesResult.message,
+                                    );
+
+                                    return {
+                                        ...location,
+                                        name: location.locationName || "",
+                                        address: location.locationAddress || "",
+                                        images: [],
+                                        imagesLoadError: true,
+                                    };
+                                }
 
                                 return {
                                     ...location,
                                     name: location.locationName || "",
                                     address: location.locationAddress || "",
-                                    images: [],
+                                    images: imagesResult.data.map(image => ({
+                                        ...image,
+                                        isNew: false,
+                                        file: null,
+                                    })),
                                 };
-                            }
+                            }),
+                        );
 
-                            return {
-                                ...location,
-                                name: location.locationName || "",
-                                address: location.locationAddress || "",
-                                images: imagesResult.data.map(image => ({
-                                    ...image,
-                                    isNew: false,
-                                    file: null,
-                                })),
-                            };
-                        }),
-                    );
+                        if (cancelled) return null;
 
-                    return {
-                        ...day,
-                        locations: loadedLocations,
-                    };
-                }),
-            );
+                        return {
+                            ...day,
+                            locations: loadedLocations.filter(Boolean),
+                        };
+                    }),
+                );
 
-            if (cancelled) return;
+                if (cancelled) return;
 
-            setDays(loadedDays);
+                setDays(loadedDays.filter(Boolean));
+            } finally {
+                if (!cancelled) {
+                    setLoadingData(false);
+                }
+            }
         };
 
         loadData();
@@ -241,7 +314,7 @@ export default function CreateItineraryOverlay({
         return () => {
             cancelled = true;
         };
-    }, [open, existingItinerary]);
+    }, [open, existingItinerary, loadAttempt]);
 
     const resetForm = () => {
         setItineraryId(null);
@@ -272,6 +345,61 @@ export default function CreateItineraryOverlay({
     };
 
     if (!open) return null;
+
+    if (loadingData || loadError) {
+        return (
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-end z-50"
+                onClick={onClose}>
+                <div
+                    className="bg-white w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden"
+                    onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+                        <h2 className="text-base font-semibold text-gray-900 font-primary">
+                            {isEditMode ? "Edit Itinerary" : "New Itinerary"}
+                        </h2>
+
+                        <button
+                            onClick={onClose}
+                            disabled={saving || loadingData}
+                            aria-label="Close"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            <X size={16} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 flex items-center justify-center">
+                        {loadingData ? (
+                            <div
+                                className="flex flex-col items-center justify-center text-center px-6"
+                                role="status"
+                                aria-live="polite">
+                                <div
+                                    className="w-10 h-10 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"
+                                    aria-hidden="true"
+                                />
+
+                                <p className="mt-4 text-sm font-medium text-gray-700">
+                                    {isEditMode
+                                        ? "Loading itinerary..."
+                                        : "Preparing itinerary form..."}
+                                </p>
+                            </div>
+                        ) : (
+                            <ErrorState
+                                title={loadError.title}
+                                message={loadError.message}
+                                onRetry={() => {
+                                    setLoadError(null);
+                                    setLoadAttempt(prev => prev + 1);
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const createOrUpdateItinerary = async () => {
         if (!title || !place || !type || !startDate || !endDate) {
@@ -917,6 +1045,16 @@ export default function CreateItineraryOverlay({
 
                                         {/* Locations */}
                                         <div className="space-y-2">
+                                            {day.locationsLoadError && (
+                                                <div
+                                                    role="alert"
+                                                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-600">
+                                                    Some locations could not be loaded.
+                                                    You can continue editing the
+                                                    itinerary, but those locations may
+                                                    need to be added again.
+                                                </div>
+                                            )}
                                             {day.locations?.map((loc, locIndex) => (
                                                 <div
                                                     key={
@@ -1002,49 +1140,70 @@ export default function CreateItineraryOverlay({
                                                     </div>
 
                                                     {/* Image previews */}
-                                                    {loc.images?.length > 0 && (
-                                                        <div className="flex gap-2 flex-wrap pt-1">
-                                                            {loc.images.map(
-                                                                (img, imgIndex) => (
-                                                                    <div
-                                                                        key={
-                                                                            img.imageId ??
-                                                                            `new-${imgIndex}`
-                                                                        }
-                                                                        className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group">
-                                                                        <img
-                                                                            src={
-                                                                                img.isNew
-                                                                                    ? URL.createObjectURL(
-                                                                                          img.file,
-                                                                                      )
-                                                                                    : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
-                                                                            }
-                                                                            alt=""
-                                                                            className="w-full h-full object-cover"
-                                                                        />
+                                                    {(loc.images?.length > 0 ||
+                                                        loc.imagesLoadError) && (
+                                                        <div className="space-y-2 pt-1">
+                                                            {loc.imagesLoadError && (
+                                                                <div
+                                                                    role="alert"
+                                                                    className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600">
+                                                                    Some images could not
+                                                                    be loaded. You can
+                                                                    continue editing this
+                                                                    location.
+                                                                </div>
+                                                            )}
 
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() =>
-                                                                                removeImage(
-                                                                                    dayIndex,
-                                                                                    locIndex,
-                                                                                    imgIndex,
-                                                                                )
-                                                                            }
-                                                                            disabled={
-                                                                                saving
-                                                                            }
-                                                                            aria-label="Remove image"
-                                                                            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed">
-                                                                            <Trash
-                                                                                size={12}
-                                                                                className="text-white"
-                                                                            />
-                                                                        </button>
-                                                                    </div>
-                                                                ),
+                                                            {loc.images?.length > 0 && (
+                                                                <div className="flex gap-2 flex-wrap">
+                                                                    {loc.images.map(
+                                                                        (
+                                                                            img,
+                                                                            imgIndex,
+                                                                        ) => (
+                                                                            <div
+                                                                                key={
+                                                                                    img.imageId ??
+                                                                                    `new-${imgIndex}`
+                                                                                }
+                                                                                className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group">
+                                                                                <img
+                                                                                    src={
+                                                                                        img.isNew
+                                                                                            ? URL.createObjectURL(
+                                                                                                  img.file,
+                                                                                              )
+                                                                                            : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
+                                                                                    }
+                                                                                    alt=""
+                                                                                    className="w-full h-full object-cover"
+                                                                                />
+
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() =>
+                                                                                        removeImage(
+                                                                                            dayIndex,
+                                                                                            locIndex,
+                                                                                            imgIndex,
+                                                                                        )
+                                                                                    }
+                                                                                    disabled={
+                                                                                        saving
+                                                                                    }
+                                                                                    aria-label="Remove image"
+                                                                                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed">
+                                                                                    <Trash
+                                                                                        size={
+                                                                                            12
+                                                                                        }
+                                                                                        className="text-white"
+                                                                                    />
+                                                                                </button>
+                                                                            </div>
+                                                                        ),
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     )}
