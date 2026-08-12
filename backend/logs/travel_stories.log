@@ -1106,3 +1106,123 @@ Caused by: java.lang.IllegalArgumentException: Invalid UUID string: null
                 [http-nio-8080-exec-7]
                 o.t.exception.GlobalExceptionHandler
                 - Resource not found: Profile picture not found.
+2026-08-12 19:44:29.812
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-12 19:44:29.831
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-12 19:44:30.326
+                INFO 
+                [http-nio-8080-exec-10]
+                o.travel_stories.service.UserService
+                - User 'Test_User' authenticated successfully
+2026-08-12 19:44:30.354
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:44:50.054
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:44:52.628
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:44:54.502
+                INFO 
+                [http-nio-8080-exec-8]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:44:55.212
+                INFO 
+                [http-nio-8080-exec-1]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:44:59.152
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:45:08.993
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:45:09.512
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:45:35.472
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:45:43.374
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.SavedItineraryService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0
+2026-08-12 19:45:51.733
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.service.SavedItineraryService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 removed itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0 from saved itineraries
+2026-08-12 19:50:02.207
+                INFO 
+                [http-nio-8080-exec-5]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:03.519
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:04.904
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:05.703
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:07.085
+                INFO 
+                [http-nio-8080-exec-1]
+                o.t.service.LikedItineraryService
+                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:07.670
+                INFO 
+                [http-nio-8080-exec-4]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:08.772
+                INFO 
+                [http-nio-8080-exec-8]
+                o.t.service.LikedItineraryService
+                - Itinerary liked: itineraryId=37d8d119-8a04-4283-9553-f1feae1bc5cf, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
+2026-08-12 19:50:09.905
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.SavedItineraryService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0
+2026-08-12 19:50:12.939
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.SavedItineraryService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 removed itinerary c6e59ec1-d7bc-46be-8db2-38d47dc1794d from saved itineraries
+2026-08-12 19:50:14.342
+                INFO 
+                [http-nio-8080-exec-9]
+                o.t.service.SavedItineraryService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 37d8d119-8a04-4283-9553-f1feae1bc5cf

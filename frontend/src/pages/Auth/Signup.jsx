@@ -18,7 +18,7 @@ export default function Signup() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
     const isNameValid = name.length >= 4;
-    const isPasswordValid = password.length >= 8 && password.length <= 12;
+    const isPasswordValid = password.length === 12;
     const isFormValid =
         name && email && password && isNameValid && isPasswordValid && isEmailValid;
 
@@ -159,7 +159,7 @@ export default function Signup() {
                             />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="8–12 characters"
+                                placeholder="must be 12 characters"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 disabled={loading}
@@ -175,7 +175,7 @@ export default function Signup() {
                         </div>
                         {passwordHint && (
                             <p className="text-xs text-red-400 mt-1">
-                                Password must be 8–12 characters
+                                Password must be at least 12 characters
                             </p>
                         )}
                     </div>

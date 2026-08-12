@@ -15,7 +15,7 @@ export default function ResetPassword() {
     const [showConfirm, setShowConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const isPasswordValid = newPassword.length >= 8 && newPassword.length <= 12;
+    const isPasswordValid = newPassword.length === 12;
     const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
     const isFormValid = isPasswordValid && passwordsMatch;
 
@@ -88,7 +88,7 @@ export default function ResetPassword() {
 
                             <input
                                 type={showNew ? "text" : "password"}
-                                placeholder="8–12 characters"
+                                placeholder="must be 12 characters"
                                 value={newPassword}
                                 onChange={e => setNewPassword(e.target.value)}
                                 disabled={loading}
@@ -111,7 +111,7 @@ export default function ResetPassword() {
 
                         {passwordHint && (
                             <p className="text-xs text-red-400 mt-1">
-                                Password must be 8–12 characters
+                                Password must be at least 12 characters
                             </p>
                         )}
                     </div>

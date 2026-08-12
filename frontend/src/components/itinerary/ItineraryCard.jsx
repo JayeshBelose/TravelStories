@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
+import { toast } from "react-toastify";
 import ItineraryThumbnail from "./ItineraryThumbnail";
 import {
     getLikedStatusService,
@@ -16,32 +17,53 @@ export default function ItineraryCard({ itinerary, onClick }) {
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
+    const [likeLoading, setLikeLoading] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(true);
+
     // Fetching itinerary likes and saves
     useEffect(() => {
-        if (!loggedInUser?.userId) return;
+        if (!loggedInUser?.userId) {
+            setStatusLoading(false);
+            return;
+        }
 
         const fetchStatus = async () => {
-            const [likeResult, saveResult] = await Promise.all([
-                getLikedStatusService({
-                    userId: loggedInUser.userId,
-                    itineraryId: itinerary.itineraryId,
-                }),
-                getSavedStatusService({
-                    userId: loggedInUser.userId,
-                    itineraryId: itinerary.itineraryId,
-                }),
-            ]);
+            setStatusLoading(true);
 
-            if (likeResult.success) {
-                setLiked(likeResult.data);
-            } else {
-                console.error(likeResult.message);
-            }
+            try {
+                const [likeResult, saveResult] = await Promise.all([
+                    getLikedStatusService({
+                        userId: loggedInUser.userId,
+                        itineraryId: itinerary.itineraryId,
+                    }),
+                    getSavedStatusService({
+                        userId: loggedInUser.userId,
+                        itineraryId: itinerary.itineraryId,
+                    }),
+                ]);
 
-            if (saveResult.success) {
-                setSaved(saveResult.data);
-            } else {
-                console.error(saveResult.message);
+                if (likeResult.success) {
+                    setLiked(likeResult.data);
+                } else {
+                    console.error(likeResult.message);
+                    toast.error(
+                        likeResult.message ||
+                            "Unable to load the like status. Please try again.",
+                    );
+                }
+
+                if (saveResult.success) {
+                    setSaved(saveResult.data);
+                } else {
+                    console.error(saveResult.message);
+                    toast.error(
+                        saveResult.message ||
+                            "Unable to load the save status. Please try again.",
+                    );
+                }
+            } finally {
+                setStatusLoading(false);
             }
         };
 
@@ -52,37 +74,56 @@ export default function ItineraryCard({ itinerary, onClick }) {
     const handleLike = async e => {
         e.stopPropagation();
 
-        if (!loggedInUser?.userId) return;
+        if (!loggedInUser?.userId || likeLoading || statusLoading) return;
 
-        const result = await toggleLikeItineraryService({
-            userId: loggedInUser.userId,
-            itineraryId: itinerary.itineraryId,
-        });
+        setLikeLoading(true);
 
-        if (result.success) {
-            setLiked(prev => !prev);
-            setLikes(prev => (liked ? prev - 1 : prev + 1));
-        } else {
-            console.error(result.message);
+        try {
+            const result = await toggleLikeItineraryService({
+                userId: loggedInUser.userId,
+                itineraryId: itinerary.itineraryId,
+            });
+
+            if (result.success) {
+                const newLikedState = !liked;
+
+                setLiked(newLikedState);
+                setLikes(prev => (newLikedState ? prev + 1 : prev - 1));
+            } else {
+                toast.error(
+                    result.message || "Unable to update the like. Please try again.",
+                );
+            }
+        } finally {
+            setLikeLoading(false);
         }
     };
 
     const handleSave = async e => {
         e.stopPropagation();
 
-        if (!loggedInUser?.userId) return;
-        if (loggedInUser.username === itinerary.createdBy) return;
+        if (!loggedInUser?.userId || isOwner || saveLoading || statusLoading) return;
 
-        const result = await toggleSaveItineraryService({
-            userId: loggedInUser.userId,
-            itineraryId: itinerary.itineraryId,
-        });
+        setSaveLoading(true);
 
-        if (result.success) {
-            setSaved(prev => !prev);
-            setSaves(prev => (saved ? prev - 1 : prev + 1));
-        } else {
-            console.error(result.message);
+        try {
+            const result = await toggleSaveItineraryService({
+                userId: loggedInUser.userId,
+                itineraryId: itinerary.itineraryId,
+            });
+
+            if (result.success) {
+                const newSavedState = !saved;
+
+                setSaved(newSavedState);
+                setSaves(prev => (newSavedState ? prev + 1 : prev - 1));
+            } else {
+                toast.error(
+                    result.message || "Unable to update the save. Please try again.",
+                );
+            }
+        } finally {
+            setSaveLoading(false);
         }
     };
 
@@ -155,7 +196,14 @@ export default function ItineraryCard({ itinerary, onClick }) {
                     <div className="flex items-center gap-3 ml-auto">
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
+                            disabled={likeLoading || statusLoading}
+                            aria-label={liked ? "Unlike itinerary" : "Like itinerary"}
+                            aria-busy={likeLoading}
+                            className={`flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors ${
+                                likeLoading
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : "cursor-pointer"
+                            }`}>
                             <Heart
                                 size={14}
                                 className={`transition-colors ${liked ? "fill-red-500 text-red-500" : ""}`}
@@ -165,12 +213,16 @@ export default function ItineraryCard({ itinerary, onClick }) {
 
                         <button
                             onClick={handleSave}
-                            disabled={isOwner}
+                            disabled={isOwner || saveLoading || statusLoading}
+                            aria-label={saved ? "Unsave itinerary" : "Save itinerary"}
+                            aria-busy={saveLoading}
                             className={`flex items-center gap-1 text-xs transition-colors
                                 ${
                                     isOwner
                                         ? "text-gray-200 cursor-default"
-                                        : "text-gray-400 hover:text-yellow-500 cursor-pointer"
+                                        : saveLoading
+                                          ? "text-gray-400 opacity-50 cursor-not-allowed"
+                                          : "text-gray-400 hover:text-yellow-500 cursor-pointer"
                                 }`}>
                             <Bookmark
                                 size={14}

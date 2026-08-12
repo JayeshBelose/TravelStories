@@ -17,7 +17,7 @@ export default function Login() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
-    const isPasswordValid = password.length >= 8 && password.length <= 12;
+    const isPasswordValid = password.length === 12;
     const isFormValid = email && password && isEmailValid && isPasswordValid;
 
     const handleLogin = async e => {
@@ -167,7 +167,7 @@ export default function Login() {
                             />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="8–12 characters"
+                                placeholder="must be 12 characters"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 disabled={loading || forgotPasswordLoading}
@@ -183,7 +183,7 @@ export default function Login() {
                         </div>
                         {passwordHint && (
                             <p className="text-xs text-red-400 mt-1">
-                                Password must be 8–12 characters
+                                Password must be at least 12 characters
                             </p>
                         )}
                     </div>
