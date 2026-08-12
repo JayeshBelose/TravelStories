@@ -238,3 +238,63 @@
                 [http-nio-8080-exec-5]
                 o.t.exception.GlobalExceptionHandler
                 - Resource not found: Profile picture not found.
+2026-08-12 11:24:51.338
+                WARN 
+                [http-nio-8080-exec-2]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 11:24:51.341
+                WARN 
+                [http-nio-8080-exec-2]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-12 11:24:51.416
+                WARN 
+                [http-nio-8080-exec-4]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 11:24:51.416
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
+2026-08-12 11:24:51.417
+                WARN 
+                [http-nio-8080-exec-4]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-12 11:24:51.417
+                WARN 
+                [http-nio-8080-exec-10]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
+2026-08-12 11:24:51.417
+                WARN 
+                [http-nio-8080-exec-10]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-12 11:24:51.417
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-12 11:26:03.680
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 11:26:03.681
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-12 11:26:15.193
+                WARN 
+                [http-nio-8080-exec-4]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 11:26:15.194
+                WARN 
+                [http-nio-8080-exec-4]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import {
     Search,
@@ -69,6 +69,8 @@ export default function ItineraryManagement() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loadingItineraries, setLoadingItineraries] = useState(true);
+    const [loadingTypes, setLoadingTypes] = useState(true);
+
     const [itineraryError, setItineraryError] = useState("");
     const [typeError, setTypeError] = useState("");
 
@@ -95,8 +97,8 @@ export default function ItineraryManagement() {
                 <ConfirmToast
                     message="Delete this itinerary? This cannot be undone."
                     confirmLabel="Delete"
-                    onConfirm={() => {
-                        handleDelete(itineraryId);
+                    onConfirm={async () => {
+                        await handleDelete(itineraryId);
                         closeToast();
                     }}
                     onCancel={closeToast}
@@ -113,8 +115,8 @@ export default function ItineraryManagement() {
                 <ConfirmToast
                     message="Delete this itinerary type? This cannot be undone."
                     confirmLabel="Delete"
-                    onConfirm={() => {
-                        deleteType(typeId);
+                    onConfirm={async () => {
+                        await deleteType(typeId);
                         closeToast();
                     }}
                     onCancel={closeToast}
@@ -129,42 +131,60 @@ export default function ItineraryManagement() {
         setLoadingItineraries(true);
         setItineraryError("");
 
-        const result = await getAdminItinerariesService({
-            page,
-            size: 10,
-            search,
-            filter,
-            type: typeFilter,
-            sort: sortFilter,
-        });
+        try {
+            const result = await getAdminItinerariesService({
+                page,
+                size: 10,
+                search,
+                filter,
+                type: typeFilter === "all" ? "" : typeFilter,
+                sort: sortFilter,
+            });
 
-        if (result.success) {
-            setItineraries(result.data.content || []);
-            setTotalPages(result.data.totalPages || 0);
-        } else {
+            if (result.success) {
+                setItineraries(result.data?.content || []);
+                setTotalPages(result.data?.totalPages || 0);
+            } else {
+                setItineraries([]);
+                setTotalPages(0);
+                setItineraryError(result.message || "Failed to load itineraries.");
+            }
+        } catch (error) {
+            console.error("Failed to load itineraries:", error);
+
             setItineraries([]);
             setTotalPages(0);
-            setItineraryError(result.message || "Failed to load itineraries.");
-            console.error(result.message);
+            setItineraryError("Unable to load itineraries. Please try again.");
+        } finally {
+            setLoadingItineraries(false);
         }
-
-        setLoadingItineraries(false);
     };
 
     // Fetching itinerary types
     const fetchTypes = async () => {
+        setLoadingTypes(true);
         setTypeError("");
 
-        const result = await getItineraryTypesAdminService();
+        try {
+            const result = await getItineraryTypesAdminService();
 
-        if (result.success) {
-            setTypes(result.data || []);
-        } else {
+            if (result.success) {
+                setTypes(result.data || []);
+            } else {
+                setTypes([]);
+                setTypeError(result.message || "Failed to load itinerary types.");
+            }
+        } catch (error) {
+            console.error("Failed to load itinerary types:", error);
+
             setTypes([]);
-            setTypeError(result.message || "Failed to load itinerary types.");
-            console.error(result.message);
+            setTypeError("Unable to load itinerary types. Please try again.");
+        } finally {
+            setLoadingTypes(false);
         }
     };
+
+    const itineraryTypes = [{ typeId: "all", name: "All Types" }, ...types];
 
     useEffect(() => {
         fetchTypes();
@@ -208,11 +228,6 @@ export default function ItineraryManagement() {
         }
     };
 
-    const itineraryTypes = useMemo(() => {
-        const t = itineraries.map(i => i.type).filter(Boolean);
-        return ["all", ...new Set(t)];
-    }, [itineraries]);
-
     // Fetching itineraries after filters or searching
     useEffect(() => {
         const delay = setTimeout(() => fetchItineraries(), 400);
@@ -227,9 +242,15 @@ export default function ItineraryManagement() {
         });
 
         if (result.success) {
-            setItineraries(prev =>
-                prev.filter(itinerary => itinerary.itineraryId !== itineraryId),
+            const remaining = itineraries.filter(
+                itinerary => itinerary.itineraryId !== itineraryId,
             );
+
+            if (remaining.length === 0 && page > 0) {
+                setPage(prev => prev - 1);
+            } else {
+                setItineraries(remaining);
+            }
 
             toast.success("Itinerary deleted.");
         } else {
@@ -392,18 +413,22 @@ export default function ItineraryManagement() {
                         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1 max-h-56 overflow-y-auto">
                             {itineraryTypes.map(type => (
                                 <button
-                                    key={type}
+                                    key={type.typeId}
+                                    type="button"
                                     onClick={() => {
-                                        setTypeFilter(type);
+                                        setPage(0);
+                                        setTypeFilter(
+                                            type.typeId === "all" ? "all" : type.name,
+                                        );
                                         setOpenType(false);
                                     }}
                                     className={`block w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer
-                                        ${
-                                            typeFilter === type
-                                                ? "bg-gray-50 text-gray-900 font-medium"
-                                                : "text-gray-600 hover:bg-gray-50"
-                                        }`}>
-                                    {type === "all" ? "All Types" : type}
+            ${
+                typeFilter === (type.typeId === "all" ? "all" : type.name)
+                    ? "bg-gray-50 text-gray-900 font-medium"
+                    : "text-gray-600 hover:bg-gray-50"
+            }`}>
+                                    {type.name}
                                 </button>
                             ))}
                         </div>
@@ -556,15 +581,19 @@ export default function ItineraryManagement() {
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <button
+                                                type="button"
                                                 onClick={e => handleEdit(e, item)}
+                                                aria-label={`Edit itinerary ${item.title}`}
                                                 className="w-7 h-7 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
                                                 <Pencil size={13} />
                                             </button>
 
                                             <button
+                                                type="button"
                                                 onClick={() =>
                                                     confirmDelete(item.itineraryId)
                                                 }
+                                                aria-label={`Delete itinerary ${item.title}`}
                                                 className="w-7 h-7 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
                                                 <Trash size={13} />
                                             </button>
@@ -596,22 +625,33 @@ export default function ItineraryManagement() {
             {/* Pagination */}
             <div className="flex items-center justify-center gap-3 mb-12">
                 <button
-                    disabled={page === 0}
+                    type="button"
+                    disabled={page === 0 || totalPages === 0}
                     onClick={() => setPage(p => p - 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                    <ChevronLeft size={15} />
+                    <ChevronLeft size={15} aria-hidden="true" />
                 </button>
 
                 <span className="text-sm text-gray-500">
-                    Page <span className="font-semibold text-gray-900">{page + 1}</span>{" "}
-                    of {totalPages}
+                    {totalPages > 0 ? (
+                        <>
+                            Page{" "}
+                            <span className="font-semibold text-gray-900">
+                                {page + 1}
+                            </span>{" "}
+                            of {totalPages}
+                        </>
+                    ) : (
+                        "No pages"
+                    )}
                 </span>
 
                 <button
-                    disabled={page >= totalPages - 1}
+                    type="button"
+                    disabled={totalPages === 0 || page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                    <ChevronRight size={15} />
+                    <ChevronRight size={15} aria-hidden="true" />
                 </button>
             </div>
 
@@ -626,11 +666,19 @@ export default function ItineraryManagement() {
                     </p>
                 </div>
 
-                {/* Type error */}
-                {typeError ? (
+                {/* Type management state */}
+                {loadingTypes ? (
+                    <div className="flex flex-wrap gap-2 mb-5">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <Skeleton key={index} className="h-8 w-24 rounded-full" />
+                        ))}
+                    </div>
+                ) : typeError ? (
                     <div className="mb-5 text-sm text-gray-500">
                         <p className="mb-2">{typeError}</p>
+
                         <button
+                            type="button"
                             onClick={fetchTypes}
                             className="font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer">
                             Try again
@@ -658,11 +706,14 @@ export default function ItineraryManagement() {
                                         key={type.typeId}
                                         className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors">
                                         <Tag size={12} className="text-gray-400" />
+
                                         {type.name}
 
                                         <button
+                                            type="button"
                                             onClick={() => confirmDeleteType(type.typeId)}
-                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
+                                            aria-label={`Delete itinerary type ${type.name}`}
+                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100">
                                             <X size={12} />
                                         </button>
                                     </div>
@@ -672,24 +723,34 @@ export default function ItineraryManagement() {
                         {/* Add type input */}
                         <div className="flex items-center gap-2 max-w-sm">
                             <div className="flex-1 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
-                                <Tag size={14} className="text-gray-300 flex-shrink-0" />
+                                <Tag
+                                    size={14}
+                                    className="text-gray-300 flex-shrink-0"
+                                    aria-hidden="true"
+                                />
 
                                 <input
                                     type="text"
                                     value={newType}
                                     placeholder="New type name…"
+                                    aria-label="New itinerary type name"
                                     className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                                     onChange={e => setNewType(e.target.value)}
                                     onKeyDown={e => {
-                                        if (e.key === "Enter") addType();
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            addType();
+                                        }
                                     }}
                                 />
                             </div>
 
                             <button
+                                type="button"
                                 onClick={addType}
                                 className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0">
-                                <Plus size={14} /> Add
+                                <Plus size={14} aria-hidden="true" />
+                                Add
                             </button>
                         </div>
                     </>
