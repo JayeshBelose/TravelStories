@@ -22,6 +22,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import UserManagement from "./pages/Admin/UserManagement";
 import ItineraryManagement from "./pages/Admin/ItineraryManagement";
 
+import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 export default function App() {
@@ -87,7 +88,7 @@ function Router() {
                 </Route>
 
                 {/* Catch-all */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </>
     );

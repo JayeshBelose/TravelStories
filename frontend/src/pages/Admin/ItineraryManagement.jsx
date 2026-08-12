@@ -508,6 +508,32 @@ export default function ItineraryManagement() {
 
                             {!loadingItineraries &&
                                 !itineraryError &&
+                                itineraries.length === 0 && (
+                                    <tr>
+                                        <td colSpan={9}>
+                                            <div className="flex flex-col items-center justify-center py-16 text-center">
+                                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                                                    <Search
+                                                        size={20}
+                                                        className="text-gray-300"
+                                                        aria-hidden="true"
+                                                    />
+                                                </div>
+
+                                                <p className="text-sm font-medium text-gray-500">
+                                                    No itineraries found
+                                                </p>
+
+                                                <p className="text-xs text-gray-300 mt-1">
+                                                    Try adjusting your search or filters.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+
+                            {!loadingItineraries &&
+                                !itineraryError &&
                                 itineraries.map(item => (
                                     <tr
                                         key={item.itineraryId}

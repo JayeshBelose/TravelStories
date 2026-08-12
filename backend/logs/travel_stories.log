@@ -1241,3 +1241,33 @@ Caused by: java.lang.IllegalArgumentException: Invalid UUID string: null
                 [http-nio-8080-exec-5]
                 o.t.service.FollowService
                 - User 89a22df3-81ed-4e06-b148-1af73d61aba3 followed user 7b85c689-7838-42aa-983f-8642014624dd
+2026-08-12 20:13:05.555
+                DEBUG
+                [http-nio-8080-exec-5]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-12 20:13:05.558
+                DEBUG
+                [http-nio-8080-exec-5]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-12 20:13:05.915
+                INFO 
+                [http-nio-8080-exec-5]
+                o.travel_stories.service.UserService
+                - User 'Admin' authenticated successfully
+2026-08-12 20:13:05.920
+                INFO 
+                [http-nio-8080-exec-5]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 20:13:07.458
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
+2026-08-12 20:13:07.467
+                WARN 
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
