@@ -1226,3 +1226,18 @@ Caused by: java.lang.IllegalArgumentException: Invalid UUID string: null
                 [http-nio-8080-exec-9]
                 o.t.service.SavedItineraryService
                 - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 37d8d119-8a04-4283-9553-f1feae1bc5cf
+2026-08-12 19:59:59.951
+                INFO 
+                [scheduling-1]
+                o.t.service.RefreshTokenService
+                - Deleted 1 expired refresh tokens.
+2026-08-12 20:03:20.069
+                INFO 
+                [http-nio-8080-exec-9]
+                o.t.service.FollowService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 unfollowed user 7b85c689-7838-42aa-983f-8642014624dd
+2026-08-12 20:03:26.626
+                INFO 
+                [http-nio-8080-exec-5]
+                o.t.service.FollowService
+                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 followed user 7b85c689-7838-42aa-983f-8642014624dd

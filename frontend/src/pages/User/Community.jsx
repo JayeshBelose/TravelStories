@@ -59,6 +59,7 @@ export default function Community() {
 
     const searchRef = useRef(null);
     const inputRef = useRef(null);
+    const searchRequestRef = useRef(0);
 
     // Close search dropdown on outside click
     useEffect(() => {
@@ -115,6 +116,8 @@ export default function Community() {
             return;
         }
 
+        const requestId = ++searchRequestRef.current;
+
         setSearchLoading(true);
         setSearchError(null);
 
@@ -122,6 +125,10 @@ export default function Community() {
             const result = await searchUsersService({
                 query: search,
             });
+
+            if (requestId !== searchRequestRef.current) {
+                return;
+            }
 
             if (result.success) {
                 const filtered = result.data.filter(
@@ -184,26 +191,38 @@ export default function Community() {
     const retrySearch = async () => {
         if (!search.trim()) return;
 
+        const requestId = ++searchRequestRef.current;
+
         setSearchError(null);
         setSearchLoading(true);
 
-        const result = await searchUsersService({
-            query: search,
-        });
+        try {
+            const result = await searchUsersService({
+                query: search,
+            });
 
-        if (result.success) {
-            const filtered = result.data.filter(u => u.userId !== loggedInUser?.userId);
+            if (requestId !== searchRequestRef.current) {
+                return;
+            }
 
-            setSearchResults(filtered);
-            setSearchError(null);
-            setSearchOpen(true);
-        } else {
-            setSearchResults([]);
-            setSearchError(result.message);
-            setSearchOpen(true);
+            if (result.success) {
+                const filtered = result.data.filter(
+                    u => u.userId !== loggedInUser?.userId,
+                );
+
+                setSearchResults(filtered);
+                setSearchError(null);
+                setSearchOpen(true);
+            } else {
+                setSearchResults([]);
+                setSearchError(result.message);
+                setSearchOpen(true);
+            }
+        } finally {
+            if (requestId === searchRequestRef.current) {
+                setSearchLoading(false);
+            }
         }
-
-        setSearchLoading(false);
     };
 
     const clearSearch = () => {
