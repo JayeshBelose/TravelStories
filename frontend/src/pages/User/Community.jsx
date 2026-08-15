@@ -152,6 +152,10 @@ export default function Community() {
 
     const isFollowing = userId => following.some(u => u.userId === userId);
 
+    const isFollower = userId => followers.some(u => u.userId === userId);
+
+    const isFriend = userId => isFollowing(userId) && isFollower(userId);
+
     const toggleFollow = async user => {
         if (followActionUserId === user.userId) return;
 
@@ -320,6 +324,7 @@ export default function Community() {
                         ) : (
                             searchResults.map(user => {
                                 const followed = isFollowing(user.userId);
+                                const friend = isFriend(user.userId);
                                 const followLoading = followActionUserId === user.userId;
 
                                 return (
@@ -341,41 +346,49 @@ export default function Community() {
                                             </span>
                                         </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                                toggleFollow(user);
-                                            }}
-                                            disabled={followLoading}
-                                            className={`ml-3 flex items-center justify-center gap-1.5 min-w-[86px] px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
-                            ${
-                                followed
-                                    ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
-                                    : "bg-gray-900 text-white hover:bg-gray-700"
-                            }`}>
-                                            {followLoading ? (
-                                                <>
-                                                    <Loader2
-                                                        size={11}
-                                                        className="animate-spin"
-                                                    />
-                                                    {followed
-                                                        ? "Unfollowing…"
-                                                        : "Following…"}
-                                                </>
-                                            ) : followed ? (
-                                                <>
-                                                    <UserMinus size={11} />
-                                                    Following
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <UserPlus size={11} />
-                                                    Follow
-                                                </>
+                                        <div className="ml-3 flex items-center gap-2 flex-shrink-0">
+                                            {friend && followed && (
+                                                <span className="inline-flex items-center px-2 py-1 text-[10px] font-semibold text-gray-500 bg-green-100 rounded-full">
+                                                    Friend
+                                                </span>
                                             )}
-                                        </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    toggleFollow(user);
+                                                }}
+                                                disabled={followLoading}
+                                                className={`flex items-center justify-center gap-1.5 min-w-[86px] px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60
+            ${
+                followed
+                    ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
+                    : "bg-gray-900 text-white hover:bg-gray-700"
+            }`}>
+                                                {followLoading ? (
+                                                    <>
+                                                        <Loader2
+                                                            size={11}
+                                                            className="animate-spin"
+                                                        />
+                                                        {followed
+                                                            ? "Unfollowing…"
+                                                            : "Following…"}
+                                                    </>
+                                                ) : followed ? (
+                                                    <>
+                                                        <UserMinus size={11} />
+                                                        Unfollow
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <UserPlus size={11} />
+                                                        Follow
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })
@@ -385,6 +398,49 @@ export default function Community() {
             </div>
 
             {/* Tabs */}
+            {/* Tabs */}
+            <div className="mb-5 flex items-center gap-1 border-b border-gray-200">
+                <button
+                    type="button"
+                    onClick={() => setActiveTab("following")}
+                    className={`relative px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${
+                        activeTab === "following"
+                            ? "text-gray-900"
+                            : "text-gray-400 hover:text-gray-600"
+                    }`}>
+                    Following
+                    <span
+                        className={`ml-1.5 text-xs ${
+                            activeTab === "following" ? "text-gray-500" : "text-gray-300"
+                        }`}>
+                        {following.length}
+                    </span>
+                    {activeTab === "following" && (
+                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+                    )}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => setActiveTab("followers")}
+                    className={`relative px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${
+                        activeTab === "followers"
+                            ? "text-gray-900"
+                            : "text-gray-400 hover:text-gray-600"
+                    }`}>
+                    Followers
+                    <span
+                        className={`ml-1.5 text-xs ${
+                            activeTab === "followers" ? "text-gray-500" : "text-gray-300"
+                        }`}>
+                        {followers.length}
+                    </span>
+                    {activeTab === "followers" && (
+                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+                    )}
+                </button>
+            </div>
+
             {loadingConnections ? (
                 <div
                     aria-busy="true"
@@ -437,7 +493,7 @@ export default function Community() {
                 <div className="space-y-2">
                     {currentList.map(user => {
                         const followingUser = isFollowing(user.userId);
-
+                        const friend = isFriend(user.userId);
                         const followLoading = followActionUserId === user.userId;
 
                         return (
@@ -470,69 +526,81 @@ export default function Community() {
                                 {/* Action button */}
 
                                 {activeTab === "following" ? (
-                                    <button
-                                        type="button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-
-                                            toggleFollow(user);
-                                        }}
-                                        disabled={followLoading}
-                                        className="flex items-center justify-center gap-1.5 min-w-[82px] px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
-                                        {followLoading ? (
-                                            <>
-                                                <Loader2
-                                                    size={12}
-                                                    className="animate-spin"
-                                                />
-                                                Unfollowing…
-                                            </>
-                                        ) : (
-                                            <>
-                                                <UserMinus size={12} />
-                                                Unfollow
-                                            </>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        {friend && (
+                                            <span className="inline-flex items-center px-2 py-1 text-[10px] font-semibold text-gray-500 bg-green-100 rounded-full">
+                                                Friend
+                                            </span>
                                         )}
-                                    </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                toggleFollow(user);
+                                            }}
+                                            disabled={followLoading}
+                                            className="flex items-center justify-center gap-1.5 min-w-[82px] px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
+                                            {followLoading ? (
+                                                <>
+                                                    <Loader2
+                                                        size={12}
+                                                        className="animate-spin"
+                                                    />
+                                                    Unfollowing…
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserMinus size={12} />
+                                                    Unfollow
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                 ) : (
-                                    <button
-                                        type="button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-
-                                            toggleFollow(user);
-                                        }}
-                                        disabled={followLoading}
-                                        className={`flex items-center justify-center gap-1.5 min-w-[92px] px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
-
-                                        ${
-                                            followingUser
-                                                ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
-                                                : "bg-gray-900 text-white hover:bg-gray-700"
-                                        }`}>
-                                        {followLoading ? (
-                                            <>
-                                                <Loader2
-                                                    size={12}
-                                                    className="animate-spin"
-                                                />
-
-                                                {followingUser
-                                                    ? "Unfollowing…"
-                                                    : "Following…"}
-                                            </>
-                                        ) : followingUser ? (
-                                            <>
-                                                <UserMinus size={12} />
-                                                Unfollow
-                                            </>
-                                        ) : (
-                                            <>
-                                                <UserPlus size={12} />
-                                                Follow Back
-                                            </>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        {friend && followingUser && (
+                                            <span className="inline-flex items-center px-2 py-1 text-[10px] font-semibold text-gray-500 bg-gray-100 rounded-full">
+                                                Friend
+                                            </span>
                                         )}
-                                    </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                toggleFollow(user);
+                                            }}
+                                            disabled={followLoading}
+                                            className={`flex items-center justify-center gap-1.5 min-w-[92px] px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60
+            ${
+                followingUser
+                    ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
+                    : "bg-gray-900 text-white hover:bg-gray-700"
+            }`}>
+                                            {followLoading ? (
+                                                <>
+                                                    <Loader2
+                                                        size={12}
+                                                        className="animate-spin"
+                                                    />
+                                                    {followingUser
+                                                        ? "Unfollowing…"
+                                                        : "Following…"}
+                                                </>
+                                            ) : followingUser ? (
+                                                <>
+                                                    <UserMinus size={12} />
+                                                    Unfollow
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={12} />
+                                                    Follow Back
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         );

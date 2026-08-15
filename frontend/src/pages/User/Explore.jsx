@@ -137,6 +137,7 @@ export default function Explore() {
                     {/* Search */}
                     <div className="flex-1 min-w-56 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
                         <Search size={15} className="text-gray-400 flex-shrink-0" />
+
                         <input
                             type="text"
                             placeholder="Search by title or place…"
@@ -150,16 +151,29 @@ export default function Explore() {
                                 }
                             }}
                         />
+
                         {search && (
                             <button
                                 onClick={() => {
                                     setSearch("");
                                     setAppliedSearch("");
                                 }}
-                                className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                                className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
+                                aria-label="Clear search">
                                 <X size={14} />
                             </button>
                         )}
+
+                        <button
+                            onClick={() => {
+                                setCurrentPage(1);
+                                setAppliedSearch(search);
+                            }}
+                            disabled={!search.trim()}
+                            className="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            aria-label="Search">
+                            <Search size={15} />
+                        </button>
                     </div>
 
                     {/* Sort dropdown */}

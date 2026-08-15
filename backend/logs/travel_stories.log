@@ -1,354 +1,93 @@
-2026-08-12 00:01:31.572
-                WARN 
-                [HikariPool-1:housekeeper]
+2026-08-15 20:22:52.634
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 24.0.2 with PID 6003 (/Users/admin/Desktop/Jayesh/TravelStories/backend/target/classes started by admin in /Users/admin/Desktop/Jayesh/TravelStories/backend)
+2026-08-15 20:22:52.635
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-15 20:22:52.636
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-15 20:22:53.624
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-15 20:22:53.625
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-15 20:22:53.625
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-15 20:22:53.858
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-15 20:22:53.858
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-15 20:22:54.297
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-15 20:22:54.544
+                INFO 
+                [main]
                 com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m38s979ms).
-2026-08-12 00:08:34.830
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2e2cd42c
+2026-08-15 20:22:54.545
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-15 20:22:57.098
                 WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m3s257ms).
-2026-08-12 00:13:58.726
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m23s897ms).
-2026-08-12 00:20:31.508
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m32s782ms).
-2026-08-12 00:24:16.375
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m44s867ms).
-2026-08-12 00:25:35.251
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m18s876ms).
-2026-08-12 00:30:47.261
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m12s10ms).
-2026-08-12 00:31:34.824
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47s563ms).
-2026-08-12 00:37:25.944
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m51s120ms).
-2026-08-12 00:40:36.735
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m10s791ms).
-2026-08-12 00:43:10.735
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m3s995ms).
-2026-08-12 00:47:06.427
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m55s692ms).
-2026-08-12 00:50:24.470
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m38s160ms).
-2026-08-12 00:54:22.377
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m57s907ms).
-2026-08-12 00:56:13.195
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m50s818ms).
-2026-08-12 01:01:05.901
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m52s706ms).
-2026-08-12 01:04:03.750
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m57s849ms).
-2026-08-12 01:49:36.880
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=45m2s774ms).
-2026-08-12 03:11:29.389
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h21m52s510ms).
-2026-08-12 03:43:25.344
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=31m55s955ms).
-2026-08-12 04:44:01.283
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h35s939ms).
-2026-08-12 05:01:25.258
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m53s970ms).
-2026-08-12 05:07:41.039
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m44s25ms).
-2026-08-12 05:46:28.533
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=38m47s493ms).
-2026-08-12 06:24:04.998
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=37m6s453ms).
-2026-08-12 06:43:53.447
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m48s448ms).
-2026-08-12 06:59:43.090
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m49s644ms).
-2026-08-12 07:47:27.906
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47m44s816ms).
-2026-08-12 08:48:11.761
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h43s854ms).
-2026-08-12 09:00:00.351
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m48s591ms).
-2026-08-12 09:15:35.383
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m35s32ms).
-2026-08-12 09:49:31.609
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=33m56s226ms).
-2026-08-12 10:00:29.984
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m58s375ms).
-2026-08-12 11:06:51.461
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h6m21s476ms).
-2026-08-12 11:11:43.101
-                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 762246d2-536c-4190-8158-99040fff1f05
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-15 20:22:57.303
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-15 20:22:57.322
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 5.034 seconds (process running for 5.401)
+2026-08-15 20:23:03.837
+                INFO 
                 [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:11:43.103
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:11:43.105
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:11:43.106
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:11:43.108
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:11:43.109
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:13:30.220
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:13:30.224
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:13:30.288
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:13:30.289
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:13:30.291
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:13:30.291
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:13:30.292
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:13:30.292
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:24:51.338
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:24:51.341
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:24:51.416
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:24:51.416
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:24:51.417
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:24:51.417
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:24:51.417
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:24:51.417
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:26:03.680
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:26:03.681
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:26:15.193
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:26:15.194
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:28:08.186
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-15 20:23:03.922
                 ERROR
                 [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Unexpected server error occurred
-org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'itineraryId': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: null
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.convertIfNecessary(AbstractNamedValueMethodArgumentResolver.java:295)
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:134)
-	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
-	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:230)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:180)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+                o.a.c.c.C.[.[.[.[dispatcherServlet]
+                - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.security.authentication.BadCredentialsException: Invalid or expired token
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:82)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
 	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:59)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
 	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
 	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
 	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
@@ -404,870 +143,311 @@ org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: M
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
 	at java.base/java.lang.Thread.run(Thread.java:1447)
-Caused by: java.lang.IllegalArgumentException: Invalid UUID string: null
-	at java.base/java.util.UUID.fromString1(UUID.java:285)
-	at java.base/java.util.UUID.fromString(UUID.java:263)
-	at org.springframework.beans.propertyeditors.UUIDEditor.setAsText(UUIDEditor.java:37)
-	at org.springframework.beans.TypeConverterDelegate.doConvertTextValue(TypeConverterDelegate.java:434)
-	at org.springframework.beans.TypeConverterDelegate.doConvertValue(TypeConverterDelegate.java:407)
-	at org.springframework.beans.TypeConverterDelegate.convertIfNecessary(TypeConverterDelegate.java:158)
-	at org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:75)
-	at org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:51)
-	at org.springframework.validation.DataBinder.convertIfNecessary(DataBinder.java:843)
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.convertIfNecessary(AbstractNamedValueMethodArgumentResolver.java:287)
-	... 99 common frames omitted
-2026-08-12 11:41:34.630
-                WARN 
+Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expired token
+	at org.travel_stories.security.JwtUtil.validateToken(JwtUtil.java:68)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:64)
+	... 58 common frames omitted
+2026-08-15 20:23:03.969
+                ERROR
                 [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:41:34.637
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:41:34.663
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:41:34.664
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:41:34.693
-                WARN 
+                o.a.c.c.C.[.[.[.[dispatcherServlet]
+                - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.security.authentication.BadCredentialsException: Invalid or expired token
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:82)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expired token
+	at org.travel_stories.security.JwtUtil.validateToken(JwtUtil.java:68)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:64)
+	... 58 common frames omitted
+2026-08-15 20:23:04.170
+                ERROR
+                [http-nio-8080-exec-7]
+                o.a.c.c.C.[.[.[.[dispatcherServlet]
+                - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.security.authentication.BadCredentialsException: Invalid or expired token
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:82)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expired token
+	at org.travel_stories.security.JwtUtil.validateToken(JwtUtil.java:68)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:64)
+	... 58 common frames omitted
+2026-08-15 20:23:10.397
+                ERROR
                 [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:41:34.695
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:31.453
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:47:31.465
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:35.281
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:47:35.282
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:47:35.283
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:35.283
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:35.317
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:47:35.318
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:36.996
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:47:36.998
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:37.081
-                WARN 
+                o.a.c.c.C.[.[.[.[dispatcherServlet]
+                - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.security.authentication.BadCredentialsException: Invalid or expired token
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:82)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expired token
+	at org.travel_stories.security.JwtUtil.validateToken(JwtUtil.java:68)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:64)
+	... 58 common frames omitted
+2026-08-15 20:23:11.296
+                ERROR
                 [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:47:37.081
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:47:37.081
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:47:37.082
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:37.082
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:47:37.082
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:49:54.749
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:49:54.751
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:56:58.548
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:56:58.551
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:56:59.964
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:56:59.964
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:56:59.970
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:56:59.971
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:00.009
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:57:00.010
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:28.365
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:57:28.365
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:57:28.365
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:57:28.372
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:28.372
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:28.372
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:31.697
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:57:31.697
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:57:31.697
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:57:31.698
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:31.698
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:31.698
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:33.843
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:57:33.844
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:33.844
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:57:33.845
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:57:33.845
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:57:33.845
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:58:53.590
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:58:53.590
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:58:53.592
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:58:53.592
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:58:53.598
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:58:53.599
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:59:58.701
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:59:58.705
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:59:58.801
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 11:59:58.801
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 11:59:58.801
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 11:59:58.802
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:59:58.802
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 11:59:58.802
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:01.271
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 12:00:01.271
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 12:00:01.272
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:01.272
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:01.279
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 12:00:01.281
-                WARN 
-                [http-nio-8080-exec-3]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:23.646
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 12:00:23.646
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 12:00:23.649
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:23.649
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 12:00:23.656
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 12:00:23.657
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 14:08:21.077
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m28s47ms).
-2026-08-12 14:08:23.362
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 14:08:23.366
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 14:08:27.341
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 14:08:27.345
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 14:08:27.885
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 14:08:27.887
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 14:08:28.303
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 14:08:28.304
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 14:22:09.332
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m18s216ms).
-2026-08-12 14:27:42.472
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m3s121ms).
-2026-08-12 14:43:10.251
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m27s781ms).
-2026-08-12 14:59:30.713
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m50s460ms).
-2026-08-12 15:04:43.032
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m42s313ms).
-2026-08-12 15:09:25.021
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m41s989ms).
-2026-08-12 16:37:12.615
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m16s743ms).
-2026-08-12 16:55:29.561
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 16:55:29.562
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 16:55:29.664
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 16:55:29.665
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 16:55:29.671
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 16:55:29.672
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 16:55:29.673
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 16:55:29.673
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:02:54.258
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:02:54.274
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:02:54.389
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 17:02:54.389
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:02:54.390
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:02:54.390
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:02:54.453
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 17:02:54.454
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:13.315
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 17:03:13.316
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 17:03:13.317
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:13.318
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:13.323
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:03:13.324
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:17.254
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 17:03:17.254
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 17:03:17.255
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:17.255
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:03:17.261
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:03:17.262
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:25:12.764
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:25:12.769
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:25:12.981
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 17:25:12.981
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:25:13.000
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 17:25:13.001
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:25:13.023
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 17:25:13.024
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 17:40:46.839
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m33s898ms).
-2026-08-12 19:14:24.947
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m37s77ms).
-2026-08-12 19:28:25.714
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 19:28:25.716
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 19:28:25.788
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=95a9b4e7-fdef-41fc-9e74-ea952ddadcd5
-2026-08-12 19:28:25.789
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=0b0b9588-c819-4c0a-ba9c-a943f16bde3f
-2026-08-12 19:28:25.789
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 19:28:25.789
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 19:28:25.794
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 19:28:25.795
-                WARN 
-                [http-nio-8080-exec-7]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-12 19:44:29.812
+                o.a.c.c.C.[.[.[.[dispatcherServlet]
+                - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.security.authentication.BadCredentialsException: Invalid or expired token
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:82)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+Caused by: org.travel_stories.exception.InvalidTokenException: Invalid or expired token
+	at org.travel_stories.security.JwtUtil.validateToken(JwtUtil.java:68)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:64)
+	... 58 common frames omitted
+2026-08-15 20:23:50.524
                 DEBUG
-                [http-nio-8080-exec-10]
+                [http-nio-8080-exec-2]
                 o.t.s.ratelimit.RateLimitingFilter
                 - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-12 19:44:29.831
+2026-08-15 20:23:50.560
                 DEBUG
-                [http-nio-8080-exec-10]
+                [http-nio-8080-exec-2]
                 o.t.service.RateLimitingService
                 - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-12 19:44:30.326
+2026-08-15 20:23:51.353
                 INFO 
-                [http-nio-8080-exec-10]
+                [http-nio-8080-exec-2]
                 o.travel_stories.service.UserService
                 - User 'Test_User' authenticated successfully
-2026-08-12 19:44:30.354
+2026-08-15 20:23:51.383
                 INFO 
-                [http-nio-8080-exec-10]
+                [http-nio-8080-exec-2]
                 o.t.service.RefreshTokenService
                 - Refresh token created for user 89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:44:50.054
-                INFO 
-                [http-nio-8080-exec-2]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:44:52.628
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:44:54.502
-                INFO 
-                [http-nio-8080-exec-8]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:44:55.212
-                INFO 
-                [http-nio-8080-exec-1]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:44:59.152
-                INFO 
-                [http-nio-8080-exec-6]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:45:08.993
-                INFO 
-                [http-nio-8080-exec-10]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:45:09.512
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:45:35.472
-                INFO 
-                [http-nio-8080-exec-2]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:45:43.374
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.SavedItineraryService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0
-2026-08-12 19:45:51.733
-                INFO 
-                [http-nio-8080-exec-6]
-                o.t.service.SavedItineraryService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 removed itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0 from saved itineraries
-2026-08-12 19:50:02.207
-                INFO 
-                [http-nio-8080-exec-5]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:03.519
-                INFO 
-                [http-nio-8080-exec-10]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:04.904
-                INFO 
-                [http-nio-8080-exec-6]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:05.703
-                INFO 
-                [http-nio-8080-exec-3]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=c6e59ec1-d7bc-46be-8db2-38d47dc1794d, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:07.085
-                INFO 
-                [http-nio-8080-exec-1]
-                o.t.service.LikedItineraryService
-                - Itinerary unliked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:07.670
-                INFO 
-                [http-nio-8080-exec-4]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=7587f5b7-f693-48bc-8afa-edf8ccf7a4d0, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:08.772
-                INFO 
-                [http-nio-8080-exec-8]
-                o.t.service.LikedItineraryService
-                - Itinerary liked: itineraryId=37d8d119-8a04-4283-9553-f1feae1bc5cf, userId=89a22df3-81ed-4e06-b148-1af73d61aba3
-2026-08-12 19:50:09.905
-                INFO 
-                [http-nio-8080-exec-2]
-                o.t.service.SavedItineraryService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 7587f5b7-f693-48bc-8afa-edf8ccf7a4d0
-2026-08-12 19:50:12.939
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.SavedItineraryService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 removed itinerary c6e59ec1-d7bc-46be-8db2-38d47dc1794d from saved itineraries
-2026-08-12 19:50:14.342
-                INFO 
-                [http-nio-8080-exec-9]
-                o.t.service.SavedItineraryService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 saved itinerary 37d8d119-8a04-4283-9553-f1feae1bc5cf
-2026-08-12 19:59:59.951
-                INFO 
-                [scheduling-1]
-                o.t.service.RefreshTokenService
-                - Deleted 1 expired refresh tokens.
-2026-08-12 20:03:20.069
-                INFO 
-                [http-nio-8080-exec-9]
-                o.t.service.FollowService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 unfollowed user 7b85c689-7838-42aa-983f-8642014624dd
-2026-08-12 20:03:26.626
-                INFO 
-                [http-nio-8080-exec-5]
-                o.t.service.FollowService
-                - User 89a22df3-81ed-4e06-b148-1af73d61aba3 followed user 7b85c689-7838-42aa-983f-8642014624dd
-2026-08-12 20:13:05.555
-                DEBUG
-                [http-nio-8080-exec-5]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-12 20:13:05.558
-                DEBUG
-                [http-nio-8080-exec-5]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-12 20:13:05.915
-                INFO 
-                [http-nio-8080-exec-5]
-                o.travel_stories.service.UserService
-                - User 'Admin' authenticated successfully
-2026-08-12 20:13:05.920
-                INFO 
-                [http-nio-8080-exec-5]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user 9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 20:13:07.458
+2026-08-15 20:23:53.398
                 WARN 
                 [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=9ffccd61-fec2-40f4-b338-c2a400b99efa
-2026-08-12 20:13:07.467
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
+                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
+                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+

@@ -22,7 +22,7 @@ import {
     updateItineraryService,
     uploadThumbnailService,
 } from "@/services/itineraryService";
-import { getFollowingService } from "@/services/userService";
+import { getFollowingService, getFollowersService } from "@/services/userService";
 import {
     createDayService,
     deleteDayService,
@@ -88,6 +88,7 @@ export default function CreateItineraryOverlay({
     const [isPublic, setIsPublic] = useState(true);
     const [days, setDays] = useState([]);
     const [followingList, setFollowingList] = useState([]);
+    const [followersList, setFollowersList] = useState([]);
     const [members, setMembers] = useState([]);
     const [memberSearch, setMemberSearch] = useState("");
     const [types, setTypes] = useState([]);
@@ -126,12 +127,17 @@ export default function CreateItineraryOverlay({
             setLoadError(null);
 
             try {
-                const [typesResult, followingResult] = await Promise.all([
-                    getItineraryTypesService(),
-                    getFollowingService({
-                        userId: user.userId,
-                    }),
-                ]);
+                const [typesResult, followingResult, followersResult] = await Promise.all(
+                    [
+                        getItineraryTypesService(),
+                        getFollowingService({
+                            userId: user.userId,
+                        }),
+                        getFollowersService({
+                            userId: user.userId,
+                        }),
+                    ],
+                );
 
                 if (cancelled) return;
 
@@ -166,6 +172,13 @@ export default function CreateItineraryOverlay({
                         followingResult.message,
                     );
                     setFollowingList([]);
+                }
+
+                if (followersResult.success) {
+                    setFollowersList(followersResult.data);
+                } else {
+                    console.error("Failed to load followers:", followersResult.message);
+                    setFollowersList([]);
                 }
 
                 /*
@@ -430,7 +443,6 @@ export default function CreateItineraryOverlay({
             let result;
 
             /*
-             * Step 1:
              * Create or update the itinerary itself.
              */
             if (isEditMode && isCreator) {
@@ -455,7 +467,6 @@ export default function CreateItineraryOverlay({
             setItineraryId(id);
 
             /*
-             * Step 2:
              * Delete resources that were removed from the editor.
              */
             await Promise.all([
@@ -480,7 +491,6 @@ export default function CreateItineraryOverlay({
             ]);
 
             /*
-             * Step 3:
              * Upload the itinerary thumbnail if a new one was selected.
              */
             if (thumbnailFile) {
@@ -499,7 +509,6 @@ export default function CreateItineraryOverlay({
             }
 
             /*
-             * Step 4:
              * Create/update days, locations and images.
              *
              * These operations remain sequential because later
@@ -600,7 +609,6 @@ export default function CreateItineraryOverlay({
             }
 
             /*
-             * Step 5:
              * Synchronize itinerary members.
              */
             const existingMembers = existingItinerary?.members || [];
@@ -706,14 +714,19 @@ export default function CreateItineraryOverlay({
         setDays(updated);
     };
 
+    // Filter to get friends only
+    const friendsList = followingList.filter(user =>
+        followersList.some(follower => follower.userId === user.userId),
+    );
+
     // Searching for members
     const filteredMembers =
         memberSearch.trim().length === 0
             ? []
-            : followingList.filter(
-                  u =>
-                      u.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
-                      !members.find(m => m.userId === u.userId),
+            : friendsList.filter(
+                  user =>
+                      user.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
+                      !members.some(member => member.userId === user.userId),
               );
 
     return (
@@ -918,7 +931,7 @@ export default function CreateItineraryOverlay({
                             />
 
                             <input
-                                placeholder="Search people you follow…"
+                                placeholder="Search friends to add..."
                                 value={memberSearch}
                                 onChange={e => setMemberSearch(e.target.value)}
                                 className={`${inputClass} pl-9`}
