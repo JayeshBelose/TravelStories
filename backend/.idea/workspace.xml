@@ -7,9 +7,7 @@
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/travel_stories.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/travel_stories.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/RefreshTokenRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/RefreshTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/RefreshTokenService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Itinerary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Itinerary.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

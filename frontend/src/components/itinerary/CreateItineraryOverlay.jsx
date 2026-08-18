@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { itinerarySchema } from "@/schemas/itinerarySchemas";
 import {
     X,
     Plus,
@@ -22,7 +25,10 @@ import {
     updateItineraryService,
     uploadThumbnailService,
 } from "@/services/itineraryService";
-import { getFollowingService, getFollowersService } from "@/services/userService";
+import {
+    getFollowingService,
+    getFollowersService,
+} from "@/services/userService";
 import {
     createDayService,
     deleteDayService,
@@ -74,17 +80,13 @@ export default function CreateItineraryOverlay({
     const isEditMode = !!existingItinerary || user?.role === "admin";
 
     const isCreator =
-        existingItinerary?.createdBy === user?.username || user?.role === "admin";
+        existingItinerary?.createdBy === user?.username ||
+        user?.role === "admin";
 
     const [itineraryId, setItineraryId] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [thumbnailPreview, setThumbnailPreview] = useState(null);
-    const [title, setTitle] = useState("");
-    const [place, setPlace] = useState("");
-    const [type, setType] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [description, setDescription] = useState("");
+
     const [isPublic, setIsPublic] = useState(true);
     const [days, setDays] = useState([]);
     const [followingList, setFollowingList] = useState([]);
@@ -101,6 +103,27 @@ export default function CreateItineraryOverlay({
     const [deletedDays, setDeletedDays] = useState([]);
     const [deletedLocations, setDeletedLocations] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        resolver: zodResolver(itinerarySchema),
+        mode: "onChange",
+        defaultValues: {
+            title: "",
+            place: "",
+            type: "",
+            startDate: "",
+            endDate: "",
+            description: "",
+        },
+    });
+
+    const titleValue = watch("title");
 
     /*
      * Cleanup thumbnail preview URL whenever it changes or
@@ -127,8 +150,8 @@ export default function CreateItineraryOverlay({
             setLoadError(null);
 
             try {
-                const [typesResult, followingResult, followersResult] = await Promise.all(
-                    [
+                const [typesResult, followingResult, followersResult] =
+                    await Promise.all([
                         getItineraryTypesService(),
                         getFollowingService({
                             userId: user.userId,
@@ -136,8 +159,7 @@ export default function CreateItineraryOverlay({
                         getFollowersService({
                             userId: user.userId,
                         }),
-                    ],
-                );
+                    ]);
 
                 if (cancelled) return;
 
@@ -177,7 +199,10 @@ export default function CreateItineraryOverlay({
                 if (followersResult.success) {
                     setFollowersList(followersResult.data);
                 } else {
-                    console.error("Failed to load followers:", followersResult.message);
+                    console.error(
+                        "Failed to load followers:",
+                        followersResult.message,
+                    );
                     setFollowersList([]);
                 }
 
@@ -232,12 +257,14 @@ export default function CreateItineraryOverlay({
 
                 const itinerary = itineraryResult.data;
 
-                setTitle(itinerary.title);
-                setPlace(itinerary.place);
-                setType(itinerary.type);
-                setStartDate(itinerary.startDate);
-                setEndDate(itinerary.endDate);
-                setDescription(itinerary.description);
+                reset({
+                    title: itinerary.title || "",
+                    place: itinerary.place || "",
+                    type: itinerary.type || "",
+                    startDate: itinerary.startDate || "",
+                    endDate: itinerary.endDate || "",
+                    description: itinerary.description || "",
+                });
                 setIsPublic(itinerary.public);
                 setMembers(itinerary.members || []);
 
@@ -247,7 +274,7 @@ export default function CreateItineraryOverlay({
                  * from being displayed/edited.
                  */
                 const loadedDays = await Promise.all(
-                    daysResult.data.map(async day => {
+                    daysResult.data.map(async (day) => {
                         const locationsResult = await getDayLocationsService({
                             dayId: day.dayId,
                         });
@@ -268,10 +295,11 @@ export default function CreateItineraryOverlay({
                         }
 
                         const loadedLocations = await Promise.all(
-                            locationsResult.data.map(async location => {
-                                const imagesResult = await getLocationImagesService({
-                                    locationId: location.locationId,
-                                });
+                            locationsResult.data.map(async (location) => {
+                                const imagesResult =
+                                    await getLocationImagesService({
+                                        locationId: location.locationId,
+                                    });
 
                                 if (cancelled) return null;
 
@@ -294,7 +322,7 @@ export default function CreateItineraryOverlay({
                                     ...location,
                                     name: location.locationName || "",
                                     address: location.locationAddress || "",
-                                    images: imagesResult.data.map(image => ({
+                                    images: imagesResult.data.map((image) => ({
                                         ...image,
                                         isNew: false,
                                         file: null,
@@ -331,12 +359,14 @@ export default function CreateItineraryOverlay({
 
     const resetForm = () => {
         setItineraryId(null);
-        setTitle("");
-        setPlace("");
-        setType("");
-        setStartDate("");
-        setEndDate("");
-        setDescription("");
+        reset({
+            title: "",
+            place: "",
+            type: "",
+            startDate: "",
+            endDate: "",
+            description: "",
+        });
         setIsPublic(true);
         setDays([]);
         setMembers([]);
@@ -363,10 +393,12 @@ export default function CreateItineraryOverlay({
         return (
             <div
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-end z-50"
-                onClick={onClose}>
+                onClick={onClose}
+            >
                 <div
                     className="bg-white w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden"
-                    onClick={e => e.stopPropagation()}>
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
                         <h2 className="text-base font-semibold text-gray-900 font-primary">
                             {isEditMode ? "Edit Itinerary" : "New Itinerary"}
@@ -376,7 +408,8 @@ export default function CreateItineraryOverlay({
                             onClick={onClose}
                             disabled={saving || loadingData}
                             aria-label="Close"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             <X size={16} />
                         </button>
                     </div>
@@ -386,7 +419,8 @@ export default function CreateItineraryOverlay({
                             <div
                                 className="flex flex-col items-center justify-center text-center px-6"
                                 role="status"
-                                aria-live="polite">
+                                aria-live="polite"
+                            >
                                 <div
                                     className="w-10 h-10 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"
                                     aria-hidden="true"
@@ -404,7 +438,7 @@ export default function CreateItineraryOverlay({
                                 message={loadError.message}
                                 onRetry={() => {
                                     setLoadError(null);
-                                    setLoadAttempt(prev => prev + 1);
+                                    setLoadAttempt((prev) => prev + 1);
                                 }}
                             />
                         )}
@@ -414,16 +448,16 @@ export default function CreateItineraryOverlay({
         );
     }
 
-    const createOrUpdateItinerary = async () => {
-        if (!title || !place || !type || !startDate || !endDate) {
-            toast.error("Please fill all required fields.");
-            return;
-        }
-
-        if (endDate < startDate) {
-            toast.error("End date cannot be before start date.");
-            return;
-        }
+    const createOrUpdateItinerary = async (data) => {
+        const itinerary = {
+            title: data.title.trim(),
+            place: data.place.trim(),
+            type: data.type,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description.trim(),
+            public: isPublic,
+        };
 
         if (saving) return;
 
@@ -470,19 +504,19 @@ export default function CreateItineraryOverlay({
              * Delete resources that were removed from the editor.
              */
             await Promise.all([
-                ...deletedImages.map(imageId =>
+                ...deletedImages.map((imageId) =>
                     deleteLocationImageService({
                         imageId,
                     }),
                 ),
 
-                ...deletedLocations.map(locationId =>
+                ...deletedLocations.map((locationId) =>
                     deleteLocationService({
                         locationId,
                     }),
                 ),
 
-                ...deletedDays.map(dayId =>
+                ...deletedDays.map((dayId) =>
                     deleteDayService({
                         itineraryId: id,
                         dayId,
@@ -616,10 +650,12 @@ export default function CreateItineraryOverlay({
             await Promise.all([
                 ...existingMembers
                     .filter(
-                        member =>
-                            !members.some(selected => selected.userId === member.userId),
+                        (member) =>
+                            !members.some(
+                                (selected) => selected.userId === member.userId,
+                            ),
                     )
-                    .map(member =>
+                    .map((member) =>
                         removeMemberService({
                             itineraryId: id,
                             userId: member.userId,
@@ -628,12 +664,12 @@ export default function CreateItineraryOverlay({
 
                 ...members
                     .filter(
-                        member =>
+                        (member) =>
                             !existingMembers.some(
-                                existing => existing.userId === member.userId,
+                                (existing) => existing.userId === member.userId,
                             ),
                     )
-                    .map(member =>
+                    .map((member) =>
                         addMemberService({
                             itineraryId: id,
                             userId: member.userId,
@@ -655,7 +691,9 @@ export default function CreateItineraryOverlay({
             setDeletedLocations([]);
             setDeletedImages([]);
 
-            toast.success(isEditMode ? "Itinerary updated!" : "Itinerary created!");
+            toast.success(
+                isEditMode ? "Itinerary updated!" : "Itinerary created!",
+            );
 
             onClose();
         } catch (err) {
@@ -667,21 +705,21 @@ export default function CreateItineraryOverlay({
     };
 
     // Remove functions
-    const removeDay = index => {
+    const removeDay = (index) => {
         const day = days[index];
 
         if (day.dayId) {
-            setDeletedDays(prev => [...prev, day.dayId]);
+            setDeletedDays((prev) => [...prev, day.dayId]);
         }
 
-        setDays(prev => prev.filter((_, i) => i !== index));
+        setDays((prev) => prev.filter((_, i) => i !== index));
     };
 
     const removeLocation = (dayIndex, locIndex) => {
         const loc = days[dayIndex].locations[locIndex];
 
         if (loc.locationId) {
-            setDeletedLocations(prev => [...prev, loc.locationId]);
+            setDeletedLocations((prev) => [...prev, loc.locationId]);
         }
 
         const updated = [...days];
@@ -699,7 +737,7 @@ export default function CreateItineraryOverlay({
         const img = updated[dayIndex].locations[locIndex].images[imgIndex];
 
         if (!img.isNew && img.imageId) {
-            setDeletedImages(prev => [...prev, img.imageId]);
+            setDeletedImages((prev) => [...prev, img.imageId]);
         }
 
         /*
@@ -707,16 +745,16 @@ export default function CreateItineraryOverlay({
          * is necessary. Its object URL is generated only during render
          * and does not need to be stored.
          */
-        updated[dayIndex].locations[locIndex].images = updated[dayIndex].locations[
-            locIndex
-        ].images.filter((_, index) => index !== imgIndex);
+        updated[dayIndex].locations[locIndex].images = updated[
+            dayIndex
+        ].locations[locIndex].images.filter((_, index) => index !== imgIndex);
 
         setDays(updated);
     };
 
     // Filter to get friends only
-    const friendsList = followingList.filter(user =>
-        followersList.some(follower => follower.userId === user.userId),
+    const friendsList = followingList.filter((user) =>
+        followersList.some((follower) => follower.userId === user.userId),
     );
 
     // Searching for members
@@ -724,18 +762,22 @@ export default function CreateItineraryOverlay({
         memberSearch.trim().length === 0
             ? []
             : friendsList.filter(
-                  user =>
-                      user.username.toLowerCase().includes(memberSearch.toLowerCase()) &&
-                      !members.some(member => member.userId === user.userId),
+                  (user) =>
+                      user.username
+                          .toLowerCase()
+                          .includes(memberSearch.toLowerCase()) &&
+                      !members.some((member) => member.userId === user.userId),
               );
 
     return (
         <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-end z-50"
-            onClick={onClose}>
+            onClick={onClose}
+        >
             <div
                 className="bg-white w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden"
-                onClick={e => e.stopPropagation()}>
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
                     <h2 className="text-base font-semibold text-gray-900 font-primary">
@@ -746,7 +788,8 @@ export default function CreateItineraryOverlay({
                         onClick={onClose}
                         disabled={saving}
                         aria-label="Close"
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         <X size={16} />
                     </button>
                 </div>
@@ -755,7 +798,8 @@ export default function CreateItineraryOverlay({
                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                     {/* Thumbnail */}
                     <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden">
-                        {(thumbnailPreview || (isEditMode && existingItinerary)) && (
+                        {(thumbnailPreview ||
+                            (isEditMode && existingItinerary)) && (
                             <div className="relative h-36 w-full">
                                 <img
                                     src={
@@ -774,7 +818,9 @@ export default function CreateItineraryOverlay({
                             <Upload size={14} className="text-gray-400" />
 
                             <span className="text-sm text-gray-500 truncate">
-                                {thumbnailFile ? thumbnailFile.name : "Upload thumbnail"}
+                                {thumbnailFile
+                                    ? thumbnailFile.name
+                                    : "Upload thumbnail"}
                             </span>
 
                             <input
@@ -782,7 +828,7 @@ export default function CreateItineraryOverlay({
                                 accept="image/*"
                                 className="hidden"
                                 disabled={saving}
-                                onChange={e => {
+                                onChange={(e) => {
                                     const file = e.target.files?.[0];
 
                                     if (!file) return;
@@ -796,7 +842,9 @@ export default function CreateItineraryOverlay({
                                     }
 
                                     setThumbnailFile(file);
-                                    setThumbnailPreview(URL.createObjectURL(file));
+                                    setThumbnailPreview(
+                                        URL.createObjectURL(file),
+                                    );
 
                                     /*
                                      * Allows selecting the same file again.
@@ -811,18 +859,39 @@ export default function CreateItineraryOverlay({
                     <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
                         <SectionLabel>Basic Info</SectionLabel>
 
+                        {/* Title */}
                         <div>
                             <FieldLabel required>Title</FieldLabel>
 
                             <input
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
+                                type="text"
                                 placeholder="e.g. Summer in Tokyo"
-                                className={inputClass}
-                                disabled={saving}
+                                {...register("title")}
+                                disabled={saving || isSubmitting}
+                                aria-invalid={errors.title ? "true" : "false"}
+                                aria-describedby={
+                                    errors.title
+                                        ? "itinerary-title-error"
+                                        : undefined
+                                }
+                                className={`${inputClass} ${
+                                    errors.title
+                                        ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                        : ""
+                                }`}
                             />
+
+                            {errors.title && (
+                                <p
+                                    id="itinerary-title-error"
+                                    className="text-xs text-red-400 mt-1"
+                                >
+                                    {errors.title.message}
+                                </p>
+                            )}
                         </div>
 
+                        {/* Place */}
                         <div>
                             <FieldLabel required>Place</FieldLabel>
 
@@ -833,24 +902,58 @@ export default function CreateItineraryOverlay({
                                 />
 
                                 <input
-                                    value={place}
-                                    onChange={e => setPlace(e.target.value)}
+                                    type="text"
                                     placeholder="City, Country"
-                                    className={`${inputClass} pl-9`}
-                                    disabled={saving}
+                                    {...register("place")}
+                                    disabled={saving || isSubmitting}
+                                    aria-invalid={
+                                        errors.place ? "true" : "false"
+                                    }
+                                    aria-describedby={
+                                        errors.place
+                                            ? "itinerary-place-error"
+                                            : undefined
+                                    }
+                                    className={`${inputClass} pl-9 ${
+                                        errors.place
+                                            ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                            : ""
+                                    }`}
                                 />
                             </div>
+
+                            {errors.place && (
+                                <p
+                                    id="itinerary-place-error"
+                                    className="text-xs text-red-400 mt-1"
+                                >
+                                    {errors.place.message}
+                                </p>
+                            )}
                         </div>
 
+                        {/* Type */}
                         <div>
                             <FieldLabel required>Type</FieldLabel>
 
                             <div className="relative">
                                 <select
-                                    value={type}
-                                    onChange={e => setType(e.target.value)}
-                                    disabled={saving}
-                                    className={`${inputClass} appearance-none pr-8`}>
+                                    {...register("type")}
+                                    disabled={saving || isSubmitting}
+                                    aria-invalid={
+                                        errors.type ? "true" : "false"
+                                    }
+                                    aria-describedby={
+                                        errors.type
+                                            ? "itinerary-type-error"
+                                            : undefined
+                                    }
+                                    className={`${inputClass} appearance-none pr-8 ${
+                                        errors.type
+                                            ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                            : ""
+                                    }`}
+                                >
                                     <option value="">Select a type</option>
 
                                     {[...types]
@@ -861,13 +964,14 @@ export default function CreateItineraryOverlay({
                                                 .localeCompare(
                                                     b.name.trim().toLowerCase(),
                                                     undefined,
-                                                    {
-                                                        sensitivity: "base",
-                                                    },
+                                                    { sensitivity: "base" },
                                                 ),
                                         )
-                                        .map(t => (
-                                            <option key={t.typeId} value={t.name}>
+                                        .map((t) => (
+                                            <option
+                                                key={t.typeId}
+                                                value={t.name}
+                                            >
                                                 {t.name}
                                             </option>
                                         ))}
@@ -878,45 +982,86 @@ export default function CreateItineraryOverlay({
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
                                 />
                             </div>
+
+                            {errors.type && (
+                                <p
+                                    id="itinerary-type-error"
+                                    className="text-xs text-red-400 mt-1"
+                                >
+                                    {errors.type.message}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                            <div>
-                                <FieldLabel required>Start Date</FieldLabel>
+                        {/* Start and End Dates */}
+                        <div>
+                            <FieldLabel required>Start Date</FieldLabel>
 
-                                <input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={e => setStartDate(e.target.value)}
-                                    className={inputClass}
-                                    disabled={saving}
-                                />
-                            </div>
+                            <input
+                                type="date"
+                                {...register("startDate")}
+                                disabled={saving || isSubmitting}
+                                className={`${inputClass} ${
+                                    errors.startDate
+                                        ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                        : ""
+                                }`}
+                            />
 
-                            <div>
-                                <FieldLabel required>End Date</FieldLabel>
-
-                                <input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={e => setEndDate(e.target.value)}
-                                    className={inputClass}
-                                    disabled={saving}
-                                />
-                            </div>
+                            {errors.startDate && (
+                                <p className="text-xs text-red-400 mt-1">
+                                    {errors.startDate.message}
+                                </p>
+                            )}
                         </div>
 
+                        <div>
+                            <FieldLabel required>End Date</FieldLabel>
+
+                            <input
+                                type="date"
+                                {...register("endDate")}
+                                disabled={saving || isSubmitting}
+                                className={`${inputClass} ${
+                                    errors.endDate
+                                        ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                        : ""
+                                }`}
+                            />
+
+                            {errors.endDate && (
+                                <p className="text-xs text-red-400 mt-1">
+                                    {errors.endDate.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Description */}
                         <div>
                             <FieldLabel>Description</FieldLabel>
 
                             <textarea
-                                value={description}
                                 rows={3}
                                 placeholder="What's this trip about?"
-                                onChange={e => setDescription(e.target.value)}
-                                className={`${inputClass} resize-none`}
-                                disabled={saving}
+                                {...register("description")}
+                                disabled={saving || isSubmitting}
+                                maxLength={500}
+                                className={`${inputClass} resize-none ${
+                                    errors.description
+                                        ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                        : ""
+                                }`}
                             />
+
+                            {errors.description && (
+                                <p className="text-xs text-red-400 mt-1">
+                                    {errors.description.message}
+                                </p>
+                            )}
+
+                            <p className="text-xs text-gray-300 mt-1 text-right">
+                                {(watch("description") || "").length} / 500
+                            </p>
                         </div>
                     </div>
 
@@ -933,7 +1078,9 @@ export default function CreateItineraryOverlay({
                             <input
                                 placeholder="Search friends to add..."
                                 value={memberSearch}
-                                onChange={e => setMemberSearch(e.target.value)}
+                                onChange={(e) =>
+                                    setMemberSearch(e.target.value)
+                                }
                                 className={`${inputClass} pl-9`}
                                 disabled={saving}
                             />
@@ -941,7 +1088,7 @@ export default function CreateItineraryOverlay({
 
                         {filteredMembers.length > 0 && (
                             <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden">
-                                {filteredMembers.map(member => (
+                                {filteredMembers.map((member) => (
                                     <button
                                         key={member.userId}
                                         type="button"
@@ -950,7 +1097,8 @@ export default function CreateItineraryOverlay({
                                             setMemberSearch("");
                                         }}
                                         disabled={saving}
-                                        className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left disabled:opacity-50 disabled:cursor-not-allowed">
+                                        className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
                                         <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
                                             <img
                                                 src={`${import.meta.env.VITE_API_BASE_URL}/users/${member.userId}/profilePicture`}
@@ -967,10 +1115,11 @@ export default function CreateItineraryOverlay({
 
                         {members.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3">
-                                {members.map(member => (
+                                {members.map((member) => (
                                     <span
                                         key={member.userId}
-                                        className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                        className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full"
+                                    >
                                         {member.username}
 
                                         <button
@@ -978,13 +1127,16 @@ export default function CreateItineraryOverlay({
                                             onClick={() =>
                                                 setMembers(
                                                     members.filter(
-                                                        m => m.userId !== member.userId,
+                                                        (m) =>
+                                                            m.userId !==
+                                                            member.userId,
                                                     ),
                                                 )
                                             }
                                             disabled={saving}
                                             aria-label={`Remove ${member.username}`}
-                                            className="text-gray-400 hover:text-gray-700 cursor-pointer disabled:cursor-not-allowed">
+                                            className="text-gray-400 hover:text-gray-700 cursor-pointer disabled:cursor-not-allowed"
+                                        >
                                             <X size={11} />
                                         </button>
                                     </span>
@@ -1010,7 +1162,8 @@ export default function CreateItineraryOverlay({
                                     ])
                                 }
                                 disabled={saving}
-                                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
                                 <Plus size={12} />
                                 Add Day
                             </button>
@@ -1020,7 +1173,8 @@ export default function CreateItineraryOverlay({
                             {days.map((day, dayIndex) => (
                                 <div
                                     key={day.dayId ?? `day-${dayIndex}`}
-                                    className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                                    className="bg-white border border-gray-100 rounded-2xl overflow-hidden"
+                                >
                                     {/* Day header */}
                                     <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
@@ -1032,7 +1186,8 @@ export default function CreateItineraryOverlay({
                                             onClick={() => removeDay(dayIndex)}
                                             disabled={saving}
                                             aria-label={`Remove day ${dayIndex + 1}`}
-                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
                                             <Trash size={12} />
                                         </button>
                                     </div>
@@ -1042,7 +1197,7 @@ export default function CreateItineraryOverlay({
                                             value={day.description}
                                             placeholder="Notes for this day…"
                                             rows={2}
-                                            onChange={e => {
+                                            onChange={(e) => {
                                                 const updated = [...days];
 
                                                 updated[dayIndex] = {
@@ -1061,206 +1216,279 @@ export default function CreateItineraryOverlay({
                                             {day.locationsLoadError && (
                                                 <div
                                                     role="alert"
-                                                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-600">
-                                                    Some locations could not be loaded.
-                                                    You can continue editing the
-                                                    itinerary, but those locations may
-                                                    need to be added again.
+                                                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-600"
+                                                >
+                                                    Some locations could not be
+                                                    loaded. You can continue
+                                                    editing the itinerary, but
+                                                    those locations may need to
+                                                    be added again.
                                                 </div>
                                             )}
-                                            {day.locations?.map((loc, locIndex) => (
-                                                <div
-                                                    key={
-                                                        loc.locationId ??
-                                                        `loc-${locIndex}`
-                                                    }
-                                                    className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2">
-                                                    <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                                                        <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-                                                            {locIndex + 1}
-                                                        </span>
+                                            {day.locations?.map(
+                                                (loc, locIndex) => (
+                                                    <div
+                                                        key={
+                                                            loc.locationId ??
+                                                            `loc-${locIndex}`
+                                                        }
+                                                        className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2"
+                                                    >
+                                                        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+                                                            <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                                                                {locIndex + 1}
+                                                            </span>
 
-                                                        <input
-                                                            placeholder="Location name"
-                                                            value={loc.name || ""}
-                                                            onChange={e => {
-                                                                const updated = [...days];
+                                                            <input
+                                                                placeholder="Location name"
+                                                                value={
+                                                                    loc.name ||
+                                                                    ""
+                                                                }
+                                                                onChange={(
+                                                                    e,
+                                                                ) => {
+                                                                    const updated =
+                                                                        [
+                                                                            ...days,
+                                                                        ];
 
-                                                                updated[
-                                                                    dayIndex
-                                                                ].locations = updated[
-                                                                    dayIndex
-                                                                ].locations.map(
-                                                                    (item, index) =>
-                                                                        index === locIndex
-                                                                            ? {
-                                                                                  ...item,
-                                                                                  name: e
-                                                                                      .target
-                                                                                      .value,
-                                                                              }
-                                                                            : item,
-                                                                );
+                                                                    updated[
+                                                                        dayIndex
+                                                                    ].locations =
+                                                                        updated[
+                                                                            dayIndex
+                                                                        ].locations.map(
+                                                                            (
+                                                                                item,
+                                                                                index,
+                                                                            ) =>
+                                                                                index ===
+                                                                                locIndex
+                                                                                    ? {
+                                                                                          ...item,
+                                                                                          name: e
+                                                                                              .target
+                                                                                              .value,
+                                                                                      }
+                                                                                    : item,
+                                                                        );
 
-                                                                setDays(updated);
-                                                            }}
-                                                            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
-                                                            disabled={saving}
-                                                        />
+                                                                    setDays(
+                                                                        updated,
+                                                                    );
+                                                                }}
+                                                                className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
+                                                                disabled={
+                                                                    saving
+                                                                }
+                                                            />
 
-                                                        <input
-                                                            placeholder="Address"
-                                                            value={loc.address || ""}
-                                                            onChange={e => {
-                                                                const updated = [...days];
+                                                            <input
+                                                                placeholder="Address"
+                                                                value={
+                                                                    loc.address ||
+                                                                    ""
+                                                                }
+                                                                onChange={(
+                                                                    e,
+                                                                ) => {
+                                                                    const updated =
+                                                                        [
+                                                                            ...days,
+                                                                        ];
 
-                                                                updated[
-                                                                    dayIndex
-                                                                ].locations = updated[
-                                                                    dayIndex
-                                                                ].locations.map(
-                                                                    (item, index) =>
-                                                                        index === locIndex
-                                                                            ? {
-                                                                                  ...item,
-                                                                                  address:
-                                                                                      e
-                                                                                          .target
-                                                                                          .value,
-                                                                              }
-                                                                            : item,
-                                                                );
+                                                                    updated[
+                                                                        dayIndex
+                                                                    ].locations =
+                                                                        updated[
+                                                                            dayIndex
+                                                                        ].locations.map(
+                                                                            (
+                                                                                item,
+                                                                                index,
+                                                                            ) =>
+                                                                                index ===
+                                                                                locIndex
+                                                                                    ? {
+                                                                                          ...item,
+                                                                                          address:
+                                                                                              e
+                                                                                                  .target
+                                                                                                  .value,
+                                                                                      }
+                                                                                    : item,
+                                                                        );
 
-                                                                setDays(updated);
-                                                            }}
-                                                            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
-                                                            disabled={saving}
-                                                        />
+                                                                    setDays(
+                                                                        updated,
+                                                                    );
+                                                                }}
+                                                                className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
+                                                                disabled={
+                                                                    saving
+                                                                }
+                                                            />
 
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                removeLocation(
-                                                                    dayIndex,
-                                                                    locIndex,
-                                                                )
-                                                            }
-                                                            disabled={saving}
-                                                            aria-label={`Remove ${loc.name || "location"}`}
-                                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                                                            <Trash size={11} />
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Image previews */}
-                                                    {(loc.images?.length > 0 ||
-                                                        loc.imagesLoadError) && (
-                                                        <div className="space-y-2 pt-1">
-                                                            {loc.imagesLoadError && (
-                                                                <div
-                                                                    role="alert"
-                                                                    className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600">
-                                                                    Some images could not
-                                                                    be loaded. You can
-                                                                    continue editing this
-                                                                    location.
-                                                                </div>
-                                                            )}
-
-                                                            {loc.images?.length > 0 && (
-                                                                <div className="flex gap-2 flex-wrap">
-                                                                    {loc.images.map(
-                                                                        (
-                                                                            img,
-                                                                            imgIndex,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    img.imageId ??
-                                                                                    `new-${imgIndex}`
-                                                                                }
-                                                                                className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group">
-                                                                                <img
-                                                                                    src={
-                                                                                        img.isNew
-                                                                                            ? URL.createObjectURL(
-                                                                                                  img.file,
-                                                                                              )
-                                                                                            : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
-                                                                                    }
-                                                                                    alt=""
-                                                                                    className="w-full h-full object-cover"
-                                                                                />
-
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() =>
-                                                                                        removeImage(
-                                                                                            dayIndex,
-                                                                                            locIndex,
-                                                                                            imgIndex,
-                                                                                        )
-                                                                                    }
-                                                                                    disabled={
-                                                                                        saving
-                                                                                    }
-                                                                                    aria-label="Remove image"
-                                                                                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed">
-                                                                                    <Trash
-                                                                                        size={
-                                                                                            12
-                                                                                        }
-                                                                                        className="text-white"
-                                                                                    />
-                                                                                </button>
-                                                                            </div>
-                                                                        ),
-                                                                    )}
-                                                                </div>
-                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    removeLocation(
+                                                                        dayIndex,
+                                                                        locIndex,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    saving
+                                                                }
+                                                                aria-label={`Remove ${loc.name || "location"}`}
+                                                                className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                <Trash
+                                                                    size={11}
+                                                                />
+                                                            </button>
                                                         </div>
-                                                    )}
 
-                                                    {/* Upload image */}
-                                                    <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer transition-colors">
-                                                        <ImageIcon size={12} />
-                                                        Add photo
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            className="hidden"
-                                                            disabled={saving}
-                                                            onChange={e => {
-                                                                const file =
-                                                                    e.target.files?.[0];
+                                                        {/* Image previews */}
+                                                        {(loc.images?.length >
+                                                            0 ||
+                                                            loc.imagesLoadError) && (
+                                                            <div className="space-y-2 pt-1">
+                                                                {loc.imagesLoadError && (
+                                                                    <div
+                                                                        role="alert"
+                                                                        className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600"
+                                                                    >
+                                                                        Some
+                                                                        images
+                                                                        could
+                                                                        not be
+                                                                        loaded.
+                                                                        You can
+                                                                        continue
+                                                                        editing
+                                                                        this
+                                                                        location.
+                                                                    </div>
+                                                                )}
 
-                                                                if (!file) return;
+                                                                {loc.images
+                                                                    ?.length >
+                                                                    0 && (
+                                                                    <div className="flex gap-2 flex-wrap">
+                                                                        {loc.images.map(
+                                                                            (
+                                                                                img,
+                                                                                imgIndex,
+                                                                            ) => (
+                                                                                <div
+                                                                                    key={
+                                                                                        img.imageId ??
+                                                                                        `new-${imgIndex}`
+                                                                                    }
+                                                                                    className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group"
+                                                                                >
+                                                                                    <img
+                                                                                        src={
+                                                                                            img.isNew
+                                                                                                ? URL.createObjectURL(
+                                                                                                      img.file,
+                                                                                                  )
+                                                                                                : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
+                                                                                        }
+                                                                                        alt=""
+                                                                                        className="w-full h-full object-cover"
+                                                                                    />
 
-                                                                const updated = [...days];
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() =>
+                                                                                            removeImage(
+                                                                                                dayIndex,
+                                                                                                locIndex,
+                                                                                                imgIndex,
+                                                                                            )
+                                                                                        }
+                                                                                        disabled={
+                                                                                            saving
+                                                                                        }
+                                                                                        aria-label="Remove image"
+                                                                                        className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed"
+                                                                                    >
+                                                                                        <Trash
+                                                                                            size={
+                                                                                                12
+                                                                                            }
+                                                                                            className="text-white"
+                                                                                        />
+                                                                                    </button>
+                                                                                </div>
+                                                                            ),
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
 
-                                                                updated[
-                                                                    dayIndex
-                                                                ].locations[
-                                                                    locIndex
-                                                                ].images = [
-                                                                    ...updated[dayIndex]
-                                                                        .locations[
+                                                        {/* Upload image */}
+                                                        <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer transition-colors">
+                                                            <ImageIcon
+                                                                size={12}
+                                                            />
+                                                            Add photo
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                disabled={
+                                                                    saving
+                                                                }
+                                                                onChange={(
+                                                                    e,
+                                                                ) => {
+                                                                    const file =
+                                                                        e.target
+                                                                            .files?.[0];
+
+                                                                    if (!file)
+                                                                        return;
+
+                                                                    const updated =
+                                                                        [
+                                                                            ...days,
+                                                                        ];
+
+                                                                    updated[
+                                                                        dayIndex
+                                                                    ].locations[
                                                                         locIndex
-                                                                    ].images,
-                                                                    {
-                                                                        isNew: true,
-                                                                        file,
-                                                                    },
-                                                                ];
+                                                                    ].images = [
+                                                                        ...updated[
+                                                                            dayIndex
+                                                                        ]
+                                                                            .locations[
+                                                                            locIndex
+                                                                        ]
+                                                                            .images,
+                                                                        {
+                                                                            isNew: true,
+                                                                            file,
+                                                                        },
+                                                                    ];
 
-                                                                setDays(updated);
+                                                                    setDays(
+                                                                        updated,
+                                                                    );
 
-                                                                e.target.value = "";
-                                                            }}
-                                                        />
-                                                    </label>
-                                                </div>
-                                            ))}
+                                                                    e.target.value =
+                                                                        "";
+                                                                }}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                ),
+                                            )}
                                         </div>
 
                                         <button
@@ -1269,8 +1497,8 @@ export default function CreateItineraryOverlay({
                                                 const updated = [...days];
 
                                                 updated[dayIndex].locations = [
-                                                    ...(updated[dayIndex].locations ||
-                                                        []),
+                                                    ...(updated[dayIndex]
+                                                        .locations || []),
                                                     {
                                                         name: "",
                                                         address: "",
@@ -1281,7 +1509,8 @@ export default function CreateItineraryOverlay({
                                                 setDays(updated);
                                             }}
                                             disabled={saving}
-                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
                                             <Plus size={11} />
                                             Add location
                                         </button>
@@ -1304,7 +1533,8 @@ export default function CreateItineraryOverlay({
                                 isPublic
                                     ? "bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100"
                                     : "bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200"
-                            }`}>
+                            }`}
+                    >
                         {isPublic ? (
                             <>
                                 <Globe size={12} />
@@ -1323,16 +1553,23 @@ export default function CreateItineraryOverlay({
                             type="button"
                             onClick={onClose}
                             disabled={saving}
-                            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             Cancel
                         </button>
 
                         <button
                             type="button"
-                            onClick={createOrUpdateItinerary}
-                            disabled={saving}
-                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                            {saving ? "Saving…" : isEditMode ? "Update" : "Create"}
+                            onClick={handleSubmit(createOrUpdateItinerary)}
+                            disabled={saving || isSubmitting}
+                            aria-busy={saving || isSubmitting}
+                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {saving
+                                ? "Saving…"
+                                : isEditMode
+                                  ? "Update"
+                                  : "Create"}
                         </button>
                     </div>
                 </div>

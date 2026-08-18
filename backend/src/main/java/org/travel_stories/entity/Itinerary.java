@@ -58,7 +58,8 @@ public class Itinerary {
     private Thumbnail thumbnail;
 
     @Column(
-            name = "description"
+            name = "description",
+            length = 500
     )
     private String description;
 
