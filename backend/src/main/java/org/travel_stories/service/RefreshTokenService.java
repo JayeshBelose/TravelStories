@@ -14,6 +14,7 @@ import org.travel_stories.repository.RefreshTokenRepository;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -165,6 +166,32 @@ public class RefreshTokenService {
 
 
         return newToken;
+    }
+
+    @Transactional
+    public void deleteRefreshTokenByUserId(UUID userId) {
+
+        RefreshToken refreshToken =
+                refreshTokenRepository.findByUserUserId(userId)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Deletion failed. Refresh token not found."
+                            );
+
+                            return new InvalidTokenException(
+                                    "Invalid refresh token."
+                            );
+
+                        });
+
+        refreshTokenRepository.delete(refreshToken);
+
+        log.info(
+                "Deleted {} refresh token",
+                refreshToken.getRefreshTokenId()
+        );
+
     }
 
     @Transactional

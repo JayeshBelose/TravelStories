@@ -35,6 +35,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final AuthorizationService authorizationService;
     private final PasswordValidationService passwordValidationService;
+    private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -347,6 +348,7 @@ public class UserService {
     @Transactional
     public void deleteUser(UUID userId) {
         authorizationService.verifyOwnership(userId);
+        refreshTokenService.deleteRefreshTokenByUserId(userId);
         performUserDeletion(userId);
     }
 

@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Camera, Save, Trash, X, AlertTriangle, Check, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema } from "@/schemas/profileSchemas";
+import {
+    Camera,
+    Save,
+    Trash,
+    X,
+    AlertTriangle,
+    Check,
+    Loader2,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -24,25 +35,33 @@ export default function Profile() {
     const user = JSON.parse(sessionStorage.getItem("user"));
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState("");
-    const [bio, setBio] = useState("");
     const [profileImage, setProfileImage] = useState(null);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [profileImageLoading, setProfileImageLoading] = useState(true);
 
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [savingProfile, setSavingProfile] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [deletingAccount, setDeletingAccount] = useState(false);
 
-    useEffect(() => {
-        if (user) {
-            setUsername(user.username || "");
-            setBio(user.bio || "");
-        }
-    }, []);
+    const {
+        register,
+        handleSubmit,
+        watch,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        resolver: zodResolver(profileSchema),
+        mode: "onChange",
+        defaultValues: {
+            username: user?.username || "",
+            bio: user?.bio || "",
+        },
+    });
 
-    const handleImageChange = e => {
+    const usernameValue = watch("username") || "";
+    const bioValue = watch("bio") || "";
+
+    const handleImageChange = (e) => {
         const file = e.target.files[0];
 
         if (!file) return;
@@ -77,33 +96,31 @@ export default function Profile() {
         setUploadingImage(false);
     };
 
-    const handleSave = async () => {
-        if (savingProfile) return;
-
-        setSavingProfile(true);
-
+    const handleSave = async (data) => {
         const result = await updateUserProfileService({
             userId: user.userId,
-            username,
-            bio,
+            username: data.username,
+            bio: data.bio,
         });
 
         if (result.success) {
-            sessionStorage.setItem(
-                "user",
-                JSON.stringify({
-                    ...user,
-                    username,
-                    bio,
-                }),
-            );
+            const updatedUser = {
+                ...user,
+                username: data.username,
+                bio: data.bio,
+            };
+
+            sessionStorage.setItem("user", JSON.stringify(updatedUser));
 
             toast.success("Profile updated!");
+
+            reset({
+                username: data.username,
+                bio: data.bio,
+            });
         } else {
             toast.error(result.message);
         }
-
-        setSavingProfile(false);
     };
 
     const handleDelete = async () => {
@@ -159,7 +176,9 @@ export default function Profile() {
                 <h1 className="text-3xl font-bold font-primary text-gray-900 tracking-tight mb-1">
                     Profile Settings
                 </h1>
-                <p className="text-sm text-gray-400">Manage your account information</p>
+                <p className="text-sm text-gray-400">
+                    Manage your account information
+                </p>
             </div>
 
             <div className="space-y-4">
@@ -179,13 +198,15 @@ export default function Profile() {
                             <Avatar className="w-20 h-20 ring-2 ring-gray-100">
                                 <AvatarImage
                                     src={avatarSrc}
-                                    alt={username}
+                                    alt={usernameValue || "Profile picture"}
                                     onLoad={() => setProfileImageLoading(false)}
-                                    onError={() => setProfileImageLoading(false)}
+                                    onError={() =>
+                                        setProfileImageLoading(false)
+                                    }
                                 />
 
                                 <AvatarFallback className="bg-gray-900 text-white text-xl font-semibold">
-                                    {username?.[0]?.toUpperCase() || "U"}
+                                    {usernameValue?.[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                             </Avatar>
 
@@ -207,7 +228,7 @@ export default function Profile() {
 
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-900 truncate">
-                                {username}
+                                {usernameValue}
                             </p>
 
                             <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer mt-1 transition-colors">
@@ -231,7 +252,8 @@ export default function Profile() {
                                     <button
                                         onClick={handleImageUpload}
                                         disabled={uploadingImage}
-                                        className="flex items-center gap-1.5 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                        className="flex items-center gap-1.5 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
                                         {uploadingImage ? (
                                             <>
                                                 <Loader2
@@ -252,7 +274,8 @@ export default function Profile() {
                                         onClick={handleCancelImage}
                                         disabled={uploadingImage}
                                         aria-label="Cancel selected image"
-                                        className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                        className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
                                         <X size={14} />
                                     </button>
                                 </div>
@@ -262,66 +285,124 @@ export default function Profile() {
                 </div>
 
                 {/* Info Card */}
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
+                <form
+                    onSubmit={handleSubmit(handleSave)}
+                    className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5"
+                >
                     <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
                         Account Details
                     </p>
 
                     {/* Username */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label
+                            htmlFor="profile-username"
+                            className="block text-sm font-medium text-gray-700 mb-1.5"
+                        >
                             Username
                         </label>
 
                         <input
+                            id="profile-username"
                             type="text"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                            disabled={savingProfile}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                            {...register("username")}
+                            disabled={isSubmitting}
+                            aria-invalid={errors.username ? "true" : "false"}
+                            aria-describedby={
+                                errors.username
+                                    ? "profile-username-error"
+                                    : undefined
+                            }
+                            autoComplete="username"
+                            className={`w-full border rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors disabled:bg-gray-50 disabled:text-gray-400 ${
+                                errors.username
+                                    ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                    : "border-gray-200 focus:border-gray-400"
+                            }`}
                         />
+
+                        {errors.username && (
+                            <p
+                                id="profile-username-error"
+                                className="text-xs text-red-400 mt-1"
+                            >
+                                {errors.username.message}
+                            </p>
+                        )}
                     </div>
 
                     {/* Bio */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label
+                            htmlFor="profile-bio"
+                            className="block text-sm font-medium text-gray-700 mb-1.5"
+                        >
                             Bio
                         </label>
 
                         <textarea
+                            id="profile-bio"
                             rows={4}
                             placeholder="Tell us about yourself…"
-                            value={bio}
-                            onChange={e => setBio(e.target.value)}
-                            disabled={savingProfile}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors resize-none disabled:bg-gray-50 disabled:text-gray-400"
+                            {...register("bio")}
+                            disabled={isSubmitting}
+                            aria-invalid={errors.bio ? "true" : "false"}
+                            aria-describedby={
+                                errors.bio
+                                    ? "profile-bio-error"
+                                    : "profile-bio-count"
+                            }
+                            maxLength={300}
+                            className={`w-full border rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors resize-none disabled:bg-gray-50 disabled:text-gray-400 ${
+                                errors.bio
+                                    ? "border-red-300 focus:border-red-400 bg-red-50/30"
+                                    : "border-gray-200 focus:border-gray-400"
+                            }`}
                         />
 
-                        <p className="text-xs text-gray-300 mt-1 text-right">
-                            {bio.length} / 300
+                        {errors.bio && (
+                            <p
+                                id="profile-bio-error"
+                                className="text-xs text-red-400 mt-1"
+                            >
+                                {errors.bio.message}
+                            </p>
+                        )}
+
+                        <p
+                            id="profile-bio-count"
+                            className="text-xs text-gray-300 mt-1 text-right"
+                        >
+                            {bioValue.length} / 300
                         </p>
                     </div>
 
                     {/* Save */}
                     <div className="flex justify-end pt-1">
                         <button
-                            onClick={handleSave}
-                            disabled={savingProfile}
-                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                            {savingProfile ? (
+                            type="submit"
+                            disabled={isSubmitting}
+                            aria-busy={isSubmitting}
+                            className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? (
                                 <>
-                                    <Loader2 size={14} className="animate-spin" />
+                                    <Loader2
+                                        size={14}
+                                        className="animate-spin"
+                                        aria-hidden="true"
+                                    />
                                     Saving…
                                 </>
                             ) : (
                                 <>
-                                    <Save size={14} />
+                                    <Save size={14} aria-hidden="true" />
                                     Save Changes
                                 </>
                             )}
                         </button>
                     </div>
-                </div>
+                </form>
 
                 {/* Danger Zone Card */}
                 <div className="bg-white border border-red-100 rounded-2xl p-6">
@@ -336,8 +417,8 @@ export default function Profile() {
                             </h2>
 
                             <p className="text-xs text-gray-400 leading-relaxed">
-                                Once you delete your account, all your data will be
-                                permanently removed. This cannot be undone.
+                                Once you delete your account, all your data will
+                                be permanently removed. This cannot be undone.
                             </p>
                         </div>
                     </div>
@@ -345,7 +426,8 @@ export default function Profile() {
                     <button
                         onClick={() => setConfirmOpen(true)}
                         disabled={deletingAccount}
-                        className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 border border-red-200 text-sm font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 border border-red-200 text-sm font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         <Trash size={13} />
                         Delete Account
                     </button>
@@ -375,7 +457,8 @@ export default function Profile() {
                             variant="outline"
                             onClick={() => setConfirmOpen(false)}
                             disabled={deletingAccount}
-                            className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 text-sm disabled:opacity-50">
+                            className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 text-sm disabled:opacity-50"
+                        >
                             Cancel
                         </Button>
 
@@ -383,10 +466,14 @@ export default function Profile() {
                             variant="destructive"
                             onClick={handleDelete}
                             disabled={deletingAccount}
-                            className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-sm disabled:opacity-50">
+                            className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-sm disabled:opacity-50"
+                        >
                             {deletingAccount ? (
                                 <>
-                                    <Loader2 size={14} className="mr-2 animate-spin" />
+                                    <Loader2
+                                        size={14}
+                                        className="mr-2 animate-spin"
+                                    />
                                     Deleting…
                                 </>
                             ) : (

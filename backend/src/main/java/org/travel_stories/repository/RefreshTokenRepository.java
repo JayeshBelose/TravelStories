@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.entity.RefreshToken;
-import org.travel_stories.entity.User;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -16,7 +15,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
 
     Optional<RefreshToken> findByToken(String token);
 
-    void deleteByUser(User user);
+    Optional<RefreshToken> findByUserUserId(UUID userId);
 
     @Transactional
     @Modifying
