@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import {
+    Lock,
+    Eye,
+    EyeOff,
+    ArrowRight,
+    ShieldCheck,
+    Loader2,
+} from "lucide-react";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { resetPasswordSchema } from "../../schemas/authSchemas";
 import { resetPasswordService } from "@/services/authService";
 
 export default function ResetPassword() {
@@ -9,31 +19,27 @@ export default function ResetPassword() {
     const navigate = useNavigate();
     const token = searchParams.get("token");
 
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [loading, setLoading] = useState(false);
 
-    const isPasswordValid = newPassword.length === 12;
-    const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
-    const isFormValid = isPasswordValid && passwordsMatch;
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        resolver: zodResolver(resetPasswordSchema),
+        mode: "onChange",
+        defaultValues: {
+            newPassword: "",
+            confirmPassword: "",
+        },
+    });
 
-    const passwordHint = newPassword.length > 0 && !isPasswordValid;
-    const mismatchHint = confirmPassword.length > 0 && !passwordsMatch;
-
-    const handleSubmit = async e => {
-        e.preventDefault();
-
-        // Prevent duplicate submissions while the request is in progress.
-        if (!isFormValid || loading) return;
-
-        setLoading(true);
-
+    const handlePasswordReset = async (data) => {
         try {
             const result = await resetPasswordService({
                 token,
-                newPassword,
+                newPassword: data.newPassword,
             });
 
             if (result.success) {
@@ -46,8 +52,6 @@ export default function ResetPassword() {
         } catch (error) {
             console.error("Password reset failed:", error);
             toast.error("Unable to reset your password. Please try again.");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -55,6 +59,9 @@ export default function ResetPassword() {
         "w-full border rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors";
     const inputIdle = "border-gray-200 focus:border-gray-400";
     const inputError = "border-red-300 focus:border-red-400 bg-red-50/30";
+
+    const newPasswordError = Boolean(errors.newPassword);
+    const confirmPasswordError = Boolean(errors.confirmPassword);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -69,14 +76,22 @@ export default function ResetPassword() {
                         Reset password
                     </h1>
 
-                    <p className="text-sm text-gray-400">Enter your new password below</p>
+                    <p className="text-sm text-gray-400">
+                        Enter your new password below
+                    </p>
                 </div>
 
                 {/* Card */}
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4">
+                <form
+                    onSubmit={handleSubmit(handlePasswordReset)}
+                    className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4"
+                >
                     {/* New Password */}
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest">
+                        <label
+                            htmlFor="reset-new-password"
+                            className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest"
+                        >
                             New Password
                         </label>
 
@@ -87,38 +102,60 @@ export default function ResetPassword() {
                             />
 
                             <input
+                                id="reset-new-password"
                                 type={showNew ? "text" : "password"}
-                                placeholder="must be 12 characters"
-                                value={newPassword}
-                                onChange={e => setNewPassword(e.target.value)}
-                                disabled={loading}
+                                placeholder="12–16 characters"
+                                {...register("newPassword")}
+                                disabled={isSubmitting}
+                                aria-invalid={
+                                    newPasswordError ? "true" : "false"
+                                }
+                                aria-describedby={
+                                    newPasswordError
+                                        ? "reset-new-password-error"
+                                        : undefined
+                                }
+                                autoComplete="new-password"
                                 className={`${inputBase} ${
-                                    passwordHint ? inputError : inputIdle
+                                    newPasswordError ? inputError : inputIdle
                                 } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
 
                             <button
                                 type="button"
-                                onClick={() => setShowNew(v => !v)}
-                                disabled={loading}
+                                onClick={() => setShowNew((value) => !value)}
+                                disabled={isSubmitting}
                                 aria-label={
-                                    showNew ? "Hide new password" : "Show new password"
+                                    showNew
+                                        ? "Hide new password"
+                                        : "Show new password"
                                 }
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                                {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {showNew ? (
+                                    <EyeOff size={15} />
+                                ) : (
+                                    <Eye size={15} />
+                                )}
                             </button>
                         </div>
 
-                        {passwordHint && (
-                            <p className="text-xs text-red-400 mt-1">
-                                Password must be at least 12 characters
+                        {errors.newPassword && (
+                            <p
+                                id="reset-new-password-error"
+                                className="text-xs text-red-400 mt-1"
+                            >
+                                {errors.newPassword.message}
                             </p>
                         )}
                     </div>
 
                     {/* Confirm Password */}
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest">
+                        <label
+                            htmlFor="reset-confirm-password"
+                            className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest"
+                        >
                             Confirm Password
                         </label>
 
@@ -129,50 +166,71 @@ export default function ResetPassword() {
                             />
 
                             <input
+                                id="reset-confirm-password"
                                 type={showConfirm ? "text" : "password"}
                                 placeholder="Repeat your password"
-                                value={confirmPassword}
-                                onChange={e => setConfirmPassword(e.target.value)}
-                                disabled={loading}
+                                {...register("confirmPassword")}
+                                disabled={isSubmitting}
+                                aria-invalid={
+                                    confirmPasswordError ? "true" : "false"
+                                }
+                                aria-describedby={
+                                    confirmPasswordError
+                                        ? "reset-confirm-password-error"
+                                        : undefined
+                                }
+                                autoComplete="new-password"
                                 className={`${inputBase} ${
-                                    mismatchHint ? inputError : inputIdle
+                                    confirmPasswordError
+                                        ? inputError
+                                        : inputIdle
                                 } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
 
                             <button
                                 type="button"
-                                onClick={() => setShowConfirm(v => !v)}
-                                disabled={loading}
+                                onClick={() =>
+                                    setShowConfirm((value) => !value)
+                                }
+                                disabled={isSubmitting}
                                 aria-label={
                                     showConfirm
                                         ? "Hide confirm password"
                                         : "Show confirm password"
                                 }
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                                {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {showConfirm ? (
+                                    <EyeOff size={15} />
+                                ) : (
+                                    <Eye size={15} />
+                                )}
                             </button>
                         </div>
 
-                        {mismatchHint && (
-                            <p className="text-xs text-red-400 mt-1">
-                                Passwords do not match
+                        {errors.confirmPassword && (
+                            <p
+                                id="reset-confirm-password-error"
+                                className="text-xs text-red-400 mt-1"
+                            >
+                                {errors.confirmPassword.message}
                             </p>
                         )}
                     </div>
 
                     {/* Submit */}
                     <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={!isFormValid || loading}
-                        aria-busy={loading}
+                        type="submit"
+                        disabled={isSubmitting}
+                        aria-busy={isSubmitting}
                         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2
                             ${
-                                isFormValid && !loading
+                                !isSubmitting
                                     ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                                     : "bg-gray-100 text-gray-300 cursor-not-allowed"
-                            }`}>
-                        {loading ? (
+                            }`}
+                    >
+                        {isSubmitting ? (
                             <>
                                 <Loader2
                                     size={14}
@@ -188,15 +246,17 @@ export default function ResetPassword() {
                             </>
                         )}
                     </button>
-                </div>
+                </form>
 
                 {/* Back to login */}
                 <p className="text-center text-sm text-gray-400 mt-6">
                     Remember your password?{" "}
                     <button
+                        type="button"
                         onClick={() => navigate("/login")}
-                        disabled={loading}
-                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                        disabled={isSubmitting}
+                        className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                    >
                         Sign in
                     </button>
                 </p>
