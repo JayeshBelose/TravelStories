@@ -277,7 +277,16 @@ public class FileStorageService {
             Path path
     ) {
 
-        if (!path.startsWith(storagePath)) {
+        Path normalizedPath =
+                path.toAbsolutePath()
+                        .normalize();
+
+        Path normalizedStoragePath =
+                storagePath
+                        .toAbsolutePath()
+                        .normalize();
+
+        if (!normalizedPath.startsWith(normalizedStoragePath)) {
 
             log.warn(
                     "Rejected file path outside storage directory: {}",

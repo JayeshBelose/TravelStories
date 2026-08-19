@@ -7,14 +7,9 @@
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/travel_stories.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/travel_stories.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ProfilePictureController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ProfilePictureController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ThumbnailController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ThumbnailController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/ProfilePicture.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/ProfilePicture.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Thumbnail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/Thumbnail.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ProfilePictureService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ProfilePictureService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ThumbnailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ThumbnailService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/storage/FileStorageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/storage/FileStorageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,6 +46,7 @@
     "Application.Main.executor": "Run",
     "JUnit.All in backend (1).executor": "Run",
     "JUnit.RateLimitingServiceTest.executor": "Run",
+    "Maven.backend [clean].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -66,7 +62,7 @@
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.editor"
+    "settings.editor.selected.configurable": "MavenSettings"
   }
 }]]></component>
   <component name="RunManager" selected="Application.Main">

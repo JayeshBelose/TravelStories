@@ -58,50 +58,81 @@ public class ThumbnailService {
         Optional<Thumbnail> existingThumbnail =
                 thumbnailRepository.findByItineraryItineraryId(itineraryId);
 
-        String newFilePath =
-                fileStorageService.store(
-                        file,
-                        FileStorageCategory.THUMBNAIL
+        String newFilePath = null;
+
+        try {
+
+            newFilePath =
+                    fileStorageService.store(
+                            file,
+                            FileStorageCategory.THUMBNAIL
+                    );
+
+            if (existingThumbnail.isPresent()) {
+
+                Thumbnail thumbnail = existingThumbnail.get();
+
+                String oldFilePath = thumbnail.getFilePath();
+
+                thumbnail.setFilePath(newFilePath);
+                thumbnail.setContentType(detectedMimeType);
+
+                thumbnailRepository.save(thumbnail);
+
+                if (oldFilePath != null
+                        && !oldFilePath.equals(newFilePath)) {
+
+                    fileStorageService.delete(oldFilePath);
+                }
+
+                log.info(
+                        "Thumbnail updated for itinerary {}, filePath={}",
+                        itineraryId,
+                        newFilePath
                 );
 
-        if (existingThumbnail.isPresent()) {
+            } else {
 
-            Thumbnail thumbnail = existingThumbnail.get();
+                Thumbnail thumbnail = new Thumbnail();
 
-            String oldFilePath = thumbnail.getFilePath();
+                thumbnail.setFilePath(newFilePath);
+                thumbnail.setContentType(detectedMimeType);
+                thumbnail.setItinerary(itinerary);
 
-            thumbnail.setFilePath(newFilePath);
-            thumbnail.setContentType(detectedMimeType);
+                thumbnailRepository.save(thumbnail);
 
-            thumbnailRepository.save(thumbnail);
-
-            if (oldFilePath != null
-                    && !oldFilePath.equals(newFilePath)) {
-
-                fileStorageService.delete(oldFilePath);
+                log.info(
+                        "Thumbnail uploaded for itinerary {}, filePath={}",
+                        itineraryId,
+                        newFilePath
+                );
             }
 
-            log.info(
-                    "Thumbnail updated for itinerary {}, filePath={}",
-                    itineraryId,
-                    newFilePath
-            );
+        } catch (RuntimeException exception) {
 
-        } else {
+            /*
+             * If database persistence fails after the physical
+             * file has been created, clean up the newly stored file.
+             */
+            if (newFilePath != null) {
 
-            Thumbnail thumbnail = new Thumbnail();
+                try {
 
-            thumbnail.setFilePath(newFilePath);
-            thumbnail.setContentType(detectedMimeType);
-            thumbnail.setItinerary(itinerary);
+                    fileStorageService.delete(
+                            newFilePath
+                    );
 
-            thumbnailRepository.save(thumbnail);
+                } catch (RuntimeException cleanupException) {
 
-            log.info(
-                    "Thumbnail uploaded for itinerary {}, filePath={}",
-                    itineraryId,
-                    newFilePath
-            );
+                    log.error(
+                            "Failed to clean up thumbnail after upload failure: {}",
+                            newFilePath,
+                            cleanupException
+                    );
+                }
+            }
+
+            throw exception;
         }
     }
 

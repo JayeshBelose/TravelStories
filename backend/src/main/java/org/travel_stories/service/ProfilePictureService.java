@@ -57,50 +57,81 @@ public class ProfilePictureService {
         Optional<ProfilePicture> existingPfp =
                 profilePictureRepository.findByUserUserId(userId);
 
-        String newFilePath =
-                fileStorageService.store(
-                        file,
-                        FileStorageCategory.PROFILE_PICTURE
+        String newFilePath = null;
+
+        try {
+
+            newFilePath =
+                    fileStorageService.store(
+                            file,
+                            FileStorageCategory.PROFILE_PICTURE
+                    );
+
+            if (existingPfp.isPresent()) {
+
+                ProfilePicture pfp = existingPfp.get();
+
+                String oldFilePath = pfp.getFilePath();
+
+                pfp.setFilePath(newFilePath);
+                pfp.setContentType(detectedMimeType);
+
+                profilePictureRepository.save(pfp);
+
+                if (oldFilePath != null
+                        && !oldFilePath.equals(newFilePath)) {
+
+                    fileStorageService.delete(oldFilePath);
+                }
+
+                log.info(
+                        "Profile picture updated for user {}, filePath={}",
+                        userId,
+                        newFilePath
                 );
 
-        if (existingPfp.isPresent()) {
+            } else {
 
-            ProfilePicture pfp = existingPfp.get();
+                ProfilePicture pfp = new ProfilePicture();
 
-            String oldFilePath = pfp.getFilePath();
+                pfp.setFilePath(newFilePath);
+                pfp.setContentType(detectedMimeType);
+                pfp.setUser(user);
 
-            pfp.setFilePath(newFilePath);
-            pfp.setContentType(detectedMimeType);
+                profilePictureRepository.save(pfp);
 
-            profilePictureRepository.save(pfp);
-
-            if (oldFilePath != null
-                    && !oldFilePath.equals(newFilePath)) {
-
-                fileStorageService.delete(oldFilePath);
+                log.info(
+                        "Profile picture uploaded for user {}, filePath={}",
+                        userId,
+                        newFilePath
+                );
             }
 
-            log.info(
-                    "Profile picture updated for user {}, filePath={}",
-                    userId,
-                    newFilePath
-            );
+        } catch (RuntimeException exception) {
 
-        } else {
+            /*
+             * If database persistence fails after the physical
+             * file has been created, clean up the newly stored file.
+             */
+            if (newFilePath != null) {
 
-            ProfilePicture pfp = new ProfilePicture();
+                try {
 
-            pfp.setFilePath(newFilePath);
-            pfp.setContentType(detectedMimeType);
-            pfp.setUser(user);
+                    fileStorageService.delete(
+                            newFilePath
+                    );
 
-            profilePictureRepository.save(pfp);
+                } catch (RuntimeException cleanupException) {
 
-            log.info(
-                    "Profile picture uploaded for user {}, filePath={}",
-                    userId,
-                    newFilePath
-            );
+                    log.error(
+                            "Failed to clean up profile picture after upload failure: {}",
+                            newFilePath,
+                            cleanupException
+                    );
+                }
+            }
+
+            throw exception;
         }
     }
 

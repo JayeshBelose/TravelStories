@@ -864,3 +864,186 @@ This generated password is for development use only. Your security configuration
                 [main]
                 org.travel_stories.Main
                 - Started Main in 12.793 seconds (process running for 13.678)
+2026-08-19 19:14:05.612
+                INFO 
+                [http-nio-8080-exec-1]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-19 19:14:05.670
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-19 19:14:05.700
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-19 19:14:06.381
+                INFO 
+                [http-nio-8080-exec-2]
+                o.travel_stories.service.UserService
+                - User 'Test_User' authenticated successfully
+2026-08-19 19:14:06.468
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 132d6d0d-0fcc-4467-8390-6efb163939a2
+2026-08-19 19:14:08.095
+                WARN 
+                [http-nio-8080-exec-3]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=132d6d0d-0fcc-4467-8390-6efb163939a2
+2026-08-19 19:14:08.105
+                WARN 
+                [http-nio-8080-exec-3]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-19 19:14:08.541
+                WARN 
+                [http-nio-8080-exec-10]
+                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
+                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-08-19 19:14:10.099
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.service.ProfilePictureService
+                - Failed to fetch profile picture: profile picture not found, userId=132d6d0d-0fcc-4467-8390-6efb163939a2
+2026-08-19 19:14:10.101
+                WARN 
+                [http-nio-8080-exec-9]
+                o.t.exception.GlobalExceptionHandler
+                - Resource not found: Profile picture not found.
+2026-08-19 19:14:22.001
+                DEBUG
+                [http-nio-8080-exec-4]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 19:14:22.001
+                DEBUG
+                [http-nio-8080-exec-4]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-19 19:14:22.035
+                DEBUG
+                [http-nio-8080-exec-4]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 19:14:22.071
+                DEBUG
+                [http-nio-8080-exec-4]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 19:14:22.088
+                INFO 
+                [http-nio-8080-exec-4]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=PROFILE_PICTURE, path=profile-pictures/36e50fe4-16c8-48f5-be42-2613e0c445ca.png
+2026-08-19 19:14:22.088
+                INFO 
+                [http-nio-8080-exec-4]
+                o.t.service.ProfilePictureService
+                - Profile picture uploaded for user 132d6d0d-0fcc-4467-8390-6efb163939a2, filePath=profile-pictures/36e50fe4-16c8-48f5-be42-2613e0c445ca.png
+2026-08-19 19:24:04.117
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 19:24:04.121
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 19:24:09.813
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 20604 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 19:24:09.821
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 19:24:09.822
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 19:24:12.628
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 19:24:12.634
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 19:24:12.634
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 19:24:13.369
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 19:24:13.369
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 19:24:14.727
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 19:24:15.001
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 19:24:15.003
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 19:24:19.728
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 19:24:20.068
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 774ce20b-029f-48f0-aade-2c4c600e9080
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 19:24:20.874
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 19:24:20.940
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 12.164 seconds (process running for 12.977)
+2026-08-19 19:34:06.587
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 19:34:06.591
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
