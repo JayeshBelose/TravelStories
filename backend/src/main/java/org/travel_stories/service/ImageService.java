@@ -34,19 +34,6 @@ public class ImageService {
     private final FileStorageService fileStorageService;
 
 
-    @Transactional(readOnly = true)
-    public ImageResponseDto map(Image image) {
-
-        byte[] imageData =
-                getImageData(image);
-
-        return new ImageResponseDto(
-                image.getImageId(),
-                imageData
-        );
-    }
-
-
     public void uploadImage(
             UUID locationId,
             MultipartFile file
@@ -221,26 +208,25 @@ public class ImageService {
 
 
     @Transactional(readOnly = true)
-    public List<ImageResponseDto> getImagesByLocation(
-            UUID locationId
-    ) {
+    public List<ImageResponseDto> getImagesByLocation(UUID locationId) {
 
         return imageRepository
-                .findByLocationLocationIdOrderByOrderNumber(
-                        locationId
-                )
+                .findByLocationLocationIdOrderByOrderNumber(locationId)
                 .stream()
-                .map(this::map)
+                .map(image -> new ImageResponseDto(
+                        image.getImageId(),
+                        image.getContentType(),
+                        image.getOrderNumber()
+                ))
                 .toList();
     }
 
 
     @Transactional(readOnly = true)
-    public List<ImageResponseDto> getAllImages() {
+    public List<Image> getAllImages() {
 
         return imageRepository.findAll()
                 .stream()
-                .map(this::map)
                 .toList();
     }
 
@@ -264,31 +250,11 @@ public class ImageService {
 
 
     @Transactional(readOnly = true)
-    public byte[] getImageData(Image image) {
+    public Resource getImageResource(Image image) {
 
-        try {
-
-            Resource resource =
-                    fileStorageService.load(
-                            image.getFilePath()
-                    );
-
-            return resource
-                    .getInputStream()
-                    .readAllBytes();
-
-        } catch (IOException exception) {
-
-            log.error(
-                    "Failed to read image file: {}",
-                    image.getFilePath(),
-                    exception
-            );
-
-            throw new InvalidOperationException(
-                    "Unable to read image file."
-            );
-        }
+        return fileStorageService.load(
+                image.getFilePath()
+        );
     }
 
 }

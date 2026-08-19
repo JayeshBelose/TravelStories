@@ -464,16 +464,6 @@ export default function CreateItineraryOverlay({
         setSaving(true);
 
         try {
-            const itinerary = {
-                title,
-                place,
-                type,
-                startDate,
-                endDate,
-                description,
-                public: isPublic,
-            };
-
             let result;
 
             /*
@@ -510,8 +500,9 @@ export default function CreateItineraryOverlay({
                     }),
                 ),
 
-                ...deletedLocations.map((locationId) =>
+                ...deletedLocations.map(({ dayId, locationId }) =>
                     deleteLocationService({
+                        dayId,
                         locationId,
                     }),
                 ),
@@ -719,7 +710,13 @@ export default function CreateItineraryOverlay({
         const loc = days[dayIndex].locations[locIndex];
 
         if (loc.locationId) {
-            setDeletedLocations((prev) => [...prev, loc.locationId]);
+            setDeletedLocations((prev) => [
+                ...prev,
+                {
+                    dayId: days[dayIndex].dayId,
+                    locationId: loc.locationId,
+                },
+            ]);
         }
 
         const updated = [...days];

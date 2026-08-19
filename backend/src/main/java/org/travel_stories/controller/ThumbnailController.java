@@ -1,6 +1,7 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,15 +33,15 @@ public class ThumbnailController {
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> getThumbnailByItineraryId(
+    public ResponseEntity<Resource> getThumbnailByItineraryId(
             @PathVariable("itineraryId") UUID itineraryId
     ) {
 
         Thumbnail thumbnail =
                 thumbnailService.getThumbnailByItineraryId(itineraryId);
 
-        byte[] imageData =
-                thumbnailService.getThumbnailData(thumbnail);
+        Resource resource =
+                thumbnailService.getThumbnailResource(thumbnail);
 
         return ResponseEntity.ok()
                 .contentType(
@@ -48,6 +49,6 @@ public class ThumbnailController {
                                 thumbnail.getContentType()
                         )
                 )
-                .body(imageData);
+                .body(resource);
     }
 }

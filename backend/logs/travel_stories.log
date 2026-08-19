@@ -1047,3 +1047,1430 @@ This generated password is for development use only. Your security configuration
                 [SpringApplicationShutdownHook]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Shutdown completed.
+2026-08-19 20:23:47.515
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 10696 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 20:23:47.521
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 20:23:47.522
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 20:23:50.204
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:23:50.206
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 20:23:50.207
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 20:23:50.923
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 20:23:50.924
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 20:23:52.258
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 20:23:52.503
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 20:23:52.504
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 20:23:57.176
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 20:23:57.370
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 7e7b262f-ebd2-4f34-8f02-1740378d4871
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 20:23:58.043
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:23:58.084
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 11.587 seconds (process running for 12.324)
+2026-08-19 20:24:18.392
+                INFO 
+                [http-nio-8080-exec-1]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-19 20:24:18.435
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:24:18.452
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
+2026-08-19 20:24:19.072
+                WARN 
+                [http-nio-8080-exec-2]
+                o.travel_stories.service.UserService
+                - Failed login attempt: invalid password, email=testuser@gmail.com
+2026-08-19 20:24:19.072
+                WARN 
+                [http-nio-8080-exec-2]
+                o.t.exception.GlobalExceptionHandler
+                - Authentication failed: Invalid email or password
+2026-08-19 20:24:24.501
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:24:24.501
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=3
+2026-08-19 20:24:24.772
+                INFO 
+                [http-nio-8080-exec-3]
+                o.travel_stories.service.UserService
+                - User 'Test_User' authenticated successfully
+2026-08-19 20:24:24.841
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.service.RefreshTokenService
+                - Refresh token created for user 132d6d0d-0fcc-4467-8390-6efb163939a2
+2026-08-19 20:24:26.833
+                WARN 
+                [http-nio-8080-exec-10]
+                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
+                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-08-19 20:24:42.381
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:24:42.381
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-19 20:24:42.411
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:24:42.442
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/png
+2026-08-19 20:24:42.451
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=PROFILE_PICTURE, path=profile-pictures/34393c58-a167-4a3e-bcce-f266053898f1.png
+2026-08-19 20:24:42.462
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.s.storage.FileStorageService
+                - Stored file deleted: profile-pictures/36e50fe4-16c8-48f5-be42-2613e0c445ca.png
+2026-08-19 20:24:42.462
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.ProfilePictureService
+                - Profile picture updated for user 132d6d0d-0fcc-4467-8390-6efb163939a2, filePath=profile-pictures/34393c58-a167-4a3e-bcce-f266053898f1.png
+2026-08-19 20:24:55.563
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:24:55.564
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=18
+2026-08-19 20:24:55.571
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:24:55.581
+                DEBUG
+                [http-nio-8080-exec-6]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 20:24:55.581
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=PROFILE_PICTURE, path=profile-pictures/7234ba25-fcdf-4cb2-921d-da2192678a56.png
+2026-08-19 20:24:55.581
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.s.storage.FileStorageService
+                - Stored file deleted: profile-pictures/34393c58-a167-4a3e-bcce-f266053898f1.png
+2026-08-19 20:24:55.581
+                INFO 
+                [http-nio-8080-exec-6]
+                o.t.service.ProfilePictureService
+                - Profile picture updated for user 132d6d0d-0fcc-4467-8390-6efb163939a2, filePath=profile-pictures/7234ba25-fcdf-4cb2-921d-da2192678a56.png
+2026-08-19 20:31:10.942
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.service.ItineraryService
+                - Itinerary created: itineraryId=a66bfcce-3aa5-4da0-9314-c528565f448a, userId=132d6d0d-0fcc-4467-8390-6efb163939a2
+2026-08-19 20:31:10.960
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:31:10.960
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-19 20:31:10.971
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:31:10.987
+                DEBUG
+                [http-nio-8080-exec-10]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 20:31:11.008
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=THUMBNAIL, path=thumbnails/b0395969-a2db-42b8-a962-18f5aafd8597.png
+2026-08-19 20:31:11.009
+                INFO 
+                [http-nio-8080-exec-10]
+                o.t.service.ThumbnailService
+                - Thumbnail uploaded for itinerary a66bfcce-3aa5-4da0-9314-c528565f448a, filePath=thumbnails/b0395969-a2db-42b8-a962-18f5aafd8597.png
+2026-08-19 20:31:11.042
+                INFO 
+                [http-nio-8080-exec-7]
+                o.travel_stories.service.DayService
+                - Day 1 added to itinerary a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:31:11.082
+                INFO 
+                [http-nio-8080-exec-4]
+                o.t.service.LocationService
+                - Location added: locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, dayId=34101195-18e9-446a-866a-77051823d184, orderNumber=1
+2026-08-19 20:31:11.093
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:31:11.094
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=18
+2026-08-19 20:31:11.102
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:31:11.112
+                DEBUG
+                [http-nio-8080-exec-8]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 20:31:11.122
+                INFO 
+                [http-nio-8080-exec-8]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=IMAGE, path=images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png
+2026-08-19 20:31:11.127
+                INFO 
+                [http-nio-8080-exec-8]
+                o.t.service.ImageService
+                - Image uploaded: imageId=b988f1d0-17cb-410f-8267-eb4a8bcdff31, locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, orderNumber=1, filePath=images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png
+2026-08-19 20:31:11.136
+                WARN 
+                [http-nio-8080-exec-8]
+                org.hibernate.orm.jdbc.error
+                - HHH000247: ErrorCode: 0, SQLState: 23502
+2026-08-19 20:31:11.136
+                WARN 
+                [http-nio-8080-exec-8]
+                org.hibernate.orm.jdbc.error
+                - ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (b988f1d0-17cb-410f-8267-eb4a8bcdff31, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png).
+2026-08-19 20:31:11.147
+                ERROR
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Unexpected server error occurred
+org.springframework.dao.DataIntegrityViolationException: could not execute statement [ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (b988f1d0-17cb-410f-8267-eb4a8bcdff31, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png).] [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]; SQL [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]; constraint [image_data]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:557)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:794)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:757)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:687)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:408)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+	at org.travel_stories.service.ImageService$$SpringCGLIB$$0.uploadImage(<generated>)
+	at org.travel_stories.controller.ImageController.uploadImage(ImageController.java:31)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:80)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (b988f1d0-17cb-410f-8267-eb4a8bcdff31, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png).] [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]
+	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:73)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:145)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:93)
+	at org.hibernate.action.internal.EntityInsertAction.execute(EntityInsertAction.java:108)
+	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:634)
+	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:505)
+	at org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:381)
+	at org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:40)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.fireFlush(SessionImpl.java:1489)
+	at org.hibernate.internal.SessionImpl.managedFlush(SessionImpl.java:481)
+	at org.hibernate.internal.SessionImpl.flushBeforeTransactionCompletion(SessionImpl.java:2116)
+	at org.hibernate.internal.SessionImpl.beforeTransactionCompletion(SessionImpl.java:2038)
+	at org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl.beforeTransactionCompletion(JdbcCoordinatorImpl.java:410)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.beforeCompletionCallback(JdbcResourceLocalTransactionCoordinatorImpl.java:166)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commitNoRollbackOnly(JdbcResourceLocalTransactionCoordinatorImpl.java:248)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commit(JdbcResourceLocalTransactionCoordinatorImpl.java:242)
+	at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:89)
+	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:553)
+	... 108 common frames omitted
+Caused by: org.postgresql.util.PSQLException: ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (b988f1d0-17cb-410f-8267-eb4a8bcdff31, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/d8680fcc-879a-4406-bb6a-157d45c8b36b.png).
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2846)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2531)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:429)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:526)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:436)
+	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:196)
+	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:157)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 131 common frames omitted
+2026-08-19 20:32:22.841
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 20:32:22.844
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 20:32:25.699
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 25784 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 20:32:25.704
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 20:32:25.705
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 20:32:28.194
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:32:28.196
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 20:32:28.196
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 20:32:28.789
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 20:32:28.790
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 20:32:29.853
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 20:32:30.056
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 20:32:30.058
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 20:32:34.026
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 20:32:34.217
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 5f6dca36-ea99-4052-b823-20d546fb8827
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 20:32:34.921
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:32:34.974
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 10.178 seconds (process running for 11.031)
+2026-08-19 20:32:42.162
+                INFO 
+                [http-nio-8080-exec-4]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-19 20:32:54.624
+                INFO 
+                [http-nio-8080-exec-9]
+                o.t.service.ItineraryService
+                - Itinerary updated: itineraryId=a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:32:54.652
+                INFO 
+                [http-nio-8080-exec-7]
+                o.travel_stories.service.DayService
+                - Day 34101195-18e9-446a-866a-77051823d184 updated for itinerary a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:32:54.683
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.service.LocationService
+                - Location updated: locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, dayId=34101195-18e9-446a-866a-77051823d184
+2026-08-19 20:32:54.692
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:32:54.711
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-19 20:32:54.745
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:32:54.798
+                DEBUG
+                [http-nio-8080-exec-2]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 20:32:54.815
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=IMAGE, path=images/e1400498-3e93-4057-a8e2-8199df903ddb.png
+2026-08-19 20:32:54.825
+                INFO 
+                [http-nio-8080-exec-2]
+                o.t.service.ImageService
+                - Image uploaded: imageId=2aa5ea84-148d-4ee0-bfb4-c93de561f96f, locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, orderNumber=1, filePath=images/e1400498-3e93-4057-a8e2-8199df903ddb.png
+2026-08-19 20:32:54.839
+                WARN 
+                [http-nio-8080-exec-2]
+                org.hibernate.orm.jdbc.error
+                - HHH000247: ErrorCode: 0, SQLState: 23502
+2026-08-19 20:32:54.839
+                WARN 
+                [http-nio-8080-exec-2]
+                org.hibernate.orm.jdbc.error
+                - ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (2aa5ea84-148d-4ee0-bfb4-c93de561f96f, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/e1400498-3e93-4057-a8e2-8199df903ddb.png).
+2026-08-19 20:32:54.846
+                ERROR
+                [http-nio-8080-exec-2]
+                o.t.exception.GlobalExceptionHandler
+                - Unexpected server error occurred
+org.springframework.dao.DataIntegrityViolationException: could not execute statement [ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (2aa5ea84-148d-4ee0-bfb4-c93de561f96f, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/e1400498-3e93-4057-a8e2-8199df903ddb.png).] [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]; SQL [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]; constraint [image_data]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:557)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:794)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:757)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:687)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:408)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+	at org.travel_stories.service.ImageService$$SpringCGLIB$$0.uploadImage(<generated>)
+	at org.travel_stories.controller.ImageController.uploadImage(ImageController.java:31)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:80)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (2aa5ea84-148d-4ee0-bfb4-c93de561f96f, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/e1400498-3e93-4057-a8e2-8199df903ddb.png).] [insert into image (content_type,file_path,location_id,order_number,image_id) values (?,?,?,?,?)]
+	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:73)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:145)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:93)
+	at org.hibernate.action.internal.EntityInsertAction.execute(EntityInsertAction.java:108)
+	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:634)
+	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:505)
+	at org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:381)
+	at org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:40)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.fireFlush(SessionImpl.java:1489)
+	at org.hibernate.internal.SessionImpl.managedFlush(SessionImpl.java:481)
+	at org.hibernate.internal.SessionImpl.flushBeforeTransactionCompletion(SessionImpl.java:2116)
+	at org.hibernate.internal.SessionImpl.beforeTransactionCompletion(SessionImpl.java:2038)
+	at org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl.beforeTransactionCompletion(JdbcCoordinatorImpl.java:410)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.beforeCompletionCallback(JdbcResourceLocalTransactionCoordinatorImpl.java:166)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commitNoRollbackOnly(JdbcResourceLocalTransactionCoordinatorImpl.java:248)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commit(JdbcResourceLocalTransactionCoordinatorImpl.java:242)
+	at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:89)
+	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:553)
+	... 108 common frames omitted
+Caused by: org.postgresql.util.PSQLException: ERROR: null value in column "image_data" of relation "image" violates not-null constraint
+  Detail: Failing row contains (2aa5ea84-148d-4ee0-bfb4-c93de561f96f, image/jpeg, null, 1, ae33af60-52b9-4b05-a10e-f5809ea68b7c, images/e1400498-3e93-4057-a8e2-8199df903ddb.png).
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2846)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2531)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:429)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:526)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:436)
+	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:196)
+	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:157)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 131 common frames omitted
+2026-08-19 20:35:56.086
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 20:35:56.090
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 20:35:58.584
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 21888 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 20:35:58.587
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 20:35:58.588
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 20:36:01.174
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:36:01.178
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 20:36:01.179
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 20:36:01.882
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 20:36:01.882
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 20:36:02.934
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 20:36:03.143
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 20:36:03.145
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 20:36:07.372
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 20:36:07.548
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 8136ffbf-c63f-4e3d-ad62-d3cb2aaa1ee6
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 20:36:08.259
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:36:08.310
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 10.568 seconds (process running for 11.305)
+2026-08-19 20:36:47.876
+                INFO 
+                [http-nio-8080-exec-2]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-19 20:36:56.643
+                INFO 
+                [http-nio-8080-exec-1]
+                o.t.service.ItineraryService
+                - Itinerary updated: itineraryId=a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:36:56.673
+                INFO 
+                [http-nio-8080-exec-10]
+                o.travel_stories.service.DayService
+                - Day 34101195-18e9-446a-866a-77051823d184 updated for itinerary a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:36:56.705
+                INFO 
+                [http-nio-8080-exec-4]
+                o.t.service.LocationService
+                - Location updated: locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, dayId=34101195-18e9-446a-866a-77051823d184
+2026-08-19 20:36:56.713
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Applying rate limit [UPLOAD] for [0:0:0:0:0:0:0:1]
+2026-08-19 20:36:56.733
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.service.RateLimitingService
+                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=UPLOAD, RemainingTokens=19
+2026-08-19 20:36:56.753
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.service.FileValidationService
+                - Validated file extension: png
+2026-08-19 20:36:56.793
+                DEBUG
+                [http-nio-8080-exec-3]
+                o.t.service.FileValidationService
+                - File validation successful. MIME type: image/jpeg
+2026-08-19 20:36:56.816
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.s.storage.FileStorageService
+                - File stored successfully. category=IMAGE, path=images/06d4b4aa-c560-4e5a-ada2-3158b1aa4eda.png
+2026-08-19 20:36:56.823
+                INFO 
+                [http-nio-8080-exec-3]
+                o.t.service.ImageService
+                - Image uploaded: imageId=8473ac84-770d-43be-b980-c1a35a647260, locationId=ae33af60-52b9-4b05-a10e-f5809ea68b7c, orderNumber=1, filePath=images/06d4b4aa-c560-4e5a-ada2-3158b1aa4eda.png
+2026-08-19 20:37:00.897
+                ERROR
+                [http-nio-8080-exec-2]
+                o.t.exception.GlobalExceptionHandler
+                - Unexpected server error occurred
+org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:444)
+	at org.springframework.http.converter.AbstractSmartHttpMessageConverter.write(AbstractSmartHttpMessageConverter.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:343)
+	at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:261)
+	at org.springframework.web.servlet.mvc.method.annotation.ResponseEntityReturnValueHandler.handleReturnValue(ResponseEntityReturnValueHandler.java:80)
+	at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:78)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:135)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:59)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: tools.jackson.databind.DatabindException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+ at [No location information] (through reference chain: org.travel_stories.common.ApiResponse["data"]->java.util.ImmutableCollections$ListN[0]->org.travel_stories.entity.Image["location"]->org.travel_stories.entity.Location$HibernateProxy["locationNumber"])
+	at tools.jackson.databind.DatabindException.wrapWithPath(DatabindException.java:132)
+	at tools.jackson.databind.ser.std.StdSerializer.wrapAndThrow(StdSerializer.java:275)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:771)
+	at tools.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:171)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:209)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serializeContents(IndexedListSerializer.java:118)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serialize(IndexedListSerializer.java:79)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:206)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.SerializationContextExt._serialize(SerializationContextExt.java:456)
+	at tools.jackson.databind.ser.SerializationContextExt.serializeValue(SerializationContextExt.java:308)
+	at tools.jackson.databind.ObjectWriter$Prefetch.serialize(ObjectWriter.java:1365)
+	at tools.jackson.databind.ObjectWriter.writeValue(ObjectWriter.java:973)
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:436)
+	... 100 common frames omitted
+Caused by: org.hibernate.LazyInitializationException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.hibernate.proxy.AbstractLazyInitializer.initialize(AbstractLazyInitializer.java:170)
+	at org.hibernate.proxy.AbstractLazyInitializer.getImplementation(AbstractLazyInitializer.java:323)
+	at org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor.intercept(ByteBuddyInterceptor.java:42)
+	at org.hibernate.proxy.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:95)
+	at org.travel_stories.entity.Location$HibernateProxy.getLocationNumber(Unknown Source)
+	at tools.jackson.databind.ser.BeanPropertyWriter.get(BeanPropertyWriter.java:750)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:564)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:747)
+	... 114 common frames omitted
+2026-08-19 20:37:04.708
+                ERROR
+                [http-nio-8080-exec-8]
+                o.t.exception.GlobalExceptionHandler
+                - Unexpected server error occurred
+org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:444)
+	at org.springframework.http.converter.AbstractSmartHttpMessageConverter.write(AbstractSmartHttpMessageConverter.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:343)
+	at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:261)
+	at org.springframework.web.servlet.mvc.method.annotation.ResponseEntityReturnValueHandler.handleReturnValue(ResponseEntityReturnValueHandler.java:80)
+	at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:78)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:135)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:59)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: tools.jackson.databind.DatabindException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+ at [No location information] (through reference chain: org.travel_stories.common.ApiResponse["data"]->java.util.ImmutableCollections$ListN[0]->org.travel_stories.entity.Image["location"]->org.travel_stories.entity.Location$HibernateProxy["locationNumber"])
+	at tools.jackson.databind.DatabindException.wrapWithPath(DatabindException.java:132)
+	at tools.jackson.databind.ser.std.StdSerializer.wrapAndThrow(StdSerializer.java:275)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:771)
+	at tools.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:171)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:209)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serializeContents(IndexedListSerializer.java:118)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serialize(IndexedListSerializer.java:79)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:206)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.SerializationContextExt._serialize(SerializationContextExt.java:456)
+	at tools.jackson.databind.ser.SerializationContextExt.serializeValue(SerializationContextExt.java:308)
+	at tools.jackson.databind.ObjectWriter$Prefetch.serialize(ObjectWriter.java:1365)
+	at tools.jackson.databind.ObjectWriter.writeValue(ObjectWriter.java:973)
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:436)
+	... 100 common frames omitted
+Caused by: org.hibernate.LazyInitializationException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.hibernate.proxy.AbstractLazyInitializer.initialize(AbstractLazyInitializer.java:170)
+	at org.hibernate.proxy.AbstractLazyInitializer.getImplementation(AbstractLazyInitializer.java:323)
+	at org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor.intercept(ByteBuddyInterceptor.java:42)
+	at org.hibernate.proxy.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:95)
+	at org.travel_stories.entity.Location$HibernateProxy.getLocationNumber(Unknown Source)
+	at tools.jackson.databind.ser.BeanPropertyWriter.get(BeanPropertyWriter.java:750)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:564)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:747)
+	... 114 common frames omitted
+2026-08-19 20:37:10.263
+                ERROR
+                [http-nio-8080-exec-1]
+                o.t.exception.GlobalExceptionHandler
+                - Unexpected server error occurred
+org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:444)
+	at org.springframework.http.converter.AbstractSmartHttpMessageConverter.write(AbstractSmartHttpMessageConverter.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:343)
+	at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:261)
+	at org.springframework.web.servlet.mvc.method.annotation.ResponseEntityReturnValueHandler.handleReturnValue(ResponseEntityReturnValueHandler.java:80)
+	at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:78)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:135)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.travel_stories.security.ratelimit.RateLimitingFilter.doFilterInternal(RateLimitingFilter.java:59)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: tools.jackson.databind.DatabindException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+ at [No location information] (through reference chain: org.travel_stories.common.ApiResponse["data"]->java.util.ImmutableCollections$ListN[0]->org.travel_stories.entity.Image["location"]->org.travel_stories.entity.Location$HibernateProxy["locationNumber"])
+	at tools.jackson.databind.DatabindException.wrapWithPath(DatabindException.java:132)
+	at tools.jackson.databind.ser.std.StdSerializer.wrapAndThrow(StdSerializer.java:275)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:771)
+	at tools.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:171)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:209)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serializeContents(IndexedListSerializer.java:118)
+	at tools.jackson.databind.ser.jdk.IndexedListSerializer.serialize(IndexedListSerializer.java:79)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:608)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serializeNonFiltered(UnrolledBeanSerializer.java:206)
+	at tools.jackson.databind.ser.UnrolledBeanSerializer.serialize(UnrolledBeanSerializer.java:179)
+	at tools.jackson.databind.ser.SerializationContextExt._serialize(SerializationContextExt.java:456)
+	at tools.jackson.databind.ser.SerializationContextExt.serializeValue(SerializationContextExt.java:308)
+	at tools.jackson.databind.ObjectWriter$Prefetch.serialize(ObjectWriter.java:1365)
+	at tools.jackson.databind.ObjectWriter.writeValue(ObjectWriter.java:973)
+	at org.springframework.http.converter.AbstractJacksonHttpMessageConverter.writeInternal(AbstractJacksonHttpMessageConverter.java:436)
+	... 100 common frames omitted
+Caused by: org.hibernate.LazyInitializationException: Could not initialize proxy [org.travel_stories.entity.Location#ae33af60-52b9-4b05-a10e-f5809ea68b7c] - no session
+	at org.hibernate.proxy.AbstractLazyInitializer.initialize(AbstractLazyInitializer.java:170)
+	at org.hibernate.proxy.AbstractLazyInitializer.getImplementation(AbstractLazyInitializer.java:323)
+	at org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor.intercept(ByteBuddyInterceptor.java:42)
+	at org.hibernate.proxy.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:95)
+	at org.travel_stories.entity.Location$HibernateProxy.getLocationNumber(Unknown Source)
+	at tools.jackson.databind.ser.BeanPropertyWriter.get(BeanPropertyWriter.java:750)
+	at tools.jackson.databind.ser.BeanPropertyWriter.serializeAsProperty(BeanPropertyWriter.java:564)
+	at tools.jackson.databind.ser.bean.BeanSerializerBase._serializePropertiesNoView(BeanSerializerBase.java:747)
+	... 114 common frames omitted
+2026-08-19 20:45:33.165
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 20:45:33.168
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 20:45:38.240
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 8020 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 20:45:38.243
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 20:45:38.244
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 20:45:40.725
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:45:40.730
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 20:45:40.730
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 20:45:41.380
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 20:45:41.381
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 20:45:42.367
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 20:45:42.605
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 20:45:42.607
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 20:45:46.854
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 20:45:47.048
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 62c16b21-394f-4e2b-b543-3eccca771dd7
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 20:45:47.801
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 20:45:47.846
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 10.529 seconds (process running for 11.185)
+2026-08-19 20:45:57.353
+                INFO 
+                [http-nio-8080-exec-3]
+                o.a.c.c.C.[Tomcat].[localhost].[/]
+                - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-19 20:46:36.565
+                INFO 
+                [http-nio-8080-exec-7]
+                o.t.service.ItineraryService
+                - Itinerary deleted: itineraryId=a66bfcce-3aa5-4da0-9314-c528565f448a
+2026-08-19 20:52:24.329
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 20:52:24.332
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.

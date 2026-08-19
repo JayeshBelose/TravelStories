@@ -1,7 +1,9 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,9 +65,9 @@ public class ImageController {
 
 
     @GetMapping("/images")
-    public ResponseEntity<ApiResponse<List<ImageResponseDto>>> getAllImages() {
+    public ResponseEntity<ApiResponse<List<Image>>> getAllImages() {
 
-        List<ImageResponseDto> images =
+        List<Image> images =
                 imageService.getAllImages();
 
         return ResponseEntity.ok(
@@ -78,21 +80,23 @@ public class ImageController {
 
 
     @GetMapping("/images/{imageId}")
-    public ResponseEntity<byte[]> getImageById(
-            @PathVariable UUID imageId) {
+    public ResponseEntity<Resource> getImageById(
+            @PathVariable UUID imageId
+    ) {
 
         Image image =
                 imageService.getImageById(imageId);
 
-        byte[] imageData =
-                imageService.getImageData(image);
+        Resource resource =
+                imageService.getImageResource(image);
 
         return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_TYPE,
-                        image.getContentType()
+                .contentType(
+                        MediaType.parseMediaType(
+                                image.getContentType()
+                        )
                 )
-                .body(imageData);
+                .body(resource);
     }
 
 }

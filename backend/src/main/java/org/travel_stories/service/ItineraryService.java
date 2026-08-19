@@ -11,16 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.dto.MemberResponseDto;
-import org.travel_stories.entity.Itinerary;
-import org.travel_stories.entity.ItineraryType;
-import org.travel_stories.entity.User;
+import org.travel_stories.entity.*;
 import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.*;
 import org.travel_stories.security.AuthorizationService;
+import org.travel_stories.service.storage.FileStorageService;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,6 +35,9 @@ public class ItineraryService {
     private final LikedItineraryRepository likedItineraryRepository;
     private final SavedItineraryRepository savedItineraryRepository;
     private final AuthorizationService authorizationService;
+    private final ThumbnailRepository thumbnailRepository;
+    private final ImageRepository imageRepository;
+    private final FileStorageService fileStorageService;
 
 
     public ItineraryResponseDto map(Itinerary itinerary) {
@@ -136,23 +139,108 @@ public class ItineraryService {
     @Transactional
     public void deleteItineraryById(UUID itineraryId) {
 
-        Itinerary itinerary = itineraryRepository.findById(itineraryId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Itinerary not found.")
-                );
+        Itinerary itinerary =
+                itineraryRepository.findById(itineraryId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Itinerary not found."
+                                )
+                        );
 
         authorizationService.verifyOwnership(
                 itinerary.getCreatedBy().getUserId()
         );
 
-        likedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
-        savedItineraryRepository.deleteByItineraryItineraryId(itineraryId);
+        /*
+         * Collect physical file paths before deleting the
+         * itinerary and its associated entities.
+         */
+
+        List<String> imageFilePaths =
+                imageRepository.findByItineraryId(itineraryId)
+                        .stream()
+                        .map(Image::getFilePath)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+        String thumbnailFilePath =
+                thumbnailRepository
+                        .findByItineraryItineraryId(itineraryId)
+                        .map(Thumbnail::getFilePath)
+                        .orElse(null);
+
+        /*
+         * Delete database records.
+         *
+         * Cascade + orphanRemoval on Itinerary will remove
+         * the associated Days, Locations, Images and Thumbnail.
+         */
+        likedItineraryRepository.deleteByItineraryItineraryId(
+                itineraryId
+        );
+
+        savedItineraryRepository.deleteByItineraryItineraryId(
+                itineraryId
+        );
 
         itineraryRepository.delete(itinerary);
 
+        /*
+         * Force the database deletion before deleting physical
+         * files. This keeps the database and filesystem cleanup
+         * sequence explicit.
+         */
+        itineraryRepository.flush();
+
+        /*
+         * Delete physical image files.
+         */
+        for (String filePath : imageFilePaths) {
+
+            try {
+
+                fileStorageService.delete(filePath);
+
+            } catch (RuntimeException exception) {
+
+                log.error(
+                        "Failed to delete itinerary image file: {}",
+                        filePath,
+                        exception
+                );
+
+                throw exception;
+            }
+        }
+
+        /*
+         * Delete physical thumbnail file.
+         */
+        if (thumbnailFilePath != null) {
+
+            try {
+
+                fileStorageService.delete(
+                        thumbnailFilePath
+                );
+
+            } catch (RuntimeException exception) {
+
+                log.error(
+                        "Failed to delete itinerary thumbnail file: {}",
+                        thumbnailFilePath,
+                        exception
+                );
+
+                throw exception;
+            }
+        }
+
         log.info(
-                "Itinerary deleted: itineraryId={}",
-                itineraryId
+                "Itinerary deleted: itineraryId={}, imagesDeleted={}, thumbnailDeleted={}",
+                itineraryId,
+                imageFilePaths.size(),
+                thumbnailFilePath != null
         );
     }
 

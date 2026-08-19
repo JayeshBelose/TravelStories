@@ -18,4 +18,14 @@ public interface ImageRepository extends JpaRepository<Image, UUID> {
             """)
     int findNextOrderNumber(UUID locationId);
 
+    @Query("""
+        SELECT i
+        FROM Image i
+        JOIN i.location l
+        JOIN l.day d
+        WHERE d.itinerary.itineraryId = :itineraryId
+        ORDER BY l.locationId, i.orderNumber
+       """)
+    List<Image> findByItineraryId(UUID itineraryId);
+
 }

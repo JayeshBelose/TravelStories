@@ -7,9 +7,15 @@
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/travel_stories.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/travel_stories.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ImageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ImageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ProfilePictureController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ProfilePictureController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ThumbnailController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/ThumbnailController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ImageResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/dto/ImageResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/ImageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/ImageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ImageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ImageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ItineraryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ProfilePictureService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ProfilePictureService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ThumbnailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/ThumbnailService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/storage/FileStorageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/storage/FileStorageService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +53,7 @@
     "JUnit.All in backend (1).executor": "Run",
     "JUnit.RateLimitingServiceTest.executor": "Run",
     "Maven.backend [clean].executor": "Run",
+    "Maven.backend [test].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -65,6 +72,12 @@
     "settings.editor.selected.configurable": "MavenSettings"
   }
 }]]></component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean" />
+      <command value="mvn test" />
+    </option>
+  </component>
   <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
@@ -155,5 +168,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

@@ -27,7 +27,11 @@ export const createLocationService = async ({ dayId, location }) => {
     );
 };
 
-export const updateLocationService = async ({ dayId, locationId, location }) => {
+export const updateLocationService = async ({
+    dayId,
+    locationId,
+    location,
+}) => {
     return executeServiceRequest(
         () =>
             updateLocationApi({
@@ -39,10 +43,11 @@ export const updateLocationService = async ({ dayId, locationId, location }) => 
     );
 };
 
-export const deleteLocationService = async ({ locationId }) => {
+export const deleteLocationService = async ({ dayId, locationId }) => {
     return executeServiceRequest(
         () =>
             deleteLocationApi({
+                dayId,
                 locationId,
             }),
         "Failed to delete location.",

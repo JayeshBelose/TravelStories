@@ -9,5 +9,5 @@ export const createLocationApi = ({ dayId, location }) =>
 export const updateLocationApi = ({ dayId, locationId, location }) =>
     api.put(`/itineraries/days/${dayId}/locations/${locationId}`, location);
 
-export const deleteLocationApi = ({ locationId }) =>
-    api.delete(`/itineraries/days/locations/${locationId}`);
+export const deleteLocationApi = ({ dayId, locationId }) =>
+    api.delete(`/itineraries/days/${dayId}/locations/${locationId}`);

@@ -1,6 +1,7 @@
 package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +35,15 @@ public class ProfilePictureController {
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> getPfpByUser(
+    public ResponseEntity<Resource> getPfpByUser(
             @PathVariable("userId") UUID userId
     ) {
 
         ProfilePicture pfp =
                 profilePictureService.getPfpByUser(userId);
 
-        byte[] imageData =
-                profilePictureService.getProfilePictureData(pfp);
+        Resource resource =
+                profilePictureService.getProfilePictureResource(pfp);
 
         return ResponseEntity.ok()
                 .contentType(
@@ -50,6 +51,6 @@ public class ProfilePictureController {
                                 pfp.getContentType()
                         )
                 )
-                .body(imageData);
+                .body(resource);
     }
 }

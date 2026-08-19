@@ -2,6 +2,7 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -156,27 +157,11 @@ public class ThumbnailService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] getThumbnailData(Thumbnail thumbnail) {
+    public Resource getThumbnailResource(Thumbnail thumbnail) {
 
-        try {
-
-            return fileStorageService
-                    .load(thumbnail.getFilePath())
-                    .getInputStream()
-                    .readAllBytes();
-
-        } catch (IOException exception) {
-
-            log.error(
-                    "Failed to read thumbnail file: {}",
-                    thumbnail.getFilePath(),
-                    exception
-            );
-
-            throw new InvalidOperationException(
-                    "Unable to read thumbnail."
-            );
-        }
+        return fileStorageService.load(
+                thumbnail.getFilePath()
+        );
     }
 
 }

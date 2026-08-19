@@ -2,12 +2,12 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.entity.User;
-import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ProfilePictureRepository;
 import org.travel_stories.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.travel_stories.security.AuthorizationService;
 import org.travel_stories.service.storage.FileStorageCategory;
 import org.travel_stories.service.storage.FileStorageService;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -153,27 +152,11 @@ public class ProfilePictureService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] getProfilePictureData(ProfilePicture pfp) {
+    public Resource getProfilePictureResource(ProfilePicture pfp) {
 
-        try {
-
-            return fileStorageService
-                    .load(pfp.getFilePath())
-                    .getInputStream()
-                    .readAllBytes();
-
-        } catch (IOException exception) {
-
-            log.error(
-                    "Failed to read profile picture file: {}",
-                    pfp.getFilePath(),
-                    exception
-            );
-
-            throw new InvalidOperationException(
-                    "Unable to read profile picture."
-            );
-        }
+        return fileStorageService.load(
+                pfp.getFilePath()
+        );
     }
 
 }
