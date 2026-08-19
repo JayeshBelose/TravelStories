@@ -81,14 +81,18 @@ public class ImageController {
     public ResponseEntity<byte[]> getImageById(
             @PathVariable UUID imageId) {
 
-        Image image = imageService.getImageById(imageId);
+        Image image =
+                imageService.getImageById(imageId);
+
+        byte[] imageData =
+                imageService.getImageData(image);
 
         return ResponseEntity.ok()
                 .header(
                         HttpHeaders.CONTENT_TYPE,
                         image.getContentType()
                 )
-                .body(image.getImageData());
+                .body(imageData);
     }
 
 }

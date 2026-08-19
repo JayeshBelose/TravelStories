@@ -2,6 +2,7 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,8 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ImageRepository;
 import org.travel_stories.repository.LocationRepository;
 import org.travel_stories.security.AuthorizationService;
+import org.travel_stories.service.storage.FileStorageCategory;
+import org.travel_stories.service.storage.FileStorageService;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,12 +31,18 @@ public class ImageService {
     private final LocationRepository locationRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
+    private final FileStorageService fileStorageService;
 
+
+    @Transactional(readOnly = true)
     public ImageResponseDto map(Image image) {
+
+        byte[] imageData =
+                getImageData(image);
 
         return new ImageResponseDto(
                 image.getImageId(),
-                image.getImageData()
+                imageData
         );
     }
 
@@ -42,19 +51,23 @@ public class ImageService {
             UUID locationId,
             MultipartFile file
     ) {
+
         String detectedMimeType =
                 fileValidationService.validateMimeType(file);
 
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> {
-                    log.warn(
-                            "Failed to upload image. Location not found: {}",
-                            locationId
-                    );
-                    return new ResourceNotFoundException(
-                            "Location not found."
-                    );
-                });
+        Location location =
+                locationRepository.findById(locationId)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Failed to upload image. Location not found: {}",
+                                    locationId
+                            );
+
+                            return new ResourceNotFoundException(
+                                    "Location not found."
+                            );
+                        });
 
         authorizationService.verifyOwnership(
                 location.getDay()
@@ -64,53 +77,92 @@ public class ImageService {
         );
 
         int nextOrderNumber =
-                imageRepository.findNextOrderNumber(locationId) + 1;
+                imageRepository.findNextOrderNumber(
+                        locationId
+                ) + 1;
 
-        Image image = new Image();
+        String filePath = null;
 
         try {
 
-            image.setOrderNumber(nextOrderNumber);
-            image.setImageData(file.getBytes());
-            image.setContentType(detectedMimeType);
-            image.setLocation(location);
+            filePath =
+                    fileStorageService.store(
+                            file,
+                            FileStorageCategory.IMAGE
+                    );
 
-        } catch (IOException exception) {
+            Image image = new Image();
 
-            log.error(
-                    "Failed to read image file for location {}",
+            image.setOrderNumber(
+                    nextOrderNumber
+            );
+
+            image.setFilePath(
+                    filePath
+            );
+
+            image.setContentType(
+                    detectedMimeType
+            );
+
+            image.setLocation(
+                    location
+            );
+
+            imageRepository.save(image);
+
+            log.info(
+                    "Image uploaded: imageId={}, locationId={}, orderNumber={}, filePath={}",
+                    image.getImageId(),
                     locationId,
-                    exception
+                    nextOrderNumber,
+                    filePath
             );
 
-            throw new InvalidOperationException(
-                    "Unable to process image file."
-            );
+        } catch (RuntimeException exception) {
+
+            /*
+             * If database persistence fails after the physical
+             * file has been created, clean up the orphaned file.
+             */
+            if (filePath != null) {
+
+                try {
+
+                    fileStorageService.delete(
+                            filePath
+                    );
+
+                } catch (RuntimeException cleanupException) {
+
+                    log.error(
+                            "Failed to clean up image after upload failure: {}",
+                            filePath,
+                            cleanupException
+                    );
+                }
+            }
+
+            throw exception;
         }
-
-        imageRepository.save(image);
-
-        log.info(
-                "Image uploaded: imageId={}, locationId={}, orderNumber={}",
-                image.getImageId(),
-                locationId,
-                nextOrderNumber
-        );
     }
 
 
     public void deleteImage(UUID imageId) {
 
-        Image image = imageRepository.findById(imageId)
-                .orElseThrow(() -> {
-                    log.warn(
-                            "Failed to delete image. Image not found: {}",
-                            imageId
-                    );
-                    return new ResourceNotFoundException(
-                            "Image not found."
-                    );
-                });
+        Image image =
+                imageRepository.findById(imageId)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Failed to delete image. Image not found: {}",
+                                    imageId
+                            );
+
+                            return new ResourceNotFoundException(
+                                    "Image not found."
+                            );
+                        });
 
         authorizationService.verifyOwnership(
                 image.getLocation()
@@ -120,15 +172,23 @@ public class ImageService {
                         .getUserId()
         );
 
-        int deletedImageNumber = image.getOrderNumber();
+        int deletedImageNumber =
+                image.getOrderNumber();
 
         UUID locationId =
-                image.getLocation().getLocationId();
+                image.getLocation()
+                        .getLocationId();
 
+        String filePath =
+                image.getFilePath();
 
         imageRepository.delete(image);
+
         imageRepository.flush();
 
+        fileStorageService.delete(
+                filePath
+        );
 
         List<Image> imagesToAdjust =
                 imageRepository
@@ -136,10 +196,10 @@ public class ImageService {
                                 locationId
                         );
 
-
         for (Image img : imagesToAdjust) {
 
-            if (img.getOrderNumber() > deletedImageNumber) {
+            if (img.getOrderNumber()
+                    > deletedImageNumber) {
 
                 img.setOrderNumber(
                         img.getOrderNumber() - 1
@@ -147,9 +207,9 @@ public class ImageService {
             }
         }
 
-
-        imageRepository.saveAll(imagesToAdjust);
-
+        imageRepository.saveAll(
+                imagesToAdjust
+        );
 
         log.info(
                 "Image deleted: imageId={}, locationId={}, orderNumber={}",
@@ -161,10 +221,14 @@ public class ImageService {
 
 
     @Transactional(readOnly = true)
-    public List<ImageResponseDto> getImagesByLocation(UUID locationId) {
+    public List<ImageResponseDto> getImagesByLocation(
+            UUID locationId
+    ) {
 
         return imageRepository
-                .findByLocationLocationIdOrderByOrderNumber(locationId)
+                .findByLocationLocationIdOrderByOrderNumber(
+                        locationId
+                )
                 .stream()
                 .map(this::map)
                 .toList();
@@ -186,14 +250,45 @@ public class ImageService {
 
         return imageRepository.findById(imageId)
                 .orElseThrow(() -> {
+
                     log.warn(
                             "Failed to retrieve image. Image not found: {}",
                             imageId
                     );
+
                     return new ResourceNotFoundException(
                             "Image not found."
                     );
                 });
+    }
+
+
+    @Transactional(readOnly = true)
+    public byte[] getImageData(Image image) {
+
+        try {
+
+            Resource resource =
+                    fileStorageService.load(
+                            image.getFilePath()
+                    );
+
+            return resource
+                    .getInputStream()
+                    .readAllBytes();
+
+        } catch (IOException exception) {
+
+            log.error(
+                    "Failed to read image file: {}",
+                    image.getFilePath(),
+                    exception
+            );
+
+            throw new InvalidOperationException(
+                    "Unable to read image file."
+            );
+        }
     }
 
 }

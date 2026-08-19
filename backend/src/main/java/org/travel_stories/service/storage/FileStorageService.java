@@ -20,14 +20,14 @@ import java.util.UUID;
 @Slf4j
 public class FileStorageService {
 
-    private final Path baseStoragePath;
+    private final Path storagePath;
 
     public FileStorageService(
             @Value("${app.file-storage.base-path}")
-            String baseStoragePath
+            String storagePath
     ) {
-        this.baseStoragePath =
-                Paths.get(baseStoragePath)
+        this.storagePath =
+                Paths.get(storagePath)
                         .toAbsolutePath()
                         .normalize();
 
@@ -35,11 +35,9 @@ public class FileStorageService {
     }
 
     /**
-     * Stores an uploaded file in the requested storage category.
+     * Stores a file in the requested storage category.
      *
-     * @param file uploaded multipart file
-     * @param category storage category
-     * @return relative path of the stored file
+     * @return relative path that should be stored in the database
      */
     public String store(
             MultipartFile file,
@@ -58,13 +56,14 @@ public class FileStorageService {
             );
         }
 
-        String extension = getExtension(file);
+        String extension =
+                getExtension(file);
 
         String filename =
                 UUID.randomUUID() + extension;
 
         Path categoryPath =
-                baseStoragePath
+                storagePath
                         .resolve(category.getDirectoryName())
                         .normalize();
 
@@ -79,7 +78,8 @@ public class FileStorageService {
 
             Files.createDirectories(categoryPath);
 
-            try (InputStream inputStream = file.getInputStream()) {
+            try (InputStream inputStream =
+                         file.getInputStream()) {
 
                 Files.copy(
                         inputStream,
@@ -88,7 +88,7 @@ public class FileStorageService {
             }
 
             String relativePath =
-                    baseStoragePath
+                    storagePath
                             .relativize(targetPath)
                             .toString()
                             .replace('\\', '/');
@@ -116,10 +116,7 @@ public class FileStorageService {
     }
 
     /**
-     * Loads a stored file as a Spring Resource.
-     *
-     * @param relativePath relative file path stored in the database
-     * @return file resource
+     * Loads a file using the relative path stored in the database.
      */
     public Resource load(String relativePath) {
 
@@ -157,7 +154,8 @@ public class FileStorageService {
                             filePath.toUri()
                     );
 
-            if (!resource.exists() || !resource.isReadable()) {
+            if (!resource.exists()
+                    || !resource.isReadable()) {
 
                 log.warn(
                         "Stored file is not readable: {}",
@@ -186,13 +184,13 @@ public class FileStorageService {
     }
 
     /**
-     * Deletes a stored file.
-     *
-     * @param relativePath relative file path stored in the database
+     * Deletes a file using the relative path stored in the database.
      */
     public void delete(String relativePath) {
 
-        if (relativePath == null || relativePath.isBlank()) {
+        if (relativePath == null
+                || relativePath.isBlank()) {
+
             return;
         }
 
@@ -234,14 +232,13 @@ public class FileStorageService {
     }
 
     /**
-     * Checks whether a stored file exists.
-     *
-     * @param relativePath relative file path stored in the database
-     * @return true if the file exists and is a regular file
+     * Checks whether a file exists.
      */
     public boolean exists(String relativePath) {
 
-        if (relativePath == null || relativePath.isBlank()) {
+        if (relativePath == null
+                || relativePath.isBlank()) {
+
             return false;
         }
 
@@ -252,9 +249,12 @@ public class FileStorageService {
                 && Files.isRegularFile(filePath);
     }
 
-    private Path resolveStoredPath(String relativePath) {
+    private Path resolveStoredPath(
+            String relativePath
+    ) {
 
-        if (relativePath == null || relativePath.isBlank()) {
+        if (relativePath == null
+                || relativePath.isBlank()) {
 
             throw new InvalidOperationException(
                     "File path is required."
@@ -262,18 +262,22 @@ public class FileStorageService {
         }
 
         Path resolvedPath =
-                baseStoragePath
+                storagePath
                         .resolve(relativePath)
                         .normalize();
 
-        validatePathInsideStorage(resolvedPath);
+        validatePathInsideStorage(
+                resolvedPath
+        );
 
         return resolvedPath;
     }
 
-    private void validatePathInsideStorage(Path path) {
+    private void validatePathInsideStorage(
+            Path path
+    ) {
 
-        if (!path.startsWith(baseStoragePath)) {
+        if (!path.startsWith(storagePath)) {
 
             log.warn(
                     "Rejected file path outside storage directory: {}",
@@ -286,7 +290,9 @@ public class FileStorageService {
         }
     }
 
-    private String getExtension(MultipartFile file) {
+    private String getExtension(
+            MultipartFile file
+    ) {
 
         String originalFilename =
                 file.getOriginalFilename();
@@ -315,7 +321,8 @@ public class FileStorageService {
             );
         }
 
-        return filename.substring(extensionIndex)
+        return filename
+                .substring(extensionIndex)
                 .toLowerCase();
     }
 
@@ -324,19 +331,19 @@ public class FileStorageService {
         try {
 
             Files.createDirectories(
-                    baseStoragePath
+                    storagePath
             );
 
             log.info(
                     "File storage initialized at: {}",
-                    baseStoragePath
+                    storagePath
             );
 
         } catch (IOException exception) {
 
             log.error(
                     "Failed to initialize file storage at: {}",
-                    baseStoragePath,
+                    storagePath,
                     exception
             );
 

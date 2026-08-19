@@ -34,10 +34,10 @@ public class Image {
     private Integer orderNumber;
 
     @Column(
-            name = "image_data",
+            name = "file_path",
             nullable = false
     )
-    private byte[] imageData;
+    private String filePath;
 
     @Column(
             name = "content_type",
