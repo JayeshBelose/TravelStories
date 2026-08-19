@@ -1,996 +1,180 @@
-2026-08-18 15:31:03.115
+2026-08-19 16:34:14.198
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Starting Main using Java 21.0.12 with PID 7804 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
-2026-08-18 15:31:03.119
+                - Starting Main using Java 21.0.12 with PID 6728 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 16:34:14.202
                 DEBUG
                 [main]
                 org.travel_stories.Main
                 - Running with Spring Boot v4.0.2, Spring v7.0.3
-2026-08-18 15:31:03.120
+2026-08-19 16:34:14.203
                 INFO 
                 [main]
                 org.travel_stories.Main
                 - No active profile set, falling back to 1 default profile: "default"
-2026-08-18 15:31:06.029
+2026-08-19 16:34:16.502
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Initializing ProtocolHandler ["http-nio-8080"]
-2026-08-18 15:31:06.034
+2026-08-19 16:34:16.504
                 INFO 
                 [main]
                 o.a.catalina.core.StandardService
                 - Starting service [Tomcat]
-2026-08-18 15:31:06.034
+2026-08-19 16:34:16.505
                 INFO 
                 [main]
                 o.a.catalina.core.StandardEngine
                 - Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-08-18 15:31:06.642
+2026-08-19 16:34:17.122
                 DEBUG
                 [main]
                 o.t.s.ratelimit.RateLimitingFilter
                 - Filter 'rateLimitingFilter' configured for use
-2026-08-18 15:31:06.642
+2026-08-19 16:34:17.122
                 DEBUG
                 [main]
                 o.travel_stories.security.JwtFilter
                 - Filter 'jwtFilter' configured for use
-2026-08-18 15:31:07.663
+2026-08-19 16:34:18.259
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Starting...
-2026-08-18 15:31:08.722
-                WARN 
-                [main]
-                org.hibernate.orm.jdbc.error
-                - HHH000247: ErrorCode: 0, SQLState: 08001
-2026-08-18 15:31:08.722
-                WARN 
-                [main]
-                org.hibernate.orm.jdbc.error
-                - Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.
-2026-08-18 15:31:08.725
-                WARN 
-                [main]
-                org.hibernate.orm.jdbc
-                - HHH100046: Could not obtain connection to query JDBC database metadata
-org.hibernate.exception.JDBCConnectionException: Unable to obtain isolated JDBC connection [Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.] [n/a]
-	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:80)
-	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:51)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:366)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironment(JdbcEnvironmentInitiator.java:143)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:120)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:80)
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:133)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:260)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:235)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:212)
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:44)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:251)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:203)
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:170)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1392)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.populateSessionFactoryBuilder(EntityManagerFactoryBuilderImpl.java:1472)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1454)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:433)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:416)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:409)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:976)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:620)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
-	at org.travel_stories.Main.main(Main.java:12)
-Caused by: org.postgresql.util.PSQLException: Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.
-	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:373)
-	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
-	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:290)
-	at org.postgresql.Driver.makeConnection(Driver.java:448)
-	at org.postgresql.Driver.connect(Driver.java:298)
-	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
-	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373)
-	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210)
-	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
-	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
-	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97)
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111)
-	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:508)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:48)
-	... 37 common frames omitted
-Caused by: java.net.ConnectException: Connection refused: getsockopt
-	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
-	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:694)
-	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
-	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
-	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
-	at java.base/java.net.Socket.connect(Socket.java:751)
-	at org.postgresql.core.PGStream.createSocket(PGStream.java:261)
-	at org.postgresql.core.PGStream.<init>(PGStream.java:122)
-	at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:146)
-	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:289)
-	... 51 common frames omitted
-2026-08-18 15:31:08.729
-                ERROR
-                [main]
-                o.s.o.j.LocalContainerEntityManagerFactoryBean
-                - Failed to initialize JPA EntityManagerFactory: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-2026-08-18 15:31:08.730
-                WARN 
-                [main]
-                o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext
-                - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/hibernate/autoconfigure/HibernateJpaConfiguration.class]: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-2026-08-18 15:31:08.733
-                INFO 
-                [main]
-                o.a.catalina.core.StandardService
-                - Stopping service [Tomcat]
-2026-08-18 15:31:08.755
-                ERROR
-                [main]
-                o.s.boot.SpringApplication
-                - Application run failed
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/hibernate/autoconfigure/HibernateJpaConfiguration.class]: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1817)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:976)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:620)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
-	at org.travel_stories.Main.main(Main.java:12)
-Caused by: org.hibernate.service.spi.ServiceException: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:273)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:235)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:212)
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:44)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:251)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:203)
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:170)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1392)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.populateSessionFactoryBuilder(EntityManagerFactoryBuilderImpl.java:1472)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1454)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:433)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:416)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:409)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
-	... 15 common frames omitted
-Caused by: org.hibernate.HibernateException: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.determineDialect(DialectFactoryImpl.java:190)
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.buildDialect(DialectFactoryImpl.java:86)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentWithDefaults(JdbcEnvironmentInitiator.java:200)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:452)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironment(JdbcEnvironmentInitiator.java:143)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:120)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:80)
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:133)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:260)
-	... 31 common frames omitted
-2026-08-18 15:40:43.158
-                INFO 
-                [main]
-                org.travel_stories.Main
-                - Starting Main using Java 21.0.12 with PID 13460 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
-2026-08-18 15:40:43.161
-                DEBUG
-                [main]
-                org.travel_stories.Main
-                - Running with Spring Boot v4.0.2, Spring v7.0.3
-2026-08-18 15:40:43.162
-                INFO 
-                [main]
-                org.travel_stories.Main
-                - No active profile set, falling back to 1 default profile: "default"
-2026-08-18 15:40:45.433
-                INFO 
-                [main]
-                o.a.coyote.http11.Http11NioProtocol
-                - Initializing ProtocolHandler ["http-nio-8080"]
-2026-08-18 15:40:45.436
-                INFO 
-                [main]
-                o.a.catalina.core.StandardService
-                - Starting service [Tomcat]
-2026-08-18 15:40:45.437
-                INFO 
-                [main]
-                o.a.catalina.core.StandardEngine
-                - Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-08-18 15:40:46.027
-                DEBUG
-                [main]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Filter 'rateLimitingFilter' configured for use
-2026-08-18 15:40:46.028
-                DEBUG
-                [main]
-                o.travel_stories.security.JwtFilter
-                - Filter 'jwtFilter' configured for use
-2026-08-18 15:40:47.102
-                INFO 
-                [main]
-                com.zaxxer.hikari.HikariDataSource
-                - HikariPool-1 - Starting...
-2026-08-18 15:40:47.358
+2026-08-19 16:34:18.603
                 INFO 
                 [main]
                 com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@147375b3
-2026-08-18 15:40:47.359
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5fd4e67f
+2026-08-19 16:34:18.605
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Start completed.
-2026-08-18 15:40:51.600
+2026-08-19 16:34:23.350
                 WARN 
                 [main]
                 o.s.b.s.a.UserDetailsServiceAutoConfiguration
                 - 
 
-Using generated security password: e91c9af9-9a9f-41b0-b410-71d52bc4fbe9
+Using generated security password: e94a06a3-0df9-439c-bb55-d71c808af915
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-18 15:40:52.347
+2026-08-19 16:34:24.063
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Starting ProtocolHandler ["http-nio-8080"]
-2026-08-18 15:40:52.415
+2026-08-19 16:34:24.096
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Started Main in 10.061 seconds (process running for 10.701)
-2026-08-18 16:00:00.186
+                - Started Main in 10.696 seconds (process running for 12.413)
+2026-08-19 17:00:00.165
                 INFO 
                 [scheduling-1]
                 o.t.service.RefreshTokenService
                 - Deleted 1 expired refresh tokens.
-2026-08-18 16:34:59.341
-                INFO 
-                [http-nio-8080-exec-1]
-                o.a.c.c.C.[Tomcat].[localhost].[/]
-                - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-18 16:34:59.422
-                DEBUG
-                [http-nio-8080-exec-2]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [SIGNUP] for [0:0:0:0:0:0:0:1]
-2026-08-18 16:34:59.451
-                DEBUG
-                [http-nio-8080-exec-2]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=SIGNUP, RemainingTokens=2
-2026-08-18 16:35:19.639
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-18 16:35:19.639
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-18 16:35:19.975
-                INFO 
-                [http-nio-8080-exec-4]
-                o.travel_stories.service.UserService
-                - User 'test_user' authenticated successfully
-2026-08-18 16:35:20.051
-                INFO 
-                [http-nio-8080-exec-4]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 16:35:21.631
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 16:35:21.636
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 16:35:22.066
-                WARN 
-                [http-nio-8080-exec-1]
-                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
-                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
-	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
-	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
-
-2026-08-18 17:00:00.013
-                INFO 
-                [scheduling-1]
-                o.t.service.RefreshTokenService
-                - Deleted 1 expired refresh tokens.
-2026-08-18 17:03:11.550
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [FORGOT_PASSWORD] for [0:0:0:0:0:0:0:1]
-2026-08-18 17:03:11.560
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=FORGOT_PASSWORD, RemainingTokens=2
-2026-08-18 17:03:11.570
-                INFO 
-                [http-nio-8080-exec-4]
-                o.travel_stories.service.UserService
-                - Password reset token generated for user 'test_user'
-2026-08-18 17:03:45.813
-                DEBUG
-                [http-nio-8080-exec-6]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [RESET_PASSWORD] for [0:0:0:0:0:0:0:1]
-2026-08-18 17:03:45.813
-                DEBUG
-                [http-nio-8080-exec-6]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=RESET_PASSWORD, RemainingTokens=4
-2026-08-18 17:03:46.319
-                INFO 
-                [http-nio-8080-exec-6]
-                o.travel_stories.service.UserService
-                - Password reset completed for user 'test_user'
-2026-08-18 17:03:59.656
-                DEBUG
-                [http-nio-8080-exec-7]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-18 17:03:59.660
-                DEBUG
-                [http-nio-8080-exec-7]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-18 17:03:59.929
-                INFO 
-                [http-nio-8080-exec-7]
-                o.travel_stories.service.UserService
-                - User 'test_user' authenticated successfully
-2026-08-18 17:03:59.929
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 17:04:01.460
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 17:04:01.461
-                WARN 
-                [http-nio-8080-exec-5]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:08:31.305
-                WARN 
-                [HikariPool-1:housekeeper]
-                com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h2m12s544ms399µs100ns).
-2026-08-18 18:28:47.222
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:28:47.224
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:28:48.029
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:28:48.030
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:29:26.765
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:29:26.765
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:29:28.315
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:29:28.316
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:29:55.650
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:29:55.651
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:32:58.146
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:32:58.147
-                WARN 
-                [http-nio-8080-exec-10]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:33:00.682
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:33:00.682
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:33:45.564
-                INFO 
-                [http-nio-8080-exec-9]
-                o.travel_stories.service.UserService
-                - User a574b5dd-c5ae-4539-a9f5-38e61a012f45 updated profile
-2026-08-18 18:33:51.520
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:33:51.521
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:34:15.654
-                INFO 
-                [http-nio-8080-exec-1]
-                o.travel_stories.service.UserService
-                - User a574b5dd-c5ae-4539-a9f5-38e61a012f45 deleted
-2026-08-18 18:34:15.686
-                WARN 
-                [http-nio-8080-exec-1]
-                org.hibernate.orm.jdbc.error
-                - HHH000247: ErrorCode: 0, SQLState: 23503
-2026-08-18 18:34:15.687
-                WARN 
-                [http-nio-8080-exec-1]
-                org.hibernate.orm.jdbc.error
-                - ERROR: update or delete on table "app_user" violates foreign key constraint "fk5a9ypl7oycxycfscqnsepj5t8" on table "refresh_tokens"
-  Detail: Key (user_id)=(a574b5dd-c5ae-4539-a9f5-38e61a012f45) is still referenced from table "refresh_tokens".
-2026-08-18 18:34:15.697
-                ERROR
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Unexpected server error occurred
-org.springframework.dao.DataIntegrityViolationException: could not execute statement [ERROR: update or delete on table "app_user" violates foreign key constraint "fk5a9ypl7oycxycfscqnsepj5t8" on table "refresh_tokens"
-  Detail: Key (user_id)=(a574b5dd-c5ae-4539-a9f5-38e61a012f45) is still referenced from table "refresh_tokens".] [delete from app_user where user_id=?]; SQL [delete from app_user where user_id=?]; constraint [fk5a9ypl7oycxycfscqnsepj5t8]
-	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
-	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
-	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
-	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
-	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:557)
-	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:794)
-	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:757)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:687)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:408)
-	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
-	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
-	at org.travel_stories.service.UserService$$SpringCGLIB$$0.deleteUser(<generated>)
-	at org.travel_stories.controller.UserController.deleteUser(UserController.java:68)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
-	at org.springframework.web.servlet.FrameworkServlet.doDelete(FrameworkServlet.java:925)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:651)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.travel_stories.security.JwtFilter.doFilterInternal(JwtFilter.java:88)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
-	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [ERROR: update or delete on table "app_user" violates foreign key constraint "fk5a9ypl7oycxycfscqnsepj5t8" on table "refresh_tokens"
-  Detail: Key (user_id)=(a574b5dd-c5ae-4539-a9f5-38e61a012f45) is still referenced from table "refresh_tokens".] [delete from app_user where user_id=?]
-	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:73)
-	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
-	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
-	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:145)
-	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
-	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
-	at org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:268)
-	at org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:79)
-	at org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:119)
-	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:634)
-	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:505)
-	at org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:381)
-	at org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:40)
-	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
-	at org.hibernate.internal.SessionImpl.fireFlush(SessionImpl.java:1489)
-	at org.hibernate.internal.SessionImpl.managedFlush(SessionImpl.java:481)
-	at org.hibernate.internal.SessionImpl.flushBeforeTransactionCompletion(SessionImpl.java:2116)
-	at org.hibernate.internal.SessionImpl.beforeTransactionCompletion(SessionImpl.java:2038)
-	at org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl.beforeTransactionCompletion(JdbcCoordinatorImpl.java:410)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.beforeCompletionCallback(JdbcResourceLocalTransactionCoordinatorImpl.java:166)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commitNoRollbackOnly(JdbcResourceLocalTransactionCoordinatorImpl.java:248)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commit(JdbcResourceLocalTransactionCoordinatorImpl.java:242)
-	at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:89)
-	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:553)
-	... 107 common frames omitted
-Caused by: org.postgresql.util.PSQLException: ERROR: update or delete on table "app_user" violates foreign key constraint "fk5a9ypl7oycxycfscqnsepj5t8" on table "refresh_tokens"
-  Detail: Key (user_id)=(a574b5dd-c5ae-4539-a9f5-38e61a012f45) is still referenced from table "refresh_tokens".
-	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2846)
-	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2531)
-	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:429)
-	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:526)
-	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:436)
-	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:196)
-	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:157)
-	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
-	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
-	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
-	... 128 common frames omitted
-2026-08-18 18:46:08.349
-                INFO 
-                [scheduling-1]
-                o.t.service.RefreshTokenService
-                - Deleted 1 expired refresh tokens.
-2026-08-18 18:46:08.381
+2026-08-19 17:06:25.379
                 INFO 
                 [SpringApplicationShutdownHook]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Shutdown initiated...
-2026-08-18 18:46:08.383
+2026-08-19 17:06:25.383
                 INFO 
                 [SpringApplicationShutdownHook]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Shutdown completed.
-2026-08-18 18:46:14.301
+2026-08-19 17:06:30.255
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Starting Main using Java 21.0.12 with PID 22992 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
-2026-08-18 18:46:14.306
+                - Starting Main using Java 21.0.12 with PID 16060 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 17:06:30.260
                 DEBUG
                 [main]
                 org.travel_stories.Main
                 - Running with Spring Boot v4.0.2, Spring v7.0.3
-2026-08-18 18:46:14.307
+2026-08-19 17:06:30.261
                 INFO 
                 [main]
                 org.travel_stories.Main
                 - No active profile set, falling back to 1 default profile: "default"
-2026-08-18 18:46:16.744
+2026-08-19 17:06:32.681
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Initializing ProtocolHandler ["http-nio-8080"]
-2026-08-18 18:46:16.747
+2026-08-19 17:06:32.684
                 INFO 
                 [main]
                 o.a.catalina.core.StandardService
                 - Starting service [Tomcat]
-2026-08-18 18:46:16.747
+2026-08-19 17:06:32.684
                 INFO 
                 [main]
                 o.a.catalina.core.StandardEngine
                 - Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-08-18 18:46:17.335
+2026-08-19 17:06:33.280
                 DEBUG
                 [main]
                 o.t.s.ratelimit.RateLimitingFilter
                 - Filter 'rateLimitingFilter' configured for use
-2026-08-18 18:46:17.337
+2026-08-19 17:06:33.281
                 DEBUG
                 [main]
                 o.travel_stories.security.JwtFilter
                 - Filter 'jwtFilter' configured for use
-2026-08-18 18:46:18.462
+2026-08-19 17:06:34.365
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Starting...
-2026-08-18 18:46:18.697
+2026-08-19 17:06:34.598
                 INFO 
                 [main]
                 com.zaxxer.hikari.pool.HikariPool
-                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3855b27e
-2026-08-18 18:46:18.699
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 17:06:34.600
                 INFO 
                 [main]
                 com.zaxxer.hikari.HikariDataSource
                 - HikariPool-1 - Start completed.
-2026-08-18 18:46:23.155
+2026-08-19 17:06:38.757
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects
+2026-08-19 17:06:38.858
                 WARN 
                 [main]
                 o.s.b.s.a.UserDetailsServiceAutoConfiguration
                 - 
 
-Using generated security password: e6c1e36e-0ee5-4be5-9a55-a82ba4f01db3
+Using generated security password: 131f7ed8-603a-49e8-8962-9c566c6a1362
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-18 18:46:23.842
+2026-08-19 17:06:39.563
                 INFO 
                 [main]
                 o.a.coyote.http11.Http11NioProtocol
                 - Starting ProtocolHandler ["http-nio-8080"]
-2026-08-18 18:46:23.882
+2026-08-19 17:06:39.613
                 INFO 
                 [main]
                 org.travel_stories.Main
-                - Started Main in 10.478 seconds (process running for 11.151)
-2026-08-18 18:46:28.413
+                - Started Main in 10.285 seconds (process running for 10.983)
+2026-08-19 17:09:47.768
                 INFO 
-                [http-nio-8080-exec-1]
-                o.a.c.c.C.[Tomcat].[localhost].[/]
-                - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-18 18:46:28.614
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:46:28.618
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:46:34.049
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.service.RefreshTokenService
-                - Deletion failed. Refresh token not found.
-2026-08-18 18:46:34.049
-                WARN 
-                [http-nio-8080-exec-2]
-                o.t.exception.GlobalExceptionHandler
-                - Invalid token request: Invalid refresh token.
-2026-08-18 18:46:34.065
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [REFRESH] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:46:34.079
-                DEBUG
-                [http-nio-8080-exec-4]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=REFRESH, RemainingTokens=14
-2026-08-18 18:46:34.139
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.RefreshTokenService
-                - Invalid refresh token used.
-2026-08-18 18:46:34.139
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Invalid token request: Invalid refresh token.
-2026-08-18 18:57:33.532
-                DEBUG
-                [http-nio-8080-exec-7]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [SIGNUP] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:57:33.532
-                DEBUG
-                [http-nio-8080-exec-7]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=SIGNUP, RemainingTokens=2
-2026-08-18 18:57:48.901
-                DEBUG
-                [http-nio-8080-exec-9]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:57:48.901
-                DEBUG
-                [http-nio-8080-exec-9]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-18 18:57:49.170
-                WARN 
-                [http-nio-8080-exec-9]
-                o.travel_stories.service.UserService
-                - Failed login attempt: invalid password, email=testuser@gmail.com
-2026-08-18 18:57:49.170
-                WARN 
-                [http-nio-8080-exec-9]
-                o.t.exception.GlobalExceptionHandler
-                - Authentication failed: Invalid email or password
-2026-08-18 18:58:02.473
-                DEBUG
-                [http-nio-8080-exec-10]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:58:02.473
-                DEBUG
-                [http-nio-8080-exec-10]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-18 18:58:02.760
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 17:09:47.774
                 INFO 
-                [http-nio-8080-exec-10]
-                o.travel_stories.service.UserService
-                - User 'Test_User' authenticated successfully
-2026-08-18 18:58:02.812
-                INFO 
-                [http-nio-8080-exec-10]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:58:04.388
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:58:04.390
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:58:04.831
-                WARN 
-                [http-nio-8080-exec-5]
-                o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier
-                - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
-	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
-	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
-
-2026-08-18 18:58:05.618
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=a574b5dd-c5ae-4539-a9f5-38e61a012f45
-2026-08-18 18:58:05.618
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:58:21.860
-                INFO 
-                [http-nio-8080-exec-7]
-                o.t.service.RefreshTokenService
-                - Deleted b3b902f4-cfb4-41c5-8443-fd8fa6972cd9 refresh token
-2026-08-18 18:58:21.890
-                INFO 
-                [http-nio-8080-exec-7]
-                o.travel_stories.service.UserService
-                - User a574b5dd-c5ae-4539-a9f5-38e61a012f45 deleted
-2026-08-18 18:58:43.017
-                DEBUG
-                [http-nio-8080-exec-8]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [LOGIN] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:58:43.018
-                DEBUG
-                [http-nio-8080-exec-8]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=LOGIN, RemainingTokens=4
-2026-08-18 18:58:43.021
-                WARN 
-                [http-nio-8080-exec-8]
-                o.travel_stories.service.UserService
-                - Failed login attempt: email not found, email=testuser@gmail.com
-2026-08-18 18:58:43.021
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Authentication failed: Invalid email or password
-2026-08-18 18:59:15.322
-                DEBUG
-                [http-nio-8080-exec-10]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [SIGNUP] for [0:0:0:0:0:0:0:1]
-2026-08-18 18:59:15.322
-                DEBUG
-                [http-nio-8080-exec-10]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=SIGNUP, RemainingTokens=2
-2026-08-18 18:59:15.587
-                INFO 
-                [http-nio-8080-exec-10]
-                o.travel_stories.service.UserService
-                - User 'test_user' registered successfully
-2026-08-18 18:59:15.590
-                INFO 
-                [http-nio-8080-exec-10]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user 787c28ce-abd4-4011-87db-1240299bcd50
-2026-08-18 18:59:16.642
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=787c28ce-abd4-4011-87db-1240299bcd50
-2026-08-18 18:59:16.642
-                WARN 
-                [http-nio-8080-exec-1]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:59:21.034
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=787c28ce-abd4-4011-87db-1240299bcd50
-2026-08-18 18:59:21.035
-                WARN 
-                [http-nio-8080-exec-6]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:59:26.918
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=787c28ce-abd4-4011-87db-1240299bcd50
-2026-08-18 18:59:26.919
-                WARN 
-                [http-nio-8080-exec-8]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
-2026-08-18 18:59:40.208
-                INFO 
-                [http-nio-8080-exec-1]
-                o.t.service.RefreshTokenService
-                - Deleted 81417f78-ad00-45b8-b572-e5f19c723a68 refresh token
-2026-08-18 18:59:40.209
-                INFO 
-                [http-nio-8080-exec-1]
-                o.travel_stories.service.UserService
-                - User 787c28ce-abd4-4011-87db-1240299bcd50 deleted
-2026-08-18 19:00:20.803
-                DEBUG
-                [http-nio-8080-exec-3]
-                o.t.s.ratelimit.RateLimitingFilter
-                - Applying rate limit [SIGNUP] for [0:0:0:0:0:0:0:1]
-2026-08-18 19:00:20.804
-                DEBUG
-                [http-nio-8080-exec-3]
-                o.t.service.RateLimitingService
-                - Rate limit passed. Client=ip:0:0:0:0:0:0:0:1, Category=SIGNUP, RemainingTokens=2
-2026-08-18 19:00:21.064
-                INFO 
-                [http-nio-8080-exec-3]
-                o.travel_stories.service.UserService
-                - User 'Test_User' registered successfully
-2026-08-18 19:00:21.069
-                INFO 
-                [http-nio-8080-exec-3]
-                o.t.service.RefreshTokenService
-                - Refresh token created for user 132d6d0d-0fcc-4467-8390-6efb163939a2
-2026-08-18 19:00:22.114
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.service.ProfilePictureService
-                - Failed to fetch profile picture: profile picture not found, userId=132d6d0d-0fcc-4467-8390-6efb163939a2
-2026-08-18 19:00:22.114
-                WARN 
-                [http-nio-8080-exec-4]
-                o.t.exception.GlobalExceptionHandler
-                - Resource not found: Profile picture not found.
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
