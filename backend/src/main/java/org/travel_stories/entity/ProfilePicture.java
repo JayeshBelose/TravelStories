@@ -26,10 +26,10 @@ public class ProfilePicture {
     private UUID pfpId;
 
     @Column(
-            name = "pfp_data",
-            nullable = true
+            name = "file_path",
+            nullable = false
     )
-    private byte[] pfpData;
+    private String filePath;
 
     @Column(
             name = "content_type",

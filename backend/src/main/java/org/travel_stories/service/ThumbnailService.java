@@ -12,6 +12,8 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ItineraryRepository;
 import org.travel_stories.repository.ThumbnailRepository;
 import org.travel_stories.security.AuthorizationService;
+import org.travel_stories.service.storage.FileStorageCategory;
+import org.travel_stories.service.storage.FileStorageService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -26,12 +28,14 @@ public class ThumbnailService {
     private final ItineraryRepository itineraryRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
+    private final FileStorageService fileStorageService;
 
     @Transactional
     public void uploadOrUpdate(
             UUID itineraryId,
             MultipartFile file
     ) {
+
         String detectedMimeType =
                 fileValidationService.validateMimeType(file);
 
@@ -54,75 +58,60 @@ public class ThumbnailService {
         Optional<Thumbnail> existingThumbnail =
                 thumbnailRepository.findByItineraryItineraryId(itineraryId);
 
+        String newFilePath =
+                fileStorageService.store(
+                        file,
+                        FileStorageCategory.THUMBNAIL
+                );
 
         if (existingThumbnail.isPresent()) {
 
             Thumbnail thumbnail = existingThumbnail.get();
 
-            try {
+            String oldFilePath = thumbnail.getFilePath();
 
-                thumbnail.setThumbnailData(file.getBytes());
-
-            } catch (IOException exception) {
-
-                log.error(
-                        "Failed to read thumbnail file for itinerary {}",
-                        itineraryId,
-                        exception
-                );
-
-                throw new InvalidOperationException(
-                        "Unable to process thumbnail file."
-                );
-            }
+            thumbnail.setFilePath(newFilePath);
             thumbnail.setContentType(detectedMimeType);
 
+            thumbnailRepository.save(thumbnail);
+
+            if (oldFilePath != null
+                    && !oldFilePath.equals(newFilePath)) {
+
+                fileStorageService.delete(oldFilePath);
+            }
 
             log.info(
-                    "Thumbnail updated for itinerary {}",
-                    itineraryId
+                    "Thumbnail updated for itinerary {}, filePath={}",
+                    itineraryId,
+                    newFilePath
             );
 
         } else {
 
             Thumbnail thumbnail = new Thumbnail();
 
+            thumbnail.setFilePath(newFilePath);
             thumbnail.setContentType(detectedMimeType);
-
-            try {
-
-                thumbnail.setThumbnailData(file.getBytes());
-
-            } catch (IOException exception) {
-
-                log.error(
-                        "Failed to read thumbnail file for itinerary {}",
-                        itineraryId,
-                        exception
-                );
-
-                throw new InvalidOperationException(
-                        "Unable to process thumbnail file."
-                );
-            }
-
             thumbnail.setItinerary(itinerary);
-
 
             thumbnailRepository.save(thumbnail);
 
-
             log.info(
-                    "Thumbnail uploaded for itinerary {}",
-                    itineraryId
+                    "Thumbnail uploaded for itinerary {}, filePath={}",
+                    itineraryId,
+                    newFilePath
             );
         }
     }
 
+    @Transactional(readOnly = true)
+    public Thumbnail getThumbnailByItineraryId(
+            UUID itineraryId
+    ) {
 
-    public Thumbnail getThumbnailByItineraryId(UUID itineraryId) {
-
-        return thumbnailRepository.findByItineraryItineraryId(itineraryId)
+        return thumbnailRepository
+                .findByItineraryItineraryId(itineraryId)
                 .orElseThrow(() -> {
                     log.warn(
                             "Failed to fetch thumbnail: thumbnail not found, itineraryId={}",
@@ -133,6 +122,30 @@ public class ThumbnailService {
                             "Thumbnail not found."
                     );
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getThumbnailData(Thumbnail thumbnail) {
+
+        try {
+
+            return fileStorageService
+                    .load(thumbnail.getFilePath())
+                    .getInputStream()
+                    .readAllBytes();
+
+        } catch (IOException exception) {
+
+            log.error(
+                    "Failed to read thumbnail file: {}",
+                    thumbnail.getFilePath(),
+                    exception
+            );
+
+            throw new InvalidOperationException(
+                    "Unable to read thumbnail."
+            );
+        }
     }
 
 }

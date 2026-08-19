@@ -12,6 +12,8 @@ import org.travel_stories.exception.ResourceNotFoundException;
 import org.travel_stories.repository.ProfilePictureRepository;
 import org.travel_stories.repository.UserRepository;
 import org.travel_stories.security.AuthorizationService;
+import org.travel_stories.service.storage.FileStorageCategory;
+import org.travel_stories.service.storage.FileStorageService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -26,6 +28,7 @@ public class ProfilePictureService {
     private final UserRepository userRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
+    private final FileStorageService fileStorageService;
 
 
     @Transactional
@@ -33,6 +36,7 @@ public class ProfilePictureService {
             UUID userId,
             MultipartFile file
     ) {
+
         String detectedMimeType =
                 fileValidationService.validateMimeType(file);
 
@@ -50,73 +54,58 @@ public class ProfilePictureService {
                     );
                 });
 
-
         Optional<ProfilePicture> existingPfp =
                 profilePictureRepository.findByUserUserId(userId);
 
+        String newFilePath =
+                fileStorageService.store(
+                        file,
+                        FileStorageCategory.PROFILE_PICTURE
+                );
 
         if (existingPfp.isPresent()) {
 
             ProfilePicture pfp = existingPfp.get();
 
-            try {
+            String oldFilePath = pfp.getFilePath();
 
-                pfp.setPfpData(file.getBytes());
-
-            } catch (IOException exception) {
-
-                log.error(
-                        "Failed to read profile picture file for user {}",
-                        userId,
-                        exception
-                );
-
-                throw new InvalidOperationException(
-                        "Unable to process thumbnail file."
-                );
-            }
-
+            pfp.setFilePath(newFilePath);
             pfp.setContentType(detectedMimeType);
 
+            profilePictureRepository.save(pfp);
+
+            if (oldFilePath != null
+                    && !oldFilePath.equals(newFilePath)) {
+
+                fileStorageService.delete(oldFilePath);
+            }
+
             log.info(
-                    "Profile picture updated for user {}",
-                    userId
+                    "Profile picture updated for user {}, filePath={}",
+                    userId,
+                    newFilePath
             );
 
         } else {
 
             ProfilePicture pfp = new ProfilePicture();
 
-            try {
-
-                pfp.setPfpData(file.getBytes());
-
-            } catch (IOException exception) {
-
-                log.error(
-                        "Failed to read profile picture file for user {}",
-                        userId,
-                        exception
-                );
-
-                throw new InvalidOperationException(
-                        "Unable to process thumbnail file."
-                );
-            }
-
+            pfp.setFilePath(newFilePath);
             pfp.setContentType(detectedMimeType);
             pfp.setUser(user);
 
             profilePictureRepository.save(pfp);
 
             log.info(
-                    "Profile picture uploaded for user {}",
-                    userId
+                    "Profile picture uploaded for user {}, filePath={}",
+                    userId,
+                    newFilePath
             );
         }
     }
 
 
+    @Transactional(readOnly = true)
     public ProfilePicture getPfpByUser(UUID userId) {
 
         return profilePictureRepository.findByUserUserId(userId)
@@ -130,6 +119,30 @@ public class ProfilePictureService {
                             "Profile picture not found."
                     );
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getProfilePictureData(ProfilePicture pfp) {
+
+        try {
+
+            return fileStorageService
+                    .load(pfp.getFilePath())
+                    .getInputStream()
+                    .readAllBytes();
+
+        } catch (IOException exception) {
+
+            log.error(
+                    "Failed to read profile picture file: {}",
+                    pfp.getFilePath(),
+                    exception
+            );
+
+            throw new InvalidOperationException(
+                    "Unable to read profile picture."
+            );
+        }
     }
 
 }

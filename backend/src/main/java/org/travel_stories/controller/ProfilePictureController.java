@@ -9,7 +9,6 @@ import org.travel_stories.common.ApiResponse;
 import org.travel_stories.entity.ProfilePicture;
 import org.travel_stories.service.ProfilePictureService;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +22,7 @@ public class ProfilePictureController {
     public ResponseEntity<ApiResponse<Void>> uploadOrUpdate(
             @PathVariable("userId") UUID userId,
             @RequestParam("file") MultipartFile file
-    ) throws IOException {
+    ) {
 
         profilePictureService.uploadOrUpdate(userId, file);
 
@@ -42,15 +41,15 @@ public class ProfilePictureController {
         ProfilePicture pfp =
                 profilePictureService.getPfpByUser(userId);
 
+        byte[] imageData =
+                profilePictureService.getProfilePictureData(pfp);
+
         return ResponseEntity.ok()
                 .contentType(
                         MediaType.parseMediaType(
                                 pfp.getContentType()
                         )
                 )
-                .body(
-                        pfp.getPfpData()
-                );
+                .body(imageData);
     }
-
 }

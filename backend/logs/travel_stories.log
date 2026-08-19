@@ -419,3 +419,448 @@ Caused by: org.springframework.util.PlaceholderResolutionException: Could not re
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565)
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
 	... 44 common frames omitted
+2026-08-19 17:44:13.706
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 21564 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 17:44:13.710
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 17:44:13.711
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 17:44:16.083
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:44:16.086
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 17:44:16.086
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 17:44:16.650
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 17:44:16.651
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 17:44:17.577
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 17:44:17.795
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 17:44:17.797
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 17:44:21.505
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 17:44:21.679
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 69aa6978-cb67-4c58-8218-eba4ea4befaa
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 17:44:22.298
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:44:22.343
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 9.478 seconds (process running for 10.117)
+2026-08-19 17:51:15.675
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 17:51:15.678
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 17:51:18.241
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 20592 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 17:51:18.246
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 17:51:18.247
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 17:51:20.458
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:51:20.460
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 17:51:20.461
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 17:51:21.020
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 17:51:21.020
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 17:51:22.006
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 17:51:22.201
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 17:51:22.202
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 17:51:26.028
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\TravelStories\travel-stories-storage
+2026-08-19 17:51:26.199
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 33209303-7734-4ff6-8fe5-277af930e837
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 17:51:26.815
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:51:26.850
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 9.468 seconds (process running for 10.166)
+2026-08-19 17:56:39.669
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 17:56:39.672
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 17:56:44.043
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 8904 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 17:56:44.047
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 17:56:44.048
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 17:56:46.201
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:56:46.203
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 17:56:46.204
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 17:56:46.796
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 17:56:46.796
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 17:56:47.894
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 17:56:48.117
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 17:56:48.119
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 17:56:52.079
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 17:56:52.252
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 72ab2358-0bd5-4f47-9fb8-810e7a272953
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 17:56:52.925
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 17:56:52.958
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 9.708 seconds (process running for 10.321)
+2026-08-19 18:00:20.658
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 18:00:20.660
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 18:28:27.962
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 17064 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 18:28:27.966
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 18:28:27.967
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 18:28:30.587
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 18:28:30.593
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 18:28:30.593
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 18:28:31.196
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 18:28:31.196
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 18:28:32.354
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 18:28:32.570
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 18:28:32.572
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 18:28:36.684
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 18:28:36.863
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 276432cc-c8e5-4443-a863-3e20f1864d78
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 18:28:37.581
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 18:28:37.647
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 10.64 seconds (process running for 11.392)
+2026-08-19 19:01:18.966
+                WARN 
+                [HikariPool-1:housekeeper]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m45s951ms998µs500ns).
+2026-08-19 19:07:28.532
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown initiated...
+2026-08-19 19:07:28.537
+                INFO 
+                [SpringApplicationShutdownHook]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Shutdown completed.
+2026-08-19 19:11:21.852
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Starting Main using Java 21.0.12 with PID 26484 (G:\Projects\TravelStories\backend\target\classes started by jayes in G:\Projects\TravelStories\backend)
+2026-08-19 19:11:21.864
+                DEBUG
+                [main]
+                org.travel_stories.Main
+                - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-08-19 19:11:21.865
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - No active profile set, falling back to 1 default profile: "default"
+2026-08-19 19:11:25.276
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Initializing ProtocolHandler ["http-nio-8080"]
+2026-08-19 19:11:25.276
+                INFO 
+                [main]
+                o.a.catalina.core.StandardService
+                - Starting service [Tomcat]
+2026-08-19 19:11:25.276
+                INFO 
+                [main]
+                o.a.catalina.core.StandardEngine
+                - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-08-19 19:11:26.066
+                DEBUG
+                [main]
+                o.t.s.ratelimit.RateLimitingFilter
+                - Filter 'rateLimitingFilter' configured for use
+2026-08-19 19:11:26.066
+                DEBUG
+                [main]
+                o.travel_stories.security.JwtFilter
+                - Filter 'jwtFilter' configured for use
+2026-08-19 19:11:27.486
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Starting...
+2026-08-19 19:11:27.956
+                INFO 
+                [main]
+                com.zaxxer.hikari.pool.HikariPool
+                - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7d90764a
+2026-08-19 19:11:27.961
+                INFO 
+                [main]
+                com.zaxxer.hikari.HikariDataSource
+                - HikariPool-1 - Start completed.
+2026-08-19 19:11:32.486
+                INFO 
+                [main]
+                o.t.s.storage.FileStorageService
+                - File storage initialized at: G:\Projects\travel-stories-storage
+2026-08-19 19:11:32.703
+                WARN 
+                [main]
+                o.s.b.s.a.UserDetailsServiceAutoConfiguration
+                - 
+
+Using generated security password: 6cd4346b-fbeb-4ca9-9125-8ad0d1ae404d
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-19 19:11:33.573
+                INFO 
+                [main]
+                o.a.coyote.http11.Http11NioProtocol
+                - Starting ProtocolHandler ["http-nio-8080"]
+2026-08-19 19:11:33.617
+                INFO 
+                [main]
+                org.travel_stories.Main
+                - Started Main in 12.793 seconds (process running for 13.678)

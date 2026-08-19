@@ -9,7 +9,6 @@ import org.travel_stories.common.ApiResponse;
 import org.travel_stories.entity.Thumbnail;
 import org.travel_stories.service.ThumbnailService;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +22,7 @@ public class ThumbnailController {
     public ResponseEntity<ApiResponse<Void>> uploadOrUpdate(
             @PathVariable("itineraryId") UUID itineraryId,
             @RequestParam("file") MultipartFile file
-    ) throws IOException {
+    ) {
 
         thumbnailService.uploadOrUpdate(itineraryId, file);
 
@@ -34,14 +33,21 @@ public class ThumbnailController {
 
     @GetMapping
     public ResponseEntity<byte[]> getThumbnailByItineraryId(
-            @PathVariable("itineraryId") UUID itineraryId) {
+            @PathVariable("itineraryId") UUID itineraryId
+    ) {
 
         Thumbnail thumbnail =
                 thumbnailService.getThumbnailByItineraryId(itineraryId);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(thumbnail.getContentType()))
-                .body(thumbnail.getThumbnailData());
-    }
+        byte[] imageData =
+                thumbnailService.getThumbnailData(thumbnail);
 
+        return ResponseEntity.ok()
+                .contentType(
+                        MediaType.parseMediaType(
+                                thumbnail.getContentType()
+                        )
+                )
+                .body(imageData);
+    }
 }

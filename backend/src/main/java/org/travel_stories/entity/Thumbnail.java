@@ -26,10 +26,10 @@ public class Thumbnail {
     private UUID thumbnailId;
 
     @Column(
-            name = "thumbnail_data",
-            nullable = true
+            name = "file_path",
+            nullable = false
     )
-    private byte[] thumbnailData;
+    private String filePath;
 
     @Column(
             name = "content_type",
