@@ -17,6 +17,7 @@ import {
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import ConfirmToast from "@/components/common/ConfirmToast";
 import {
     addItineraryTypeService,
     deleteItineraryByAdminService,
@@ -31,27 +32,6 @@ const SORT_OPTIONS = [
     { value: "likes", label: "Most Liked" },
     { value: "saves", label: "Most Saved" },
 ];
-
-// Confirmation window
-function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
-    return (
-        <div>
-            <p className="text-sm text-gray-700 mb-3">{message}</p>
-            <div className="flex gap-2">
-                <button
-                    onClick={onConfirm}
-                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-                    {confirmLabel}
-                </button>
-                <button
-                    onClick={onCancel}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
-}
 
 export default function ItineraryManagement() {
     const [itineraries, setItineraries] = useState([]);
@@ -78,7 +58,7 @@ export default function ItineraryManagement() {
     const typeRef = useRef(null);
 
     useEffect(() => {
-        const handler = e => {
+        const handler = (e) => {
             if (sortRef.current && !sortRef.current.contains(e.target))
                 setOpenSort(false);
             if (typeRef.current && !typeRef.current.contains(e.target))
@@ -91,7 +71,7 @@ export default function ItineraryManagement() {
     }, []);
 
     // Itinerary deletion confirmation
-    const confirmDelete = itineraryId => {
+    const confirmDelete = (itineraryId) => {
         toast(
             ({ closeToast }) => (
                 <ConfirmToast
@@ -109,7 +89,7 @@ export default function ItineraryManagement() {
     };
 
     // Itinerary type deletion confirmation
-    const confirmDeleteType = typeId => {
+    const confirmDeleteType = (typeId) => {
         toast(
             ({ closeToast }) => (
                 <ConfirmToast
@@ -147,7 +127,9 @@ export default function ItineraryManagement() {
             } else {
                 setItineraries([]);
                 setTotalPages(0);
-                setItineraryError(result.message || "Failed to load itineraries.");
+                setItineraryError(
+                    result.message || "Failed to load itineraries.",
+                );
             }
         } catch (error) {
             console.error("Failed to load itineraries:", error);
@@ -172,7 +154,9 @@ export default function ItineraryManagement() {
                 setTypes(result.data || []);
             } else {
                 setTypes([]);
-                setTypeError(result.message || "Failed to load itinerary types.");
+                setTypeError(
+                    result.message || "Failed to load itinerary types.",
+                );
             }
         } catch (error) {
             console.error("Failed to load itinerary types:", error);
@@ -197,7 +181,11 @@ export default function ItineraryManagement() {
             return;
         }
 
-        if (types.some(t => t.name.toLowerCase() === newType.trim().toLowerCase())) {
+        if (
+            types.some(
+                (t) => t.name.toLowerCase() === newType.trim().toLowerCase(),
+            )
+        ) {
             toast.error("Type already exists");
             return;
         }
@@ -215,7 +203,7 @@ export default function ItineraryManagement() {
         }
     };
 
-    const deleteType = async typeId => {
+    const deleteType = async (typeId) => {
         const result = await deleteItineraryTypeService({
             typeId,
         });
@@ -236,18 +224,18 @@ export default function ItineraryManagement() {
     }, [search, filter, typeFilter, sortFilter, page]);
 
     // Itinerary delete function
-    const handleDelete = async itineraryId => {
+    const handleDelete = async (itineraryId) => {
         const result = await deleteItineraryByAdminService({
             itineraryId,
         });
 
         if (result.success) {
             const remaining = itineraries.filter(
-                itinerary => itinerary.itineraryId !== itineraryId,
+                (itinerary) => itinerary.itineraryId !== itineraryId,
             );
 
             if (remaining.length === 0 && page > 0) {
-                setPage(prev => prev - 1);
+                setPage((prev) => prev - 1);
             } else {
                 setItineraries(remaining);
             }
@@ -259,15 +247,18 @@ export default function ItineraryManagement() {
     };
 
     const getSortLabel = () =>
-        SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
+        SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ?? "No Filter";
 
-    const getTypeLabel = () => (typeFilter === "all" ? "All Types" : typeFilter);
+    const getTypeLabel = () =>
+        typeFilter === "all" ? "All Types" : typeFilter;
 
     // Handling itinerary saving after edit or viewing
-    const handleItinerarySaved = updatedItinerary => {
-        setItineraries(prev =>
-            prev.map(it =>
-                it.itineraryId === updatedItinerary.itineraryId ? updatedItinerary : it,
+    const handleItinerarySaved = (updatedItinerary) => {
+        setItineraries((prev) =>
+            prev.map((it) =>
+                it.itineraryId === updatedItinerary.itineraryId
+                    ? updatedItinerary
+                    : it,
             ),
         );
     };
@@ -313,7 +304,7 @@ export default function ItineraryManagement() {
                         placeholder="Search by title, place or creator…"
                         className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                         value={search}
-                        onChange={e => {
+                        onChange={(e) => {
                             setPage(0);
                             setSearch(e.target.value);
                         }}
@@ -323,7 +314,8 @@ export default function ItineraryManagement() {
                             type="button"
                             onClick={() => setSearch("")}
                             aria-label="Clear itinerary search"
-                            className="text-gray-300 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 rounded cursor-pointer">
+                            className="text-gray-300 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 rounded cursor-pointer"
+                        >
                             <X size={14} aria-hidden="true" />
                         </button>
                     )}
@@ -334,7 +326,7 @@ export default function ItineraryManagement() {
                     <div className="flex items-center gap-1.5">
                         <select
                             value={filter}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setPage(0);
                                 setFilter(e.target.value);
                             }}
@@ -343,7 +335,8 @@ export default function ItineraryManagement() {
                                     visActive
                                         ? "bg-gray-900 text-white border-gray-900"
                                         : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                                }`}>
+                                }`}
+                        >
                             <option value="ALL">All</option>
                             <option value="PUBLIC">Public</option>
                             <option value="PRIVATE">Private</option>
@@ -362,7 +355,7 @@ export default function ItineraryManagement() {
                 <div ref={sortRef} className="relative">
                     <button
                         onClick={() => {
-                            setOpenSort(v => !v);
+                            setOpenSort((v) => !v);
                             setOpenType(false);
                         }}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
@@ -370,13 +363,14 @@ export default function ItineraryManagement() {
                                 sortActive
                                     ? "bg-gray-900 text-white border-gray-900"
                                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                            }`}>
+                            }`}
+                    >
                         <Filter size={13} /> {getSortLabel()}
                     </button>
 
                     {openSort && (
                         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1">
-                            {SORT_OPTIONS.map(opt => (
+                            {SORT_OPTIONS.map((opt) => (
                                 <button
                                     key={opt.value}
                                     onClick={() => {
@@ -388,7 +382,8 @@ export default function ItineraryManagement() {
                                             sortFilter === opt.value
                                                 ? "bg-gray-50 text-gray-900 font-medium"
                                                 : "text-gray-600 hover:bg-gray-50"
-                                        }`}>
+                                        }`}
+                                >
                                     {opt.label}
                                 </button>
                             ))}
@@ -400,7 +395,7 @@ export default function ItineraryManagement() {
                 <div ref={typeRef} className="relative">
                     <button
                         onClick={() => {
-                            setOpenType(v => !v);
+                            setOpenType((v) => !v);
                             setOpenSort(false);
                         }}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
@@ -408,20 +403,23 @@ export default function ItineraryManagement() {
                                 typeActive
                                     ? "bg-gray-900 text-white border-gray-900"
                                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                            }`}>
+                            }`}
+                    >
                         <Filter size={13} /> {getTypeLabel()}
                     </button>
 
                     {openType && (
                         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 py-1 max-h-56 overflow-y-auto">
-                            {itineraryTypes.map(type => (
+                            {itineraryTypes.map((type) => (
                                 <button
                                     key={type.typeId}
                                     type="button"
                                     onClick={() => {
                                         setPage(0);
                                         setTypeFilter(
-                                            type.typeId === "all" ? "all" : type.name,
+                                            type.typeId === "all"
+                                                ? "all"
+                                                : type.name,
                                         );
                                         setOpenType(false);
                                     }}
@@ -430,7 +428,8 @@ export default function ItineraryManagement() {
                 typeFilter === (type.typeId === "all" ? "all" : type.name)
                     ? "bg-gray-50 text-gray-900 font-medium"
                     : "text-gray-600 hover:bg-gray-50"
-            }`}>
+            }`}
+                                >
                                     {type.name}
                                 </button>
                             ))}
@@ -455,12 +454,13 @@ export default function ItineraryManagement() {
                                     "Likes",
                                     "Saves",
                                     "Actions",
-                                ].map(h => (
+                                ].map((h) => (
                                     <th
                                         key={h}
                                         className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
                                             h === "Actions" ? "text-right" : ""
-                                        }`}>
+                                        }`}
+                                    >
                                         {h}
                                     </th>
                                 ))}
@@ -469,10 +469,14 @@ export default function ItineraryManagement() {
 
                         <tbody
                             aria-busy={loadingItineraries}
-                            aria-label="Loading itineraries">
+                            aria-label="Loading itineraries"
+                        >
                             {loadingItineraries &&
                                 Array.from({ length: 6 }).map((_, i) => (
-                                    <tr key={i} className="border-b border-gray-50">
+                                    <tr
+                                        key={i}
+                                        className="border-b border-gray-50"
+                                    >
                                         <td className="px-4 py-3">
                                             <Skeleton className="h-3.5 w-32" />
                                         </td>
@@ -525,7 +529,8 @@ export default function ItineraryManagement() {
                                                 </p>
 
                                                 <p className="text-xs text-gray-300 mt-1">
-                                                    Try adjusting your search or filters.
+                                                    Try adjusting your search or
+                                                    filters.
                                                 </p>
                                             </div>
                                         </td>
@@ -534,15 +539,19 @@ export default function ItineraryManagement() {
 
                             {!loadingItineraries &&
                                 !itineraryError &&
-                                itineraries.map(item => (
+                                itineraries.map((item) => (
                                     <tr
                                         key={item.itineraryId}
-                                        className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                                        className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors"
+                                    >
                                         {/* Title */}
                                         <td className="px-4 py-3">
                                             <button
-                                                onClick={e => handleView(e, item)}
-                                                className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary">
+                                                onClick={(e) =>
+                                                    handleView(e, item)
+                                                }
+                                                className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary"
+                                            >
                                                 {item.title}
                                             </button>
                                         </td>
@@ -560,7 +569,8 @@ export default function ItineraryManagement() {
                                         {/* Type */}
                                         <td className="px-4 py-3">
                                             <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
-                                                <Tag size={9} /> {item.type || "—"}
+                                                <Tag size={9} />{" "}
+                                                {item.type || "—"}
                                             </span>
                                         </td>
 
@@ -572,14 +582,17 @@ export default function ItineraryManagement() {
                                             item.public
                                                 ? "bg-emerald-50 border-emerald-200 text-emerald-600"
                                                 : "bg-red-50 border-red-200 text-red-500"
-                                        }`}>
+                                        }`}
+                                            >
                                                 {item.public ? (
                                                     <>
-                                                        <Globe size={9} /> Public
+                                                        <Globe size={9} />{" "}
+                                                        Public
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Lock size={9} /> Private
+                                                        <Lock size={9} />{" "}
+                                                        Private
                                                     </>
                                                 )}
                                             </span>
@@ -587,14 +600,13 @@ export default function ItineraryManagement() {
 
                                         {/* Date */}
                                         <td className="px-4 py-3 text-sm text-gray-400">
-                                            {new Date(item.createdAt).toLocaleDateString(
-                                                "en-GB",
-                                                {
-                                                    day: "2-digit",
-                                                    month: "short",
-                                                    year: "numeric",
-                                                },
-                                            )}
+                                            {new Date(
+                                                item.createdAt,
+                                            ).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            })}
                                         </td>
 
                                         {/* Likes */}
@@ -612,19 +624,25 @@ export default function ItineraryManagement() {
                                             <div className="flex items-center justify-end gap-1">
                                                 <button
                                                     type="button"
-                                                    onClick={e => handleEdit(e, item)}
+                                                    onClick={(e) =>
+                                                        handleEdit(e, item)
+                                                    }
                                                     aria-label={`Edit itinerary ${item.title}`}
-                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer"
+                                                >
                                                     <Pencil size={14} />
                                                 </button>
 
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        confirmDelete(item.itineraryId)
+                                                        confirmDelete(
+                                                            item.itineraryId,
+                                                        )
                                                     }
                                                     aria-label={`Delete itinerary ${item.title}`}
-                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
+                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+                                                >
                                                     <Trash size={14} />
                                                 </button>
                                             </div>
@@ -637,20 +655,25 @@ export default function ItineraryManagement() {
 
                 {!loadingItineraries && itineraryError && (
                     <div className="py-16 text-center">
-                        <p className="text-sm text-gray-500 mb-3">{itineraryError}</p>
+                        <p className="text-sm text-gray-500 mb-3">
+                            {itineraryError}
+                        </p>
                         <button
                             onClick={fetchItineraries}
-                            className="text-sm font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer">
+                            className="text-sm font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer"
+                        >
                             Try again
                         </button>
                     </div>
                 )}
 
-                {!loadingItineraries && !itineraryError && itineraries.length === 0 && (
-                    <div className="py-16 text-center text-sm text-gray-400">
-                        No itineraries found.
-                    </div>
-                )}
+                {!loadingItineraries &&
+                    !itineraryError &&
+                    itineraries.length === 0 && (
+                        <div className="py-16 text-center text-sm text-gray-400">
+                            No itineraries found.
+                        </div>
+                    )}
             </div>
 
             {/* Pagination */}
@@ -659,8 +682,9 @@ export default function ItineraryManagement() {
                     type="button"
                     aria-label="Go to previous page"
                     disabled={page === 0 || totalPages === 0}
-                    onClick={() => setPage(p => p - 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                    onClick={() => setPage((p) => p - 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
                     <ChevronLeft size={15} aria-hidden="true" />
                 </button>
 
@@ -682,8 +706,9 @@ export default function ItineraryManagement() {
                     type="button"
                     aria-label="Go to next page"
                     disabled={totalPages === 0 || page >= totalPages - 1}
-                    onClick={() => setPage(p => p + 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                    onClick={() => setPage((p) => p + 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
                     <ChevronRight size={15} aria-hidden="true" />
                 </button>
             </div>
@@ -703,7 +728,10 @@ export default function ItineraryManagement() {
                 {loadingTypes ? (
                     <div className="flex flex-wrap gap-2 mb-5">
                         {Array.from({ length: 5 }).map((_, index) => (
-                            <Skeleton key={index} className="h-8 w-24 rounded-full" />
+                            <Skeleton
+                                key={index}
+                                className="h-8 w-24 rounded-full"
+                            />
                         ))}
                     </div>
                 ) : typeError ? (
@@ -713,7 +741,8 @@ export default function ItineraryManagement() {
                         <button
                             type="button"
                             onClick={fetchTypes}
-                            className="font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer">
+                            className="font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer"
+                        >
                             Try again
                         </button>
                     </div>
@@ -734,19 +763,26 @@ export default function ItineraryManagement() {
                                             },
                                         ),
                                 )
-                                .map(type => (
+                                .map((type) => (
                                     <div
                                         key={type.typeId}
-                                        className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors">
-                                        <Tag size={12} className="text-gray-400" />
+                                        className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors"
+                                    >
+                                        <Tag
+                                            size={12}
+                                            className="text-gray-400"
+                                        />
 
                                         {type.name}
 
                                         <button
                                             type="button"
-                                            onClick={() => confirmDeleteType(type.typeId)}
+                                            onClick={() =>
+                                                confirmDeleteType(type.typeId)
+                                            }
                                             aria-label={`Delete itinerary type ${type.name}`}
-                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                        >
                                             <X size={12} />
                                         </button>
                                     </div>
@@ -768,8 +804,8 @@ export default function ItineraryManagement() {
                                     placeholder="New type name…"
                                     aria-label="New itinerary type name"
                                     className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
-                                    onChange={e => setNewType(e.target.value)}
-                                    onKeyDown={e => {
+                                    onChange={(e) => setNewType(e.target.value)}
+                                    onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                             e.preventDefault();
                                             addType();
@@ -781,7 +817,8 @@ export default function ItineraryManagement() {
                             <button
                                 type="button"
                                 onClick={addType}
-                                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0">
+                                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0"
+                            >
                                 <Plus size={14} aria-hidden="true" />
                                 Add
                             </button>

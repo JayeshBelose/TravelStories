@@ -15,6 +15,7 @@ import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import CreateItineraryOverlay from "@/components/itinerary/CreateItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import ErrorState from "@/components/common/ErrorState";
+import ConfirmToast from "@/components/common/ConfirmToast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
 import {
@@ -24,46 +25,6 @@ import {
     getUserCreatedItinerariesService,
     toggleSavedItineraryService,
 } from "@/services/itineraryService";
-
-function ConfirmToast({
-    message,
-    confirmLabel,
-    loadingLabel,
-    loading,
-    onConfirm,
-    onCancel,
-}) {
-    return (
-        <div>
-            <p className="text-sm text-gray-700 mb-3">{message}</p>
-
-            <div className="flex gap-2">
-                <button
-                    type="button"
-                    onClick={onConfirm}
-                    disabled={loading}
-                    className="min-w-[76px] bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-1.5">
-                    {loading ? (
-                        <>
-                            <Loader2 size={12} className="animate-spin" />
-                            {loadingLabel}
-                        </>
-                    ) : (
-                        confirmLabel
-                    )}
-                </button>
-
-                <button
-                    type="button"
-                    onClick={onCancel}
-                    disabled={loading}
-                    className="min-w-[64px] bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
-}
 
 export default function MyItineraries() {
     const [activeTab, setActiveTab] = useState("created");
@@ -81,7 +42,7 @@ export default function MyItineraries() {
 
     const user = JSON.parse(sessionStorage.getItem("user"));
 
-    const confirmDelete = itineraryId => {
+    const confirmDelete = (itineraryId) => {
         toast(
             ({ closeToast }) => (
                 <ConfirmToast
@@ -100,7 +61,7 @@ export default function MyItineraries() {
         );
     };
 
-    const confirmUnsave = itineraryId => {
+    const confirmUnsave = (itineraryId) => {
         toast(
             ({ closeToast }) => (
                 <ConfirmToast
@@ -119,16 +80,18 @@ export default function MyItineraries() {
         );
     };
 
-    const handleOpenItinerary = itinerary => {
+    const handleOpenItinerary = (itinerary) => {
         setSelectedItinerary(itinerary);
         setOpenCreate(false);
         setOpenView(true);
     };
 
-    const handleItinerarySaved = updatedItinerary => {
-        setCreatedItineraries(prev =>
-            prev.map(it =>
-                it.itineraryId === updatedItinerary.itineraryId ? updatedItinerary : it,
+    const handleItinerarySaved = (updatedItinerary) => {
+        setCreatedItineraries((prev) =>
+            prev.map((it) =>
+                it.itineraryId === updatedItinerary.itineraryId
+                    ? updatedItinerary
+                    : it,
             ),
         );
     };
@@ -140,7 +103,7 @@ export default function MyItineraries() {
         setOpenCreate(true);
     };
 
-    const handleDelete = async itineraryId => {
+    const handleDelete = async (itineraryId) => {
         if (deleteLoadingId === itineraryId) return;
 
         setDeleteLoadingId(itineraryId);
@@ -151,8 +114,8 @@ export default function MyItineraries() {
             });
 
             if (result.success) {
-                setCreatedItineraries(prev =>
-                    prev.filter(it => it.itineraryId !== itineraryId),
+                setCreatedItineraries((prev) =>
+                    prev.filter((it) => it.itineraryId !== itineraryId),
                 );
 
                 toast.success("Itinerary deleted successfully.");
@@ -164,7 +127,7 @@ export default function MyItineraries() {
         }
     };
 
-    const handleUnsave = async itineraryId => {
+    const handleUnsave = async (itineraryId) => {
         if (unsaveLoadingId === itineraryId) return;
 
         setUnsaveLoadingId(itineraryId);
@@ -176,8 +139,8 @@ export default function MyItineraries() {
             });
 
             if (result.success) {
-                setSavedItineraries(prev =>
-                    prev.filter(it => it.itineraryId !== itineraryId),
+                setSavedItineraries((prev) =>
+                    prev.filter((it) => it.itineraryId !== itineraryId),
                 );
 
                 toast.success("Itinerary removed successfully.");
@@ -208,13 +171,17 @@ export default function MyItineraries() {
             const combined = [...createdResult.data, ...sharedResult.data];
 
             const unique = Array.from(
-                new Map(combined.map(item => [item.itineraryId, item])).values(),
+                new Map(
+                    combined.map((item) => [item.itineraryId, item]),
+                ).values(),
             );
 
             setCreatedItineraries(unique);
         } else {
             setCreatedError(
-                createdResult.success ? sharedResult.message : createdResult.message,
+                createdResult.success
+                    ? sharedResult.message
+                    : createdResult.message,
             );
         }
 
@@ -264,7 +231,9 @@ export default function MyItineraries() {
                         My Itineraries
                     </h1>
 
-                    <p className="text-sm text-gray-400">Manage your travel stories</p>
+                    <p className="text-sm text-gray-400">
+                        Manage your travel stories
+                    </p>
                 </div>
 
                 {activeTab === "created" && (
@@ -275,7 +244,8 @@ export default function MyItineraries() {
                             setOpenView(false);
                             setOpenCreate(true);
                         }}
-                        className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer">
+                        className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer"
+                    >
                         <Plus size={15} />
                         New Itinerary
                     </button>
@@ -284,7 +254,7 @@ export default function MyItineraries() {
 
             {/* Tabs */}
             <div className="flex gap-1 border-b border-gray-100 mb-6">
-                {TABS.map(tab => (
+                {TABS.map((tab) => (
                     <button
                         key={tab.key}
                         type="button"
@@ -294,7 +264,8 @@ export default function MyItineraries() {
                             activeTab === tab.key
                                 ? "border-gray-900 text-gray-900"
                                 : "border-transparent text-gray-400 hover:text-gray-600"
-                        }`}>
+                        }`}
+                    >
                         <tab.icon size={14} />
 
                         {tab.label}
@@ -305,7 +276,8 @@ export default function MyItineraries() {
                             activeTab === tab.key
                                 ? "bg-gray-900 text-white"
                                 : "bg-gray-100 text-gray-400"
-                        }`}>
+                        }`}
+                        >
                             {tab.key === "created"
                                 ? createdItineraries.length
                                 : savedItineraries.length}
@@ -317,20 +289,25 @@ export default function MyItineraries() {
             {/* Content */}
             {(() => {
                 const itineraries =
-                    activeTab === "created" ? createdItineraries : savedItineraries;
+                    activeTab === "created"
+                        ? createdItineraries
+                        : savedItineraries;
 
-                const loading = activeTab === "created" ? loadingCreated : loadingSaved;
+                const loading =
+                    activeTab === "created" ? loadingCreated : loadingSaved;
 
                 if (loading)
                     return (
                         <div
                             aria-busy="true"
                             aria-label="Loading itineraries"
-                            className="space-y-4">
+                            className="space-y-4"
+                        >
                             {Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className="flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl">
+                                    className="flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl"
+                                >
                                     <Skeleton className="w-36 h-36 rounded-xl flex-shrink-0" />
 
                                     <div className="flex-1 space-y-3 pt-1">
@@ -348,7 +325,8 @@ export default function MyItineraries() {
                         </div>
                     );
 
-                const error = activeTab === "created" ? createdError : savedError;
+                const error =
+                    activeTab === "created" ? createdError : savedError;
 
                 if (error)
                     return (
@@ -367,9 +345,15 @@ export default function MyItineraries() {
                         <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-400">
                             <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
                                 {activeTab === "created" ? (
-                                    <LayoutList size={24} className="text-gray-300" />
+                                    <LayoutList
+                                        size={24}
+                                        className="text-gray-300"
+                                    />
                                 ) : (
-                                    <BookMarked size={24} className="text-gray-300" />
+                                    <BookMarked
+                                        size={24}
+                                        className="text-gray-300"
+                                    />
                                 )}
                             </div>
 
@@ -386,7 +370,8 @@ export default function MyItineraries() {
                                         setSelectedItinerary(null);
                                         setOpenCreate(true);
                                     }}
-                                    className="mt-2 flex items-center gap-1.5 text-xs font-medium bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer">
+                                    className="mt-2 flex items-center gap-1.5 text-xs font-medium bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+                                >
                                     <Plus size={13} />
                                     Create your first itinerary
                                 </button>
@@ -396,8 +381,9 @@ export default function MyItineraries() {
 
                 return (
                     <div className="space-y-3">
-                        {itineraries.map(itinerary => {
-                            const isCreator = user?.username === itinerary.createdBy;
+                        {itineraries.map((itinerary) => {
+                            const isCreator =
+                                user?.username === itinerary.createdBy;
 
                             const isPublic = itinerary.public;
 
@@ -407,25 +393,31 @@ export default function MyItineraries() {
                             const unsaveLoading =
                                 unsaveLoadingId === itinerary.itineraryId;
 
-                            const actionLoading = deleteLoading || unsaveLoading;
+                            const actionLoading =
+                                deleteLoading || unsaveLoading;
 
                             return (
                                 <div
                                     key={itinerary.itineraryId}
-                                    onClick={e => {
-                                        if (e.target.closest(".action-btn")) return;
+                                    onClick={(e) => {
+                                        if (e.target.closest(".action-btn"))
+                                            return;
 
                                         handleOpenItinerary(itinerary);
                                     }}
-                                    className="group relative flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer">
+                                    className="group relative flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
+                                >
                                     {/* Action buttons */}
                                     <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {isCreator && (
                                             <button
                                                 type="button"
                                                 disabled={actionLoading}
-                                                onClick={e => handleEdit(e, itinerary)}
-                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
+                                                onClick={(e) =>
+                                                    handleEdit(e, itinerary)
+                                                }
+                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
                                                 <Pencil
                                                     size={13}
                                                     className="text-gray-500"
@@ -433,11 +425,12 @@ export default function MyItineraries() {
                                             </button>
                                         )}
 
-                                        {(isCreator || activeTab === "saved") && (
+                                        {(isCreator ||
+                                            activeTab === "saved") && (
                                             <button
                                                 type="button"
                                                 disabled={actionLoading}
-                                                onClick={e => {
+                                                onClick={(e) => {
                                                     e.stopPropagation();
 
                                                     if (isCreator) {
@@ -450,7 +443,8 @@ export default function MyItineraries() {
                                                         );
                                                     }
                                                 }}
-                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-red-300 hover:text-red-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
+                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-red-300 hover:text-red-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
                                                 {actionLoading ? (
                                                     <Loader2
                                                         size={13}
@@ -508,14 +502,17 @@ export default function MyItineraries() {
                                             isPublic
                                                 ? "border-emerald-200 text-emerald-600 bg-emerald-50"
                                                 : "border-red-200 text-red-500 bg-red-50"
-                                        }`}>
+                                        }`}
+                                            >
                                                 {isPublic ? (
                                                     <Globe size={10} />
                                                 ) : (
                                                     <Lock size={10} />
                                                 )}
 
-                                                {isPublic ? "Public" : "Private"}
+                                                {isPublic
+                                                    ? "Public"
+                                                    : "Private"}
                                             </span>
 
                                             {/* Creator */}
@@ -524,11 +521,12 @@ export default function MyItineraries() {
                                             </span>
 
                                             {/* Member badge */}
-                                            {!isCreator && activeTab === "created" && (
-                                                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-blue-200 text-blue-500 bg-blue-50">
-                                                    Member
-                                                </span>
-                                            )}
+                                            {!isCreator &&
+                                                activeTab === "created" && (
+                                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-blue-200 text-blue-500 bg-blue-50">
+                                                        Member
+                                                    </span>
+                                                )}
                                         </div>
                                     </div>
                                 </div>

@@ -13,6 +13,7 @@ import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
 import ErrorState from "@/components/common/ErrorState";
+import ConfirmToast from "@/components/common/ConfirmToast";
 import { useAuth } from "@/context/AuthContext";
 import {
     deleteItineraryByAdminService,
@@ -20,31 +21,6 @@ import {
     getRecentItinerariesService,
     getWeeklyActivityService,
 } from "@/services/adminService";
-
-// Confirmation window
-function ConfirmToast({ message, confirmLabel, onConfirm, onCancel }) {
-    return (
-        <div>
-            <p className="text-sm text-gray-700 mb-3">{message}</p>
-
-            <div className="flex gap-2">
-                <button
-                    type="button"
-                    onClick={onConfirm}
-                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1">
-                    {confirmLabel}
-                </button>
-
-                <button
-                    type="button"
-                    onClick={onCancel}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
-}
 
 // Stat card
 function StatCard({ title, value, icon: Icon, color, loading, error }) {
@@ -56,9 +32,14 @@ function StatCard({ title, value, icon: Icon, color, loading, error }) {
                 </p>
 
                 {loading ? (
-                    <Skeleton className="h-7 w-16" aria-label={`Loading ${title}`} />
+                    <Skeleton
+                        className="h-7 w-16"
+                        aria-label={`Loading ${title}`}
+                    />
                 ) : error ? (
-                    <p className="text-xs font-medium text-red-400">Unavailable</p>
+                    <p className="text-xs font-medium text-red-400">
+                        Unavailable
+                    </p>
                 ) : (
                     <p className="text-2xl font-bold text-gray-900">
                         {value.toLocaleString()}
@@ -68,7 +49,8 @@ function StatCard({ title, value, icon: Icon, color, loading, error }) {
 
             <div
                 className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}
-                aria-hidden="true">
+                aria-hidden="true"
+            >
                 <Icon size={18} />
             </div>
         </div>
@@ -111,11 +93,12 @@ export default function Dashboard() {
         setActivityError(null);
 
         try {
-            const [statsResult, itinerariesResult, activityResult] = await Promise.all([
-                getDashboardStatsService(),
-                getRecentItinerariesService(),
-                getWeeklyActivityService(),
-            ]);
+            const [statsResult, itinerariesResult, activityResult] =
+                await Promise.all([
+                    getDashboardStatsService(),
+                    getRecentItinerariesService(),
+                    getWeeklyActivityService(),
+                ]);
 
             if (statsResult.success) {
                 setStats(statsResult.data);
@@ -126,7 +109,8 @@ export default function Dashboard() {
                 );
 
                 setStatsError(
-                    statsResult.message || "We couldn't load the dashboard statistics.",
+                    statsResult.message ||
+                        "We couldn't load the dashboard statistics.",
                 );
             }
 
@@ -139,24 +123,30 @@ export default function Dashboard() {
                 );
 
                 setItinerariesError(
-                    itinerariesResult.message || "We couldn't load recent itineraries.",
+                    itinerariesResult.message ||
+                        "We couldn't load recent itineraries.",
                 );
             }
 
             if (activityResult.success) {
                 setActivity(activityResult.data);
             } else {
-                console.error("Failed to load weekly activity:", activityResult.message);
+                console.error(
+                    "Failed to load weekly activity:",
+                    activityResult.message,
+                );
 
                 setActivityError(
-                    activityResult.message || "We couldn't load the weekly activity.",
+                    activityResult.message ||
+                        "We couldn't load the weekly activity.",
                 );
             }
         } catch (error) {
             console.error("Failed to load dashboard:", error);
 
             const message =
-                error.message || "We couldn't load the dashboard data. Please try again.";
+                error.message ||
+                "We couldn't load the dashboard data. Please try again.";
 
             setStatsError(message);
             setItinerariesError(message);
@@ -181,17 +171,18 @@ export default function Dashboard() {
         setStatsError(null);
 
         getDashboardStatsService()
-            .then(result => {
+            .then((result) => {
                 if (result.success) {
                     setStats(result.data);
                     setStatsError(null);
                 } else {
                     setStatsError(
-                        result.message || "We couldn't load the dashboard statistics.",
+                        result.message ||
+                            "We couldn't load the dashboard statistics.",
                     );
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Failed to reload dashboard statistics:", error);
 
                 setStatsError(
@@ -208,17 +199,18 @@ export default function Dashboard() {
         setActivityError(null);
 
         getWeeklyActivityService()
-            .then(result => {
+            .then((result) => {
                 if (result.success) {
                     setActivity(result.data);
                     setActivityError(null);
                 } else {
                     setActivityError(
-                        result.message || "We couldn't load the weekly activity.",
+                        result.message ||
+                            "We couldn't load the weekly activity.",
                     );
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Failed to reload weekly activity:", error);
 
                 setActivityError(
@@ -235,17 +227,18 @@ export default function Dashboard() {
         setItinerariesError(null);
 
         getRecentItinerariesService()
-            .then(result => {
+            .then((result) => {
                 if (result.success) {
                     setRecentItineraries(result.data);
                     setItinerariesError(null);
                 } else {
                     setItinerariesError(
-                        result.message || "We couldn't load recent itineraries.",
+                        result.message ||
+                            "We couldn't load recent itineraries.",
                     );
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Failed to reload recent itineraries:", error);
 
                 setItinerariesError(
@@ -258,14 +251,16 @@ export default function Dashboard() {
     };
 
     // Itinerary delete function
-    const handleDelete = async itineraryId => {
+    const handleDelete = async (itineraryId) => {
         const result = await deleteItineraryByAdminService({
             itineraryId,
         });
 
         if (result.success) {
-            setRecentItineraries(prev =>
-                prev.filter(itinerary => itinerary.itineraryId !== itineraryId),
+            setRecentItineraries((prev) =>
+                prev.filter(
+                    (itinerary) => itinerary.itineraryId !== itineraryId,
+                ),
             );
 
             toast.success("Itinerary deleted successfully.");
@@ -275,7 +270,7 @@ export default function Dashboard() {
     };
 
     // Itinerary deletion confirmation
-    const confirmDelete = itineraryId => {
+    const confirmDelete = (itineraryId) => {
         toast(
             ({ closeToast }) => (
                 <ConfirmToast
@@ -355,12 +350,14 @@ export default function Dashboard() {
                     <div
                         aria-busy={loadingActivity}
                         aria-label="Weekly activity"
-                        className="space-y-3">
+                        className="space-y-3"
+                    >
                         {loadingActivity ? (
                             Array.from({ length: 5 }).map((_, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
+                                >
                                     <div className="flex items-center gap-2">
                                         <Skeleton className="w-3.5 h-3.5 rounded-full" />
                                         <Skeleton className="h-3 w-20" />
@@ -383,7 +380,8 @@ export default function Dashboard() {
                             activity.map((item, index) => (
                                 <div
                                     key={`${item.date}-${index}`}
-                                    className="flex items-start sm:items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
+                                    className="flex items-start sm:items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0"
+                                >
                                     <div className="flex items-center gap-2">
                                         <CalendarDays
                                             size={13}
@@ -398,7 +396,10 @@ export default function Dashboard() {
 
                                     <div className="flex items-center justify-end gap-2 flex-wrap text-xs">
                                         <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                                            <Users size={10} aria-hidden="true" />
+                                            <Users
+                                                size={10}
+                                                aria-hidden="true"
+                                            />
                                             {item.newUsers} users
                                         </span>
 
@@ -420,7 +421,11 @@ export default function Dashboard() {
                 {/* Recent Itineraries */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        <Map size={14} className="text-gray-400" aria-hidden="true" />
+                        <Map
+                            size={14}
+                            className="text-gray-400"
+                            aria-hidden="true"
+                        />
 
                         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
                             Recently Added
@@ -430,12 +435,14 @@ export default function Dashboard() {
                     <div
                         aria-busy={loadingItineraries}
                         aria-label="Recently added itineraries"
-                        className="space-y-2">
+                        className="space-y-2"
+                    >
                         {loadingItineraries ? (
                             Array.from({ length: 4 }).map((_, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-center justify-between p-2.5 rounded-xl">
+                                    className="flex items-center justify-between p-2.5 rounded-xl"
+                                >
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
                                         <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
 
@@ -456,10 +463,11 @@ export default function Dashboard() {
                                 onRetry={handleItinerariesRetry}
                             />
                         ) : recentItineraries.length > 0 ? (
-                            recentItineraries.map(itinerary => (
+                            recentItineraries.map((itinerary) => (
                                 <div
                                     key={itinerary.itineraryId}
-                                    className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                                    className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+                                >
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -467,10 +475,13 @@ export default function Dashboard() {
                                             setOpenView(true);
                                         }}
                                         className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
-                                        aria-label={`View itinerary ${itinerary.title}`}>
+                                        aria-label={`View itinerary ${itinerary.title}`}
+                                    >
                                         <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                                             <ItineraryThumbnail
-                                                itineraryId={itinerary.itineraryId}
+                                                itineraryId={
+                                                    itinerary.itineraryId
+                                                }
                                                 alt={itinerary.title}
                                             />
                                         </div>
@@ -486,7 +497,8 @@ export default function Dashboard() {
                                                     className="flex-shrink-0"
                                                     aria-hidden="true"
                                                 />
-                                                {itinerary.place} · {itinerary.createdBy}
+                                                {itinerary.place} ·{" "}
+                                                {itinerary.createdBy}
                                             </p>
                                         </div>
                                     </button>
@@ -497,18 +509,27 @@ export default function Dashboard() {
                                                 itinerary.public
                                                     ? "border-emerald-200 text-emerald-600 bg-emerald-50"
                                                     : "border-red-200 text-red-500 bg-red-50"
-                                            }`}>
-                                            {itinerary.public ? "Public" : "Private"}
+                                            }`}
+                                        >
+                                            {itinerary.public
+                                                ? "Public"
+                                                : "Private"}
                                         </span>
 
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                confirmDelete(itinerary.itineraryId)
+                                                confirmDelete(
+                                                    itinerary.itineraryId,
+                                                )
                                             }
                                             className="w-9 h-9 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
-                                            aria-label={`Delete itinerary ${itinerary.title}`}>
-                                            <Trash size={13} aria-hidden="true" />
+                                            aria-label={`Delete itinerary ${itinerary.title}`}
+                                        >
+                                            <Trash
+                                                size={13}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                     </div>
                                 </div>
