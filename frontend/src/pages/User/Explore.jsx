@@ -1,8 +1,16 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Filter, Search, X, Compass, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    Filter,
+    Search,
+    X,
+    Compass,
+    ChevronLeft,
+    ChevronRight,
+} from "lucide-react";
 import ItineraryCard from "@/components/itinerary/ItineraryCard";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import {
     getItinerariesService,
@@ -36,7 +44,7 @@ export default function Explore() {
 
     // Close dropdowns on outside click
     useEffect(() => {
-        const handler = e => {
+        const handler = (e) => {
             if (sortRef.current && !sortRef.current.contains(e.target))
                 setOpenSort(false);
             if (typeRef.current && !typeRef.current.contains(e.target))
@@ -93,12 +101,13 @@ export default function Explore() {
     }, [sortFilter, typeFilter]);
 
     const getSortLabel = () =>
-        SORT_OPTIONS.find(o => o.value === sortFilter)?.label ?? "No Filter";
+        SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ?? "No Filter";
 
     const getTypeLabel = () =>
         typeFilter === null
             ? "All Types"
-            : (itineraryTypes.find(t => t.name === typeFilter)?.name ?? "All Types");
+            : (itineraryTypes.find((t) => t.name === typeFilter)?.name ??
+              "All Types");
 
     const sortActive = sortFilter !== "random";
     const typeActive = typeFilter !== null;
@@ -106,7 +115,8 @@ export default function Explore() {
 
     // Page numbers with ellipsis
     const pageNumbers = useMemo(() => {
-        if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+        if (totalPages <= 7)
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         const pages = new Set([
             1,
             totalPages,
@@ -114,7 +124,9 @@ export default function Explore() {
             currentPage - 1,
             currentPage + 1,
         ]);
-        return [...pages].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+        return [...pages]
+            .filter((p) => p >= 1 && p <= totalPages)
+            .sort((a, b) => a - b);
     }, [totalPages, currentPage]);
 
     return (
@@ -135,16 +147,16 @@ export default function Explore() {
                 {/* Search + Filters row */}
                 <div className="flex flex-wrap gap-3">
                     {/* Search */}
-                    <div className="flex-1 min-w-56 flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
-                        <Search size={15} className="text-gray-400 flex-shrink-0" />
-
+                    <div
+                        className={`${ui.searchContainer} flex-1 min-w-56 flex items-center gap-2.5`}
+                    >
                         <input
                             type="text"
                             placeholder="Search by title or place…"
                             className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                             value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            onKeyDown={e => {
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     setCurrentPage(1);
                                     setAppliedSearch(search);
@@ -159,7 +171,8 @@ export default function Explore() {
                                     setAppliedSearch("");
                                 }}
                                 className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
-                                aria-label="Clear search">
+                                aria-label="Clear search"
+                            >
                                 <X size={14} />
                             </button>
                         )}
@@ -170,8 +183,9 @@ export default function Explore() {
                                 setAppliedSearch(search);
                             }}
                             disabled={!search.trim()}
-                            className="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                            aria-label="Search">
+                            className="flex items-center justify-center w-7 h-4 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            aria-label="Search"
+                        >
                             <Search size={15} />
                         </button>
                     </div>
@@ -180,7 +194,7 @@ export default function Explore() {
                     <div ref={sortRef} className="relative">
                         <button
                             onClick={() => {
-                                setOpenSort(v => !v);
+                                setOpenSort((v) => !v);
                                 setOpenType(false);
                             }}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
@@ -188,13 +202,14 @@ export default function Explore() {
                                     sortActive
                                         ? "bg-gray-900 text-white border-gray-900"
                                         : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                                }`}>
+                                }`}
+                        >
                             <Filter size={13} />
                             {getSortLabel()}
                         </button>
                         {openSort && (
                             <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1">
-                                {SORT_OPTIONS.map(opt => (
+                                {SORT_OPTIONS.map((opt) => (
                                     <button
                                         key={opt.value}
                                         onClick={() => {
@@ -206,7 +221,8 @@ export default function Explore() {
                                                 sortFilter === opt.value
                                                     ? "bg-gray-50 text-gray-900 font-medium"
                                                     : "text-gray-600 hover:bg-gray-50"
-                                            }`}>
+                                            }`}
+                                    >
                                         {opt.label}
                                     </button>
                                 ))}
@@ -218,7 +234,7 @@ export default function Explore() {
                     <div ref={typeRef} className="relative">
                         <button
                             onClick={() => {
-                                setOpenType(v => !v);
+                                setOpenType((v) => !v);
                                 setOpenSort(false);
                             }}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
@@ -226,7 +242,8 @@ export default function Explore() {
                                     typeActive
                                         ? "bg-gray-900 text-white border-gray-900"
                                         : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                                }`}>
+                                }`}
+                        >
                             <Filter size={13} />
                             {getTypeLabel()}
                         </button>
@@ -243,11 +260,12 @@ export default function Explore() {
                                             typeFilter === null
                                                 ? "bg-gray-50 text-gray-900 font-medium"
                                                 : "text-gray-600 hover:bg-gray-50"
-                                        }`}>
+                                        }`}
+                                >
                                     All Types
                                 </button>
 
-                                {itineraryTypes.map(type => (
+                                {itineraryTypes.map((type) => (
                                     <button
                                         key={type.typeId}
                                         onClick={() => {
@@ -259,7 +277,8 @@ export default function Explore() {
                                                 typeFilter === type.name
                                                     ? "bg-gray-50 text-gray-900 font-medium"
                                                     : "text-gray-600 hover:bg-gray-50"
-                                            }`}>
+                                            }`}
+                                    >
                                         {type.name}
                                     </button>
                                 ))}
@@ -279,7 +298,8 @@ export default function Explore() {
                                         setSearch("");
                                         setAppliedSearch("");
                                     }}
-                                    className="hover:text-gray-900 cursor-pointer">
+                                    className="hover:text-gray-900 cursor-pointer"
+                                >
                                     <X size={11} />
                                 </button>
                             </span>
@@ -289,7 +309,8 @@ export default function Explore() {
                                 {getSortLabel()}
                                 <button
                                     onClick={() => setSortFilter("random")}
-                                    className="hover:text-gray-900 cursor-pointer">
+                                    className="hover:text-gray-900 cursor-pointer"
+                                >
                                     <X size={11} />
                                 </button>
                             </span>
@@ -299,7 +320,8 @@ export default function Explore() {
                                 {getTypeLabel()}
                                 <button
                                     onClick={() => setTypeFilter(null)}
-                                    className="hover:text-gray-900 cursor-pointer">
+                                    className="hover:text-gray-900 cursor-pointer"
+                                >
                                     <X size={11} />
                                 </button>
                             </span>
@@ -313,11 +335,13 @@ export default function Explore() {
                 <div
                     aria-busy="true"
                     aria-label="Loading itineraries"
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
                     {Array.from({ length: 6 }).map((_, i) => (
                         <div
                             key={i}
-                            className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                            className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+                        >
                             <Skeleton className="h-48 w-full rounded-none" />
                             <div className="p-4 space-y-2">
                                 <Skeleton className="h-3.5 w-3/4" />
@@ -358,13 +382,14 @@ export default function Explore() {
                             setSortFilter("random");
                             setTypeFilter(null);
                         }}
-                        className="text-xs text-gray-500 underline underline-offset-2 hover:text-gray-800 transition-colors cursor-pointer">
+                        className="text-xs text-gray-500 underline underline-offset-2 hover:text-gray-800 transition-colors cursor-pointer"
+                    >
                         Clear all filters
                     </button>
                 </div>
             ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {itineraries.map(itinerary => (
+                    {itineraries.map((itinerary) => (
                         <ItineraryCard
                             key={itinerary.itineraryId}
                             itinerary={itinerary}
@@ -379,8 +404,9 @@ export default function Explore() {
                 <div className="flex justify-center items-center gap-1.5 mt-12">
                     <button
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(p => p - 1)}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    >
                         <ChevronLeft size={15} />
                     </button>
 
@@ -388,9 +414,14 @@ export default function Explore() {
                         const prev = pageNumbers[idx - 1];
                         const showEllipsis = prev && page - prev > 1;
                         return (
-                            <span key={page} className="flex items-center gap-1.5">
+                            <span
+                                key={page}
+                                className="flex items-center gap-1.5"
+                            >
                                 {showEllipsis && (
-                                    <span className="text-gray-300 text-sm px-1">…</span>
+                                    <span className="text-gray-300 text-sm px-1">
+                                        …
+                                    </span>
                                 )}
                                 <button
                                     onClick={() => setCurrentPage(page)}
@@ -399,7 +430,8 @@ export default function Explore() {
                                             currentPage === page
                                                 ? "bg-gray-900 text-white"
                                                 : "text-gray-500 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
-                                        }`}>
+                                        }`}
+                                >
                                     {page}
                                 </button>
                             </span>
@@ -408,8 +440,9 @@ export default function Explore() {
 
                     <button
                         disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(p => p + 1)}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    >
                         <ChevronRight size={15} />
                     </button>
                 </div>

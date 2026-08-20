@@ -12,6 +12,7 @@ import {
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import ConfirmToast from "@/components/common/ConfirmToast";
 import { useAuth } from "@/context/AuthContext";
@@ -27,9 +28,7 @@ function StatCard({ title, value, icon: Icon, color, loading, error }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm">
             <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
-                    {title}
-                </p>
+                <p className={`${ui.sectionLabel} mb-1`}>{title}</p>
 
                 {loading ? (
                     <Skeleton
@@ -342,7 +341,7 @@ export default function Dashboard() {
                             aria-hidden="true"
                         />
 
-                        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                        <h2 className={`${ui.sectionLabel}`}>
                             Weekly Activity
                         </h2>
                     </div>
@@ -427,9 +426,7 @@ export default function Dashboard() {
                             aria-hidden="true"
                         />
 
-                        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                            Recently Added
-                        </h2>
+                        <h2 className={`${ui.sectionLabel}`}>Recently Added</h2>
                     </div>
 
                     <div

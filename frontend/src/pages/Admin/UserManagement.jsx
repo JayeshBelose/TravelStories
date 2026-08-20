@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import ConfirmToast from "@/components/common/ConfirmToast";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
@@ -144,7 +145,9 @@ export default function UserManagement() {
             </div>
 
             {/* Search */}
-            <div className="w-full sm:max-w-md flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors mb-5">
+            <div
+                className={`${ui.searchContainer} w-full sm:max-w-md flex items-center gap-2.5 mb-5`}
+            >
                 <Search size={15} className="text-gray-400 flex-shrink-0" />
                 <input
                     type="text"

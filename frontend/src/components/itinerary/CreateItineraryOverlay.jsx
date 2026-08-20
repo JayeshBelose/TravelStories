@@ -15,6 +15,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import {
     addMemberService,
@@ -49,11 +50,7 @@ import {
 
 // Custom Tailwind CSS tags
 function SectionLabel({ children }) {
-    return (
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-            {children}
-        </p>
-    );
+    return <p className={`${ui.sectionLabel} mb-3`}>{children}</p>;
 }
 
 function FieldLabel({ children, required }) {
@@ -64,9 +61,6 @@ function FieldLabel({ children, required }) {
         </label>
     );
 }
-
-const inputClass =
-    "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 transition-colors";
 
 export default function CreateItineraryOverlay({
     open,
@@ -871,7 +865,7 @@ export default function CreateItineraryOverlay({
                                         ? "itinerary-title-error"
                                         : undefined
                                 }
-                                className={`${inputClass} ${
+                                className={`${ui.input} ${
                                     errors.title
                                         ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                         : ""
@@ -911,7 +905,7 @@ export default function CreateItineraryOverlay({
                                             ? "itinerary-place-error"
                                             : undefined
                                     }
-                                    className={`${inputClass} pl-9 ${
+                                    className={`${ui.input} pl-9 ${
                                         errors.place
                                             ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                             : ""
@@ -945,7 +939,7 @@ export default function CreateItineraryOverlay({
                                             ? "itinerary-type-error"
                                             : undefined
                                     }
-                                    className={`${inputClass} appearance-none pr-8 ${
+                                    className={`${ui.select} appearance-none pr-8 ${
                                         errors.type
                                             ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                             : ""
@@ -998,7 +992,7 @@ export default function CreateItineraryOverlay({
                                 type="date"
                                 {...register("startDate")}
                                 disabled={saving || isSubmitting}
-                                className={`${inputClass} ${
+                                className={`${ui.input} ${
                                     errors.startDate
                                         ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                         : ""
@@ -1019,7 +1013,7 @@ export default function CreateItineraryOverlay({
                                 type="date"
                                 {...register("endDate")}
                                 disabled={saving || isSubmitting}
-                                className={`${inputClass} ${
+                                className={`${ui.input} ${
                                     errors.endDate
                                         ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                         : ""
@@ -1043,7 +1037,7 @@ export default function CreateItineraryOverlay({
                                 {...register("description")}
                                 disabled={saving || isSubmitting}
                                 maxLength={500}
-                                className={`${inputClass} resize-none ${
+                                className={`${ui.textarea} resize-none ${
                                     errors.description
                                         ? "border-red-300 focus:border-red-400 bg-red-50/30"
                                         : ""
@@ -1078,7 +1072,7 @@ export default function CreateItineraryOverlay({
                                 onChange={(e) =>
                                     setMemberSearch(e.target.value)
                                 }
-                                className={`${inputClass} pl-9`}
+                                className={`${ui.input} pl-9`}
                                 disabled={saving}
                             />
                         </div>
@@ -1204,7 +1198,7 @@ export default function CreateItineraryOverlay({
 
                                                 setDays(updated);
                                             }}
-                                            className={`${inputClass} resize-none`}
+                                            className={`${ui.textarea} resize-none`}
                                             disabled={saving}
                                         />
 

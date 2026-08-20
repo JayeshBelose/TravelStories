@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/styles/uiPrimitives";
 import {
     deleteUserAccountService,
     updateUserProfileService,
@@ -184,9 +185,7 @@ export default function Profile() {
             <div className="space-y-4">
                 {/* Avatar Card */}
                 <div className="bg-white border border-gray-100 rounded-2xl p-6">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-                        Profile Picture
-                    </p>
+                    <p className={`${ui.sectionLabel} mb-4`}>Profile Picture</p>
 
                     <div className="flex items-center gap-5">
                         {/* Avatar */}
@@ -289,9 +288,7 @@ export default function Profile() {
                     onSubmit={handleSubmit(handleSave)}
                     className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                        Account Details
-                    </p>
+                    <p className={`${ui.sectionLabel}`}>Account Details</p>
 
                     {/* Username */}
                     <div>

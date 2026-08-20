@@ -13,6 +13,7 @@ import {
 import UserItineraryListOverlay from "@/components/itinerary/UserItineraryListOverlay";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -63,7 +64,7 @@ export default function Community() {
 
     // Close search dropdown on outside click
     useEffect(() => {
-        const handler = e => {
+        const handler = (e) => {
             if (searchRef.current && !searchRef.current.contains(e.target)) {
                 setSearchOpen(false);
             }
@@ -132,7 +133,7 @@ export default function Community() {
 
             if (result.success) {
                 const filtered = result.data.filter(
-                    u => u.userId !== loggedInUser?.userId,
+                    (u) => u.userId !== loggedInUser?.userId,
                 );
 
                 setSearchResults(filtered);
@@ -150,13 +151,13 @@ export default function Community() {
         return () => clearTimeout(delay);
     }, [search]);
 
-    const isFollowing = userId => following.some(u => u.userId === userId);
+    const isFollowing = (userId) => following.some((u) => u.userId === userId);
 
-    const isFollower = userId => followers.some(u => u.userId === userId);
+    const isFollower = (userId) => followers.some((u) => u.userId === userId);
 
-    const isFriend = userId => isFollowing(userId) && isFollower(userId);
+    const isFriend = (userId) => isFollowing(userId) && isFollower(userId);
 
-    const toggleFollow = async user => {
+    const toggleFollow = async (user) => {
         if (followActionUserId === user.userId) return;
 
         setFollowActionUserId(user.userId);
@@ -171,7 +172,9 @@ export default function Community() {
                 });
 
                 if (result.success) {
-                    setFollowing(prev => prev.filter(u => u.userId !== user.userId));
+                    setFollowing((prev) =>
+                        prev.filter((u) => u.userId !== user.userId),
+                    );
                 } else {
                     toast.error(result.message);
                 }
@@ -182,7 +185,7 @@ export default function Community() {
                 });
 
                 if (result.success) {
-                    setFollowing(prev => [...prev, user]);
+                    setFollowing((prev) => [...prev, user]);
                 } else {
                     toast.error(result.message);
                 }
@@ -211,7 +214,7 @@ export default function Community() {
 
             if (result.success) {
                 const filtered = result.data.filter(
-                    u => u.userId !== loggedInUser?.userId,
+                    (u) => u.userId !== loggedInUser?.userId,
                 );
 
                 setSearchResults(filtered);
@@ -237,14 +240,15 @@ export default function Community() {
         inputRef.current?.focus();
     };
 
-    const handleSelectSearchUser = user => {
+    const handleSelectSearchUser = (user) => {
         setSelectedUser(user);
         clearSearch();
     };
 
     const currentList = activeTab === "following" ? following : followers;
 
-    const currentError = activeTab === "following" ? followingError : followersError;
+    const currentError =
+        activeTab === "following" ? followingError : followersError;
 
     return (
         <div>
@@ -253,12 +257,16 @@ export default function Community() {
                 <h1 className="text-3xl font-bold font-primary text-gray-900 tracking-tight mb-1">
                     Community
                 </h1>
-                <p className="text-sm text-gray-400">Connect with fellow travelers</p>
+                <p className="text-sm text-gray-400">
+                    Connect with fellow travelers
+                </p>
             </div>
 
             {/* Search */}
             <div ref={searchRef} className="relative mb-8">
-                <div className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm focus-within:border-gray-400 transition-colors">
+                <div
+                    className={`${ui.searchContainer} flex items-center gap-2.5`}
+                >
                     <Search size={15} className="text-gray-400 flex-shrink-0" />
 
                     <input
@@ -266,7 +274,7 @@ export default function Community() {
                         type="text"
                         placeholder="Search travelers to connect with…"
                         value={search}
-                        onChange={e => setSearch(e.target.value)}
+                        onChange={(e) => setSearch(e.target.value)}
                         className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                         aria-label="Search travelers"
                     />
@@ -284,7 +292,8 @@ export default function Community() {
                             type="button"
                             onClick={clearSearch}
                             className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
-                            aria-label="Clear search">
+                            aria-label="Clear search"
+                        >
                             <X size={14} />
                         </button>
                     )}
@@ -304,7 +313,8 @@ export default function Community() {
                         ) : searchResults.length === 0 ? (
                             <div
                                 role="status"
-                                className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                                className="flex flex-col items-center justify-center py-8 px-4 text-center"
+                            >
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                                     <Users
                                         size={18}
@@ -322,19 +332,24 @@ export default function Community() {
                                 </p>
                             </div>
                         ) : (
-                            searchResults.map(user => {
+                            searchResults.map((user) => {
                                 const followed = isFollowing(user.userId);
                                 const friend = isFriend(user.userId);
-                                const followLoading = followActionUserId === user.userId;
+                                const followLoading =
+                                    followActionUserId === user.userId;
 
                                 return (
                                     <div
                                         key={user.userId}
-                                        className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors">
+                                        className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors"
+                                    >
                                         <button
                                             type="button"
-                                            onClick={() => handleSelectSearchUser(user)}
-                                            className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
+                                            onClick={() =>
+                                                handleSelectSearchUser(user)
+                                            }
+                                            className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left"
+                                        >
                                             <UserAvatar
                                                 userId={user.userId}
                                                 username={user.username}
@@ -355,7 +370,7 @@ export default function Community() {
 
                                             <button
                                                 type="button"
-                                                onClick={e => {
+                                                onClick={(e) => {
                                                     e.stopPropagation();
                                                     toggleFollow(user);
                                                 }}
@@ -365,7 +380,8 @@ export default function Community() {
                 followed
                     ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
                     : "bg-gray-900 text-white hover:bg-gray-700"
-            }`}>
+            }`}
+                                            >
                                                 {followLoading ? (
                                                     <>
                                                         <Loader2
@@ -407,12 +423,16 @@ export default function Community() {
                         activeTab === "following"
                             ? "text-gray-900"
                             : "text-gray-400 hover:text-gray-600"
-                    }`}>
+                    }`}
+                >
                     Following
                     <span
                         className={`ml-1.5 text-xs ${
-                            activeTab === "following" ? "text-gray-500" : "text-gray-300"
-                        }`}>
+                            activeTab === "following"
+                                ? "text-gray-500"
+                                : "text-gray-300"
+                        }`}
+                    >
                         {following.length}
                     </span>
                     {activeTab === "following" && (
@@ -427,12 +447,16 @@ export default function Community() {
                         activeTab === "followers"
                             ? "text-gray-900"
                             : "text-gray-400 hover:text-gray-600"
-                    }`}>
+                    }`}
+                >
                     Followers
                     <span
                         className={`ml-1.5 text-xs ${
-                            activeTab === "followers" ? "text-gray-500" : "text-gray-300"
-                        }`}>
+                            activeTab === "followers"
+                                ? "text-gray-500"
+                                : "text-gray-300"
+                        }`}
+                    >
                         {followers.length}
                     </span>
                     {activeTab === "followers" && (
@@ -445,11 +469,13 @@ export default function Community() {
                 <div
                     aria-busy="true"
                     aria-label="Loading connections"
-                    className="space-y-2">
+                    className="space-y-2"
+                >
                     {Array.from({ length: 4 }).map((_, i) => (
                         <div
                             key={i}
-                            className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl">
+                            className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl"
+                        >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <Skeleton className="w-11 h-11 rounded-full flex-shrink-0" />
 
@@ -491,21 +517,24 @@ export default function Community() {
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {currentList.map(user => {
+                    {currentList.map((user) => {
                         const followingUser = isFollowing(user.userId);
                         const friend = isFriend(user.userId);
-                        const followLoading = followActionUserId === user.userId;
+                        const followLoading =
+                            followActionUserId === user.userId;
 
                         return (
                             <div
                                 key={user.userId}
-                                className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
+                                className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all"
+                            >
                                 {/* User info */}
 
                                 <button
                                     type="button"
                                     onClick={() => setSelectedUser(user)}
-                                    className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left">
+                                    className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 text-left"
+                                >
                                     <UserAvatar
                                         userId={user.userId}
                                         username={user.username}
@@ -535,12 +564,13 @@ export default function Community() {
 
                                         <button
                                             type="button"
-                                            onClick={e => {
+                                            onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleFollow(user);
                                             }}
                                             disabled={followLoading}
-                                            className="flex items-center justify-center gap-1.5 min-w-[82px] px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
+                                            className="flex items-center justify-center gap-1.5 min-w-[82px] px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
                                             {followLoading ? (
                                                 <>
                                                     <Loader2
@@ -567,7 +597,7 @@ export default function Community() {
 
                                         <button
                                             type="button"
-                                            onClick={e => {
+                                            onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleFollow(user);
                                             }}
@@ -577,7 +607,8 @@ export default function Community() {
                 followingUser
                     ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500"
                     : "bg-gray-900 text-white hover:bg-gray-700"
-            }`}>
+            }`}
+                                        >
                                             {followLoading ? (
                                                 <>
                                                     <Loader2
@@ -613,7 +644,9 @@ export default function Community() {
                 open={!!selectedUser}
                 user={selectedUser}
                 onClose={() => setSelectedUser(null)}
-                onSelectItinerary={itinerary => setSelectedItinerary(itinerary)}
+                onSelectItinerary={(itinerary) =>
+                    setSelectedItinerary(itinerary)
+                }
             />
 
             <ItineraryOverlay
