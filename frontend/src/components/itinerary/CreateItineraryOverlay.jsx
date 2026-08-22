@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { itinerarySchema } from "@/schemas/itinerarySchemas";
@@ -98,6 +98,9 @@ export default function CreateItineraryOverlay({
     const [deletedLocations, setDeletedLocations] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
 
+    const dialogRef = useRef(null);
+    const previousFocusRef = useRef(null);
+
     const {
         register,
         handleSubmit,
@@ -118,6 +121,39 @@ export default function CreateItineraryOverlay({
     });
 
     const titleValue = watch("title");
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
+
+        previousFocusRef.current = document.activeElement;
+
+        const dialog = dialogRef.current;
+
+        if (dialog) {
+            dialog.focus();
+        }
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape" && !saving) {
+                onClose();
+            }
+        };
+
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+
+            if (
+                previousFocusRef.current &&
+                typeof previousFocusRef.current.focus === "function"
+            ) {
+                previousFocusRef.current.focus();
+            }
+        };
+    }, [open, onClose, saving]);
 
     /*
      * Cleanup thumbnail preview URL whenever it changes or
@@ -390,11 +426,19 @@ export default function CreateItineraryOverlay({
                 onClick={onClose}
             >
                 <div
+                    ref={dialogRef}
+                    tabIndex={-1}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="create-itinerary-title"
                     className="bg-white w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-                        <h2 className="text-base font-semibold text-gray-900 font-primary">
+                        <h2
+                            id="create-itinerary-title"
+                            className="text-base font-semibold text-gray-900 font-primary"
+                        >
                             {isEditMode ? "Edit Itinerary" : "New Itinerary"}
                         </h2>
 

@@ -1,5 +1,5 @@
+import { useEffect, useState, useRef } from "react";
 import { X, MapIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import ItineraryCard from "./ItineraryCard";
@@ -14,8 +14,42 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
     const [selectedItinerary, setSelectedItinerary] = useState(null);
     const [retryKey, setRetryKey] = useState(0);
 
+    const dialogRef = useRef(null);
+    const previousFocusRef = useRef(null);
+
     const currentUser = JSON.parse(sessionStorage.getItem("user"));
     const isAdmin = currentUser?.role === "admin";
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
+
+        previousFocusRef.current = document.activeElement;
+
+        if (dialogRef.current) {
+            dialogRef.current.focus();
+        }
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        };
+
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+
+            if (
+                previousFocusRef.current &&
+                typeof previousFocusRef.current.focus === "function"
+            ) {
+                previousFocusRef.current.focus();
+            }
+        };
+    }, [open, onClose]);
 
     useEffect(() => {
         if (!open || !user?.userId) {
@@ -39,13 +73,14 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
 
                 if (!result.success) {
                     throw new Error(
-                        result.message || "We couldn't load this user's itineraries.",
+                        result.message ||
+                            "We couldn't load this user's itineraries.",
                     );
                 }
 
                 const visibleItineraries = isAdmin
                     ? result.data
-                    : result.data.filter(itinerary => itinerary.public);
+                    : result.data.filter((itinerary) => itinerary.public);
 
                 setItineraries(visibleItineraries);
             } catch (error) {
@@ -53,7 +88,10 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
 
                 console.error("Failed to load user itineraries:", error);
 
-                setError(error.message || "We couldn't load this user's itineraries.");
+                setError(
+                    error.message ||
+                        "We couldn't load this user's itineraries.",
+                );
 
                 setItineraries([]);
             } finally {
@@ -77,7 +115,7 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
     }, [open]);
 
     const handleRetry = () => {
-        setRetryKey(prev => prev + 1);
+        setRetryKey((prev) => prev + 1);
     };
 
     if (!open || !user) {
@@ -92,13 +130,17 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
             <div
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
                 onClick={onClose}
-                role="presentation">
+                role="presentation"
+            >
                 <div
+                    ref={dialogRef}
+                    tabIndex={-1}
                     className="bg-white w-full max-w-5xl max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-                    onClick={event => event.stopPropagation()}
+                    onClick={(event) => event.stopPropagation()}
                     role="dialog"
                     aria-modal="true"
-                    aria-labelledby="user-itinerary-overlay-title">
+                    aria-labelledby="user-itinerary-overlay-title"
+                >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
                         <div className="flex items-center gap-3 min-w-0">
@@ -116,7 +158,8 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                             <div className="min-w-0">
                                 <h2
                                     id="user-itinerary-overlay-title"
-                                    className="text-base font-semibold text-gray-900 font-primary leading-tight truncate">
+                                    className="text-base font-semibold text-gray-900 font-primary leading-tight truncate"
+                                >
                                     {user.username}
                                 </h2>
 
@@ -144,7 +187,8 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                             type="button"
                             onClick={onClose}
                             className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer flex-shrink-0"
-                            aria-label={`Close ${user.username}'s itineraries`}>
+                            aria-label={`Close ${user.username}'s itineraries`}
+                        >
                             <X size={17} aria-hidden="true" />
                         </button>
                     </div>
@@ -152,16 +196,19 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                     {/* Body */}
                     <div
                         className="flex-1 overflow-y-auto"
-                        aria-busy={loadingItineraries}>
+                        aria-busy={loadingItineraries}
+                    >
                         {loadingItineraries ? (
                             <div
                                 aria-label="Loading itineraries"
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6"
+                            >
                                 {Array.from({ length: 3 }).map((_, index) => (
                                     <div
                                         key={index}
                                         className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
-                                        aria-hidden="true">
+                                        aria-hidden="true"
+                                    >
                                         <Skeleton className="h-48 w-full rounded-none" />
 
                                         <div className="p-4 space-y-2">
@@ -182,8 +229,12 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                             <div className="flex flex-col items-center justify-center py-20 px-6 gap-3 text-gray-400">
                                 <div
                                     className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center"
-                                    aria-hidden="true">
-                                    <MapIcon size={22} className="text-gray-300" />
+                                    aria-hidden="true"
+                                >
+                                    <MapIcon
+                                        size={22}
+                                        className="text-gray-300"
+                                    />
                                 </div>
 
                                 <p className="text-sm font-medium text-gray-500">
@@ -198,7 +249,7 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
-                                {itineraries.map(itinerary => (
+                                {itineraries.map((itinerary) => (
                                     <ItineraryCard
                                         key={itinerary.itineraryId}
                                         itinerary={itinerary}
@@ -215,6 +266,7 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}
+                allowRelatedItineraries={false}
             />
         </>
     );

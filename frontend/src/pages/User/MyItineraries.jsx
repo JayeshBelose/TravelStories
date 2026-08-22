@@ -557,6 +557,7 @@ export default function MyItineraries() {
                         setOpenView(false);
                         setSelectedItinerary(null);
                     }}
+                    allowRelatedItineraries={true}
                 />
             )}
         </div>

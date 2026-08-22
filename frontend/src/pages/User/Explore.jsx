@@ -451,6 +451,7 @@ export default function Explore() {
             <ItineraryOverlay
                 itinerary={selectedItinerary}
                 onClose={() => setSelectedItinerary(null)}
+                allowRelatedItineraries={true}
             />
         </div>
     );
