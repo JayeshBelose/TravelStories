@@ -5,7 +5,11 @@ import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 const navItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "User Management", path: "/admin/user-management", icon: Users },
-    { name: "Itinerary Management", path: "/admin/itinerary-management", icon: Map },
+    {
+        name: "Itinerary Management",
+        path: "/admin/itinerary-management",
+        icon: Map,
+    },
 ];
 
 export default function AdminSidebar({ user, onLogout }) {
@@ -33,8 +37,8 @@ export default function AdminSidebar({ user, onLogout }) {
                 </div>
 
                 {/* Nav */}
-                <nav className="space-y-0.5">
-                    {navItems.map(item => {
+                <nav className="space-y-0.5" aria-label="Admin navigation">
+                    {navItems.map((item) => {
                         const Icon = item.icon;
                         return (
                             <NavLink
@@ -48,7 +52,8 @@ export default function AdminSidebar({ user, onLogout }) {
                                             ? "bg-secondary text-black"
                                             : "text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground"
                                     }`
-                                }>
+                                }
+                            >
                                 {({ isActive }) => (
                                     <>
                                         <Icon
@@ -92,7 +97,8 @@ export default function AdminSidebar({ user, onLogout }) {
                     {/* Logout */}
                     <button
                         onClick={onLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground transition-colors cursor-pointer">
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground transition-colors cursor-pointer"
+                    >
                         <LogOut size={15} />
                         Sign out
                     </button>

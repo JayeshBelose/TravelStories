@@ -21,7 +21,7 @@ export default function Sidebar({ user, onLogout }) {
                 <div className="px-2 mb-3 pb-4 border-b border-white/10">
                     <div className="flex items-center gap-2 mb-0.5">
                         <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <img src={logo} alt="logo" />
+                            <img src={logo} alt="Travel Stories" />
                         </div>
                         <span className="text-xl font-bold font-primary tracking-tight text-primary-foreground">
                             Travel Stories
@@ -30,8 +30,8 @@ export default function Sidebar({ user, onLogout }) {
                 </div>
 
                 {/* Nav */}
-                <nav className="space-y-0.5">
-                    {navItems.map(item => {
+                <nav className="space-y-0.5" aria-label="Primary navigation">
+                    {navItems.map((item) => {
                         const Icon = item.icon;
                         return (
                             <NavLink
@@ -45,7 +45,8 @@ export default function Sidebar({ user, onLogout }) {
                                             ? "bg-secondary text-black"
                                             : "text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground"
                                     }`
-                                }>
+                                }
+                            >
                                 {({ isActive }) => (
                                     <>
                                         <Icon
@@ -85,7 +86,8 @@ export default function Sidebar({ user, onLogout }) {
                 {/* Logout */}
                 <button
                     onClick={onLogout}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground transition-colors cursor-pointer">
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-primary-foreground/70 hover:bg-white/10 hover:text-primary-foreground transition-colors cursor-pointer"
+                >
                     <LogOut size={15} />
                     Sign out
                 </button>
