@@ -71,7 +71,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
     }, [itinerary.itineraryId, loggedInUser?.userId]);
 
     // Like and save functions
-    const handleLike = async e => {
+    const handleLike = async (e) => {
         e.stopPropagation();
 
         if (!loggedInUser?.userId || likeLoading || statusLoading) return;
@@ -88,10 +88,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
                 const newLikedState = !liked;
 
                 setLiked(newLikedState);
-                setLikes(prev => (newLikedState ? prev + 1 : prev - 1));
+                setLikes((prev) => (newLikedState ? prev + 1 : prev - 1));
             } else {
                 toast.error(
-                    result.message || "Unable to update the like. Please try again.",
+                    result.message ||
+                        "Unable to update the like. Please try again.",
                 );
             }
         } finally {
@@ -99,10 +100,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
         }
     };
 
-    const handleSave = async e => {
+    const handleSave = async (e) => {
         e.stopPropagation();
 
-        if (!loggedInUser?.userId || isOwner || saveLoading || statusLoading) return;
+        if (!loggedInUser?.userId || isOwner || saveLoading || statusLoading)
+            return;
 
         setSaveLoading(true);
 
@@ -116,10 +118,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
                 const newSavedState = !saved;
 
                 setSaved(newSavedState);
-                setSaves(prev => (newSavedState ? prev + 1 : prev - 1));
+                setSaves((prev) => (newSavedState ? prev + 1 : prev - 1));
             } else {
                 toast.error(
-                    result.message || "Unable to update the save. Please try again.",
+                    result.message ||
+                        "Unable to update the save. Please try again.",
                 );
             }
         } finally {
@@ -131,8 +134,11 @@ export default function ItineraryCard({ itinerary, onClick }) {
 
     return (
         <div
+            role="button"
+            tabIndex={0}
             onClick={() => onClick(itinerary)}
-            className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 flex flex-col">
+            className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 flex flex-col"
+        >
             {/* Thumbnail */}
             <div className="relative h-48 overflow-hidden flex-shrink-0">
                 <ItineraryThumbnail
@@ -149,7 +155,8 @@ export default function ItineraryCard({ itinerary, onClick }) {
                                 itinerary.public
                                     ? "bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 backdrop-blur-sm"
                                     : "bg-red-500/15 text-red-400 border border-red-400/25 backdrop-blur-sm"
-                            }`}>
+                            }`}
+                    >
                         {itinerary.public ? "Public" : "Private"}
                     </span>
                 </div>
@@ -167,7 +174,7 @@ export default function ItineraryCard({ itinerary, onClick }) {
             {/* Card Body */}
             <div className="flex flex-col flex-1 p-4 gap-2">
                 {/* Title */}
-                <h3 className="text-sm font-semibold text-gray-900 font-primary leading-snug line-clamp-2">
+                <h3 className="text-sm font-semibold text-gray-900 font-primary leading-snug line-clamp-2 text-start">
                     {itinerary.title}
                 </h3>
 
@@ -180,7 +187,9 @@ export default function ItineraryCard({ itinerary, onClick }) {
                 {/* Creator */}
                 <p className="inline-flex items-center gap-1 text-xs text-gray-400">
                     <User size={11} className="flex-shrink-0" />
-                    <span className="truncate">{itinerary.createdBy || "Anonymous"}</span>
+                    <span className="truncate">
+                        {itinerary.createdBy || "Anonymous"}
+                    </span>
                 </p>
 
                 {/* Divider + Actions */}
@@ -197,24 +206,31 @@ export default function ItineraryCard({ itinerary, onClick }) {
                         <button
                             onClick={handleLike}
                             disabled={likeLoading || statusLoading}
-                            aria-label={liked ? "Unlike itinerary" : "Like itinerary"}
+                            aria-label={
+                                liked ? "Unlike itinerary" : "Like itinerary"
+                            }
                             aria-busy={likeLoading}
                             className={`flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors ${
                                 likeLoading
                                     ? "opacity-50 cursor-not-allowed"
                                     : "cursor-pointer"
-                            }`}>
+                            }`}
+                        >
                             <Heart
                                 size={14}
                                 className={`transition-colors ${liked ? "fill-red-500 text-red-500" : ""}`}
                             />
-                            <span className={liked ? "text-red-500" : ""}>{likes}</span>
+                            <span className={liked ? "text-red-500" : ""}>
+                                {likes}
+                            </span>
                         </button>
 
                         <button
                             onClick={handleSave}
                             disabled={isOwner || saveLoading || statusLoading}
-                            aria-label={saved ? "Unsave itinerary" : "Save itinerary"}
+                            aria-label={
+                                saved ? "Unsave itinerary" : "Save itinerary"
+                            }
                             aria-busy={saveLoading}
                             className={`flex items-center gap-1 text-xs transition-colors
                                 ${
@@ -223,7 +239,8 @@ export default function ItineraryCard({ itinerary, onClick }) {
                                         : saveLoading
                                           ? "text-gray-400 opacity-50 cursor-not-allowed"
                                           : "text-gray-400 hover:text-yellow-500 cursor-pointer"
-                                }`}>
+                                }`}
+                        >
                             <Bookmark
                                 size={14}
                                 className={`transition-colors ${saved ? "fill-yellow-400 text-yellow-400" : ""}`}

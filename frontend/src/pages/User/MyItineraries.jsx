@@ -398,6 +398,8 @@ export default function MyItineraries() {
 
                             return (
                                 <div
+                                    role="button"
+                                    tabIndex={0}
                                     key={itinerary.itineraryId}
                                     onClick={(e) => {
                                         if (e.target.closest(".action-btn"))
