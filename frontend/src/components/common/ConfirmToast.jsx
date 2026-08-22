@@ -9,7 +9,7 @@ export default function ConfirmToast({
     onCancel,
 }) {
     return (
-        <div>
+        <div role="status">
             <p className="text-sm text-gray-700 mb-3">{message}</p>
 
             <div className="flex gap-2">
@@ -21,7 +21,11 @@ export default function ConfirmToast({
                 >
                     {loading ? (
                         <>
-                            <Loader2 size={12} className="animate-spin" />
+                            <Loader2
+                                size={12}
+                                className="animate-spin"
+                                aria-hidden="true"
+                            />
                             {loadingLabel}
                         </>
                     ) : (

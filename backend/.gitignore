@@ -5,6 +5,7 @@ target/
 .kotlin
 .env
 .env.example
+**/logs/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

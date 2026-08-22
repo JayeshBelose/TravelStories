@@ -175,25 +175,46 @@ export default function UserManagement() {
                     <table className="w-full min-w-[900px] text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 text-left">
-                                <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+                                <th
+                                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
+                                    scope="col"
+                                >
                                     User
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
+                                    scope="col"
+                                >
                                     Email
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
+                                    scope="col"
+                                >
                                     Role
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
+                                    scope="col"
+                                >
                                     Joined
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center"
+                                    scope="col"
+                                >
                                     Followers
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center"
+                                    scope="col"
+                                >
                                     Following
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">
+                                <th
+                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right"
+                                    scope="col"
+                                >
                                     Actions
                                 </th>
                             </tr>
@@ -273,19 +294,25 @@ export default function UserManagement() {
                                                             "U"}
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <span className="text-sm font-medium text-gray-900 hover:underline underline-offset-2">
+                                                <span
+                                                    className="text-sm font-medium text-gray-900 hover:underline underline-offset-2"
+                                                    scope="row"
+                                                >
                                                     {user.username}
                                                 </span>
                                             </button>
                                         </td>
 
                                         {/* Email */}
-                                        <td className="px-4 py-3 text-sm text-gray-500">
+                                        <td
+                                            className="px-4 py-3 text-sm text-gray-500"
+                                            scope="row"
+                                        >
                                             {user.email}
                                         </td>
 
                                         {/* Role */}
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-3" scope="row">
                                             <span
                                                 className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full
                                         ${
@@ -310,7 +337,10 @@ export default function UserManagement() {
                                         </td>
 
                                         {/* Joined */}
-                                        <td className="px-4 py-3 text-sm text-gray-400">
+                                        <td
+                                            className="px-4 py-3 text-sm text-gray-400"
+                                            scope="row"
+                                        >
                                             {new Date(
                                                 user.createdAt,
                                             ).toLocaleDateString("en-GB", {
@@ -321,17 +351,26 @@ export default function UserManagement() {
                                         </td>
 
                                         {/* Followers */}
-                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                        <td
+                                            className="px-4 py-3 text-sm text-gray-600 text-center"
+                                            scope="row"
+                                        >
                                             {user.followersCount}
                                         </td>
 
                                         {/* Following */}
-                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                        <td
+                                            className="px-4 py-3 text-sm text-gray-600 text-center"
+                                            scope="row"
+                                        >
                                             {user.followingCount}
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="px-4 py-3 text-right">
+                                        <td
+                                            className="px-4 py-3 text-right"
+                                            scope="row"
+                                        >
                                             {user.role !== "ADMIN" &&
                                                 user.role !== "admin" && (
                                                     <button

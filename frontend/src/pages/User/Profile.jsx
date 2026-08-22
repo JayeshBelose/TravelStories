@@ -210,7 +210,10 @@ export default function Profile() {
                             </Avatar>
 
                             {/* Camera overlay trigger */}
-                            <label className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 hover:bg-black/30 transition-colors cursor-pointer group">
+                            <label
+                                className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 hover:bg-black/30 transition-colors cursor-pointer group"
+                                htmlFor="upload"
+                            >
                                 <Camera
                                     size={18}
                                     className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
@@ -221,6 +224,7 @@ export default function Profile() {
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     className="hidden"
+                                    aria-label="Upload image"
                                 />
                             </label>
                         </div>

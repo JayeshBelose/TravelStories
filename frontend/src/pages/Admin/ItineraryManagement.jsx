@@ -463,6 +463,7 @@ export default function ItineraryManagement() {
                                         className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
                                             h === "Actions" ? "text-right" : ""
                                         }`}
+                                        scope="col"
                                     >
                                         {h}
                                     </th>
