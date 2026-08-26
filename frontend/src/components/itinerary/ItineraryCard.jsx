@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
 import { toast } from "react-toastify";
 import ItineraryThumbnail from "./ItineraryThumbnail";
@@ -9,7 +9,7 @@ import {
     toggleSaveItineraryService,
 } from "@/services/userService";
 
-export default function ItineraryCard({ itinerary, onClick }) {
+function ItineraryCard({ itinerary, onClick }) {
     const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
 
     const [likes, setLikes] = useState(itinerary.likeCount);
@@ -255,3 +255,5 @@ export default function ItineraryCard({ itinerary, onClick }) {
         </div>
     );
 }
+
+export default memo(ItineraryCard);

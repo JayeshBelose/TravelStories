@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { ImageOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -10,18 +10,18 @@ import { cn } from "@/lib/utils";
  * Fills its parent container (intended to be used inside an already-sized
  * wrapper, e.g. `<div className="h-48 w-full overflow-hidden">`).
  */
-export default function ItineraryThumbnail({
-    itineraryId,
-    alt,
-    className,
-    imgClassName,
-}) {
+function ItineraryThumbnail({ itineraryId, alt, className, imgClassName }) {
     const [status, setStatus] = useState("loading"); // loading | loaded | error
 
     const src = `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`;
 
     return (
-        <div className={cn("relative h-full w-full overflow-hidden bg-gray-100", className)}>
+        <div
+            className={cn(
+                "relative h-full w-full overflow-hidden bg-gray-100",
+                className,
+            )}
+        >
             {status === "loading" && (
                 <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
             )}
@@ -48,3 +48,5 @@ export default function ItineraryThumbnail({
         </div>
     );
 }
+
+export default memo(ItineraryThumbnail);
