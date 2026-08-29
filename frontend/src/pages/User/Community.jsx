@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { toast } from "react-toastify";
 import {
     Search,
     X,
     Users,
-    UserCheck,
     UserPlus,
     UserMinus,
     MapIcon,
@@ -24,7 +23,7 @@ import {
     unfollowUserService,
 } from "@/services/userService";
 
-function UserAvatar({ userId, username, size = "md" }) {
+const UserAvatar = memo(function UserAvatar({ userId, username, size = "md" }) {
     const sizeClass = size === "sm" ? "w-8 h-8 text-xs" : "w-11 h-11 text-sm";
 
     return (
@@ -38,10 +37,16 @@ function UserAvatar({ userId, username, size = "md" }) {
             </AvatarFallback>
         </Avatar>
     );
-}
+});
 
 export default function Community() {
-    const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
+    const loggedInUser = useMemo(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("user"));
+        } catch {
+            return null;
+        }
+    }, []);
 
     const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
@@ -75,38 +80,45 @@ export default function Community() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    const fetchConnections = async () => {
+    const fetchConnections = useCallback(async () => {
         if (!loggedInUser?.userId) return;
 
         setLoadingConnections(true);
         setFollowingError(null);
         setFollowersError(null);
 
-        const [followingResult, followersResult] = await Promise.all([
-            getFollowingService({ userId: loggedInUser.userId }),
-            getFollowersService({ userId: loggedInUser.userId }),
-        ]);
+        try {
+            const [followingResult, followersResult] = await Promise.all([
+                getFollowingService({ userId: loggedInUser.userId }),
+                getFollowersService({ userId: loggedInUser.userId }),
+            ]);
 
-        if (followingResult.success) {
-            setFollowing(followingResult.data);
-        } else {
+            if (followingResult.success) {
+                setFollowing(followingResult.data);
+            } else {
+                setFollowing([]);
+                setFollowingError(followingResult.message);
+            }
+
+            if (followersResult.success) {
+                setFollowers(followersResult.data);
+            } else {
+                setFollowers([]);
+                setFollowersError(followersResult.message);
+            }
+        } catch {
             setFollowing([]);
-            setFollowingError(followingResult.message);
-        }
-
-        if (followersResult.success) {
-            setFollowers(followersResult.data);
-        } else {
             setFollowers([]);
-            setFollowersError(followersResult.message);
+            setFollowingError("Unable to load connections.");
+            setFollowersError("Unable to load connections.");
+        } finally {
+            setLoadingConnections(false);
         }
-
-        setLoadingConnections(false);
-    };
+    }, [loggedInUser]);
 
     useEffect(() => {
         fetchConnections();
-    }, []);
+    }, [fetchConnections]);
 
     useEffect(() => {
         if (search.trim() === "") {
@@ -123,79 +135,111 @@ export default function Community() {
         setSearchError(null);
 
         const delay = setTimeout(async () => {
-            const result = await searchUsersService({
-                query: search,
-            });
+            try {
+                const result = await searchUsersService({
+                    query: search,
+                });
 
-            if (requestId !== searchRequestRef.current) {
-                return;
-            }
+                if (requestId !== searchRequestRef.current) {
+                    return;
+                }
 
-            if (result.success) {
-                const filtered = result.data.filter(
-                    (u) => u.userId !== loggedInUser?.userId,
-                );
+                if (result.success) {
+                    const filtered = result.data.filter(
+                        (u) => u.userId !== loggedInUser?.userId,
+                    );
 
-                setSearchResults(filtered);
-                setSearchError(null);
-                setSearchOpen(true);
-            } else {
+                    setSearchResults(filtered);
+                    setSearchError(null);
+                    setSearchOpen(true);
+                } else {
+                    setSearchResults([]);
+                    setSearchError(result.message);
+                    setSearchOpen(true);
+                }
+            } catch {
+                if (requestId !== searchRequestRef.current) return;
+
                 setSearchResults([]);
-                setSearchError(result.message);
+                setSearchError("Unable to search users.");
                 setSearchOpen(true);
+            } finally {
+                if (requestId === searchRequestRef.current) {
+                    setSearchLoading(false);
+                }
             }
-
-            setSearchLoading(false);
         }, 300);
 
         return () => clearTimeout(delay);
-    }, [search]);
+    }, [search, loggedInUser]);
 
-    const isFollowing = (userId) => following.some((u) => u.userId === userId);
+    const followingIds = useMemo(
+        () => new Set(following.map((u) => u.userId)),
+        [following],
+    );
 
-    const isFollower = (userId) => followers.some((u) => u.userId === userId);
+    const followerIds = useMemo(
+        () => new Set(followers.map((u) => u.userId)),
+        [followers],
+    );
 
-    const isFriend = (userId) => isFollowing(userId) && isFollower(userId);
+    const isFollowing = useCallback(
+        (userId) => followingIds.has(userId),
+        [followingIds],
+    );
 
-    const toggleFollow = async (user) => {
-        if (followActionUserId === user.userId) return;
+    const isFollower = useCallback(
+        (userId) => followerIds.has(userId),
+        [followerIds],
+    );
 
-        setFollowActionUserId(user.userId);
+    const isFriend = useCallback(
+        (userId) => isFollowing(userId) && isFollower(userId),
+        [isFollowing, isFollower],
+    );
 
-        try {
-            let result;
+    const toggleFollow = useCallback(
+        async (user) => {
+            if (followActionUserId === user.userId) return;
 
-            if (isFollowing(user.userId)) {
-                result = await unfollowUserService({
-                    followerId: loggedInUser.userId,
-                    followingId: user.userId,
-                });
+            setFollowActionUserId(user.userId);
 
-                if (result.success) {
-                    setFollowing((prev) =>
-                        prev.filter((u) => u.userId !== user.userId),
-                    );
+            try {
+                let result;
+
+                if (isFollowing(user.userId)) {
+                    result = await unfollowUserService({
+                        followerId: loggedInUser.userId,
+                        followingId: user.userId,
+                    });
+
+                    if (result.success) {
+                        setFollowing((prev) =>
+                            prev.filter((u) => u.userId !== user.userId),
+                        );
+                    } else {
+                        toast.error(result.message);
+                    }
                 } else {
-                    toast.error(result.message);
-                }
-            } else {
-                result = await followUserService({
-                    followerId: loggedInUser.userId,
-                    followingId: user.userId,
-                });
+                    result = await followUserService({
+                        followerId: loggedInUser.userId,
+                        followingId: user.userId,
+                    });
 
-                if (result.success) {
-                    setFollowing((prev) => [...prev, user]);
-                } else {
-                    toast.error(result.message);
+                    if (result.success) {
+                        setFollowing((prev) => [...prev, user]);
+                    } else {
+                        toast.error(result.message);
+                    }
                 }
+            } finally {
+                setFollowActionUserId(null);
             }
-        } finally {
-            setFollowActionUserId(null);
-        }
-    };
+        },
+        [followActionUserId, loggedInUser, isFollowing],
+    );
 
-    const retrySearch = async () => {
+    const retrySearch = useCallback(async () => {
         if (!search.trim()) return;
 
         const requestId = ++searchRequestRef.current;
@@ -230,22 +274,28 @@ export default function Community() {
                 setSearchLoading(false);
             }
         }
-    };
+    }, [search, loggedInUser]);
 
-    const clearSearch = () => {
+    const clearSearch = useCallback(() => {
         setSearch("");
         setSearchResults([]);
         setSearchError(null);
         setSearchOpen(false);
         inputRef.current?.focus();
-    };
+    }, []);
 
-    const handleSelectSearchUser = (user) => {
-        setSelectedUser(user);
-        clearSearch();
-    };
+    const handleSelectSearchUser = useCallback(
+        (user) => {
+            setSelectedUser(user);
+            clearSearch();
+        },
+        [clearSearch],
+    );
 
-    const currentList = activeTab === "following" ? following : followers;
+    const currentList = useMemo(
+        () => (activeTab === "following" ? following : followers),
+        [activeTab, following, followers],
+    );
 
     const currentError =
         activeTab === "following" ? followingError : followersError;

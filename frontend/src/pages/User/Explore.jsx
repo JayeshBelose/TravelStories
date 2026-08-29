@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import {
     Filter,
     Search,
@@ -39,6 +39,7 @@ export default function Explore() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itineraryTypes, setItineraryTypes] = useState([]);
 
+    const requestRef = useRef(0);
     const sortRef = useRef(null);
     const typeRef = useRef(null);
 
@@ -57,57 +58,87 @@ export default function Explore() {
     // Fetch itinerary types from Service
     useEffect(() => {
         const fetchTypes = async () => {
-            const result = await getItineraryTypesService();
+            const currentRequestId = ++requestRef.current;
 
-            if (result.success) {
-                setItineraryTypes(result.data);
+            try {
+                const result = await getItineraryTypesService();
+
+                if (currentRequestId !== requestRef.current) return;
+
+                if (result.success) {
+                    setItineraryTypes(result.data);
+                }
+            } catch (error) {
+                console.error(error);
             }
         };
 
         fetchTypes();
     }, []);
 
-    const fetchItineraries = async () => {
+    const fetchItineraries = useCallback(async () => {
+        const currentRequestId = ++requestRef.current;
+
         setLoading(true);
         setError(null);
 
-        const result = await getItinerariesService({
-            search: appliedSearch,
-            type: typeFilter ?? undefined,
-            sort: sortFilter,
-            page: currentPage - 1,
-            size: 9,
-        });
+        try {
+            const result = await getItinerariesService({
+                search: appliedSearch,
+                type: typeFilter ?? undefined,
+                sort: sortFilter,
+                page: currentPage - 1,
+                size: 9,
+            });
 
-        if (result.success) {
-            setItineraries(result.data.content);
-            setTotalPages(result.data.totalPages);
-        } else {
+            if (currentRequestId !== requestRef.current) return;
+
+            if (result.success) {
+                setItineraries(result.data.content);
+                setTotalPages(result.data.totalPages);
+            } else {
+                setItineraries([]);
+                setTotalPages(1);
+                setError(result.message);
+            }
+        } catch (error) {
+            if (currentRequestId !== requestRef.current) return;
+
             setItineraries([]);
             setTotalPages(1);
-            setError(result.message);
+            setError("Failed to load itineraries.");
+        } finally {
+            if (currentRequestId === requestRef.current) {
+                setLoading(false);
+            }
         }
-
-        setLoading(false);
-    };
+    }, [appliedSearch, sortFilter, typeFilter, currentPage]);
 
     useEffect(() => {
-        const delay = setTimeout(() => fetchItineraries(), 400);
+        const delay = setTimeout(fetchItineraries, 400);
+
         return () => clearTimeout(delay);
-    }, [appliedSearch, sortFilter, typeFilter, currentPage]);
+    }, [fetchItineraries]);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [sortFilter, typeFilter]);
 
-    const getSortLabel = () =>
-        SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ?? "No Filter";
+    const sortLabel = useMemo(
+        () =>
+            SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ??
+            "No Filter",
+        [sortFilter],
+    );
 
-    const getTypeLabel = () =>
-        typeFilter === null
-            ? "All Types"
-            : (itineraryTypes.find((t) => t.name === typeFilter)?.name ??
-              "All Types");
+    const typeLabel = useMemo(
+        () =>
+            typeFilter === null
+                ? "All Types"
+                : (itineraryTypes.find((t) => t.name === typeFilter)?.name ??
+                  "All Types"),
+        [typeFilter, itineraryTypes],
+    );
 
     const sortActive = sortFilter !== "random";
     const typeActive = typeFilter !== null;
@@ -153,6 +184,7 @@ export default function Explore() {
                         <input
                             type="text"
                             placeholder="Search by title or place…"
+                            aria-label="Search itineraries"
                             className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -197,6 +229,8 @@ export default function Explore() {
                                 setOpenSort((v) => !v);
                                 setOpenType(false);
                             }}
+                            aria-expanded={openSort}
+                            aria-haspopup="menu"
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
                                 ${
                                     sortActive
@@ -205,7 +239,7 @@ export default function Explore() {
                                 }`}
                         >
                             <Filter size={13} />
-                            {getSortLabel()}
+                            {sortLabel}
                         </button>
                         {openSort && (
                             <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1">
@@ -237,6 +271,8 @@ export default function Explore() {
                                 setOpenType((v) => !v);
                                 setOpenSort(false);
                             }}
+                            aria-expanded={openType}
+                            aria-haspopup="menu"
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-sm transition-colors cursor-pointer
                                 ${
                                     typeActive
@@ -245,7 +281,7 @@ export default function Explore() {
                                 }`}
                         >
                             <Filter size={13} />
-                            {getTypeLabel()}
+                            {typeLabel}
                         </button>
                         {openType && (
                             <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg z-20 overflow-hidden py-1 max-h-56 overflow-y-auto">
@@ -306,7 +342,7 @@ export default function Explore() {
                         )}
                         {sortActive && (
                             <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
-                                {getSortLabel()}
+                                {sortLabel}
                                 <button
                                     onClick={() => setSortFilter("random")}
                                     className="hover:text-gray-900 cursor-pointer"
@@ -317,7 +353,7 @@ export default function Explore() {
                         )}
                         {typeActive && (
                             <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full capitalize">
-                                {getTypeLabel()}
+                                {typeLabel}
                                 <button
                                     onClick={() => setTypeFilter(null)}
                                     className="hover:text-gray-900 cursor-pointer"

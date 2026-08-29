@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
     Search,
@@ -55,6 +55,7 @@ export default function ItineraryManagement() {
     const [itineraryError, setItineraryError] = useState("");
     const [typeError, setTypeError] = useState("");
 
+    const requestIdRef = useRef(0);
     const sortRef = useRef(null);
     const typeRef = useRef(null);
 
@@ -108,7 +109,9 @@ export default function ItineraryManagement() {
     };
 
     // Fetching itineraries
-    const fetchItineraries = async () => {
+    const fetchItineraries = useCallback(async () => {
+        const requestId = ++requestIdRef.current;
+
         setLoadingItineraries(true);
         setItineraryError("");
 
@@ -121,6 +124,8 @@ export default function ItineraryManagement() {
                 type: typeFilter === "all" ? "" : typeFilter,
                 sort: sortFilter,
             });
+
+            if (requestId !== requestIdRef.current) return;
 
             if (result.success) {
                 setItineraries(result.data?.content || []);
@@ -135,16 +140,20 @@ export default function ItineraryManagement() {
         } catch (error) {
             console.error("Failed to load itineraries:", error);
 
+            if (requestId !== requestIdRef.current) return;
+
             setItineraries([]);
             setTotalPages(0);
             setItineraryError("Unable to load itineraries. Please try again.");
         } finally {
+            if (requestId !== requestIdRef.current) return;
+
             setLoadingItineraries(false);
         }
-    };
+    }, [page, search, filter, typeFilter, sortFilter]);
 
     // Fetching itinerary types
-    const fetchTypes = async () => {
+    const fetchTypes = useCallback(async () => {
         setLoadingTypes(true);
         setTypeError("");
 
@@ -167,13 +176,16 @@ export default function ItineraryManagement() {
         } finally {
             setLoadingTypes(false);
         }
-    };
+    }, []);
 
-    const itineraryTypes = [{ typeId: "all", name: "All Types" }, ...types];
+    const itineraryTypes = useMemo(
+        () => [{ typeId: "all", name: "All Types" }, ...types],
+        [types],
+    );
 
     useEffect(() => {
         fetchTypes();
-    }, []);
+    }, [fetchTypes]);
 
     // Add and delete functions for itinerary types
     const addType = async () => {
@@ -222,7 +234,7 @@ export default function ItineraryManagement() {
         const delay = setTimeout(() => fetchItineraries(), 400);
 
         return () => clearTimeout(delay);
-    }, [search, filter, typeFilter, sortFilter, page]);
+    }, [fetchItineraries]);
 
     // Itinerary delete function
     const handleDelete = async (itineraryId) => {
@@ -231,15 +243,18 @@ export default function ItineraryManagement() {
         });
 
         if (result.success) {
-            const remaining = itineraries.filter(
-                (itinerary) => itinerary.itineraryId !== itineraryId,
-            );
+            setItineraries((prev) => {
+                const remaining = prev.filter(
+                    (itinerary) => itinerary.itineraryId !== itineraryId,
+                );
 
-            if (remaining.length === 0 && page > 0) {
-                setPage((prev) => prev - 1);
-            } else {
-                setItineraries(remaining);
-            }
+                if (remaining.length === 0 && page > 0) {
+                    setPage((p) => p - 1);
+                    return prev;
+                }
+
+                return remaining;
+            });
 
             toast.success("Itinerary deleted.");
         } else {
@@ -247,11 +262,21 @@ export default function ItineraryManagement() {
         }
     };
 
-    const getSortLabel = () =>
-        SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ?? "No Filter";
+    const sortLabel = useMemo(
+        () =>
+            SORT_OPTIONS.find((o) => o.value === sortFilter)?.label ??
+            "No Filter",
+        [sortFilter],
+    );
 
-    const getTypeLabel = () =>
-        typeFilter === "all" ? "All Types" : typeFilter;
+    const typeLabel = useMemo(() => {
+        if (typeFilter === "all") return "All Types";
+
+        return (
+            itineraryTypes.find((t) => t.name === typeFilter)?.name ||
+            "All Types"
+        );
+    }, [typeFilter, itineraryTypes]);
 
     // Handling itinerary saving after edit or viewing
     const handleItinerarySaved = (updatedItinerary) => {
@@ -278,9 +303,9 @@ export default function ItineraryManagement() {
         setOpenCreate(false);
     };
 
-    const sortActive = sortFilter !== "none";
-    const typeActive = typeFilter !== "all";
-    const visActive = filter !== "ALL";
+    const sortActive = useMemo(() => sortFilter !== "none", [sortFilter]);
+    const typeActive = useMemo(() => typeFilter !== "all", [typeFilter]);
+    const isActive = filter !== "ALL";
 
     return (
         <div>
@@ -335,7 +360,7 @@ export default function ItineraryManagement() {
                             }}
                             className={`appearance-none pl-3 pr-7 py-2.5 text-sm font-medium border rounded-xl shadow-sm focus:outline-none transition-colors cursor-pointer
                                 ${
-                                    visActive
+                                    isActive
                                         ? "bg-gray-900 text-white border-gray-900"
                                         : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
                                 }`}
@@ -348,7 +373,7 @@ export default function ItineraryManagement() {
                         <ChevronDown
                             size={13}
                             className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${
-                                visActive ? "text-white" : "text-gray-400"
+                                isActive ? "text-white" : "text-gray-400"
                             }`}
                         />
                     </div>
@@ -368,7 +393,7 @@ export default function ItineraryManagement() {
                                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
                             }`}
                     >
-                        <Filter size={13} /> {getSortLabel()}
+                        <Filter size={13} /> {sortLabel}
                     </button>
 
                     {openSort && (
@@ -408,7 +433,7 @@ export default function ItineraryManagement() {
                                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
                             }`}
                     >
-                        <Filter size={13} /> {getTypeLabel()}
+                        <Filter size={13} /> {typeLabel}
                     </button>
 
                     {openType && (
@@ -670,14 +695,6 @@ export default function ItineraryManagement() {
                         </button>
                     </div>
                 )}
-
-                {!loadingItineraries &&
-                    !itineraryError &&
-                    itineraries.length === 0 && (
-                        <div className="py-16 text-center text-sm text-gray-400">
-                            No itineraries found.
-                        </div>
-                    )}
             </div>
 
             {/* Pagination */}

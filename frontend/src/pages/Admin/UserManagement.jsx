@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
     Search,
@@ -33,28 +33,68 @@ export default function UserManagement() {
     const [usersError, setUsersError] = useState(null);
     const [deletingUserId, setDeletingUserId] = useState(null);
 
-    const confirmDelete = (userId) => {
-        toast(
-            ({ closeToast }) => (
-                <ConfirmToast
-                    message="Are you sure you want to delete this user? This action cannot be undone."
-                    confirmLabel="Delete"
-                    onConfirm={() => {
-                        handleDelete(userId);
-                        closeToast();
-                    }}
-                    onCancel={closeToast}
-                />
-            ),
-            { autoClose: false },
-        );
-    };
+    const requestIdRef = useRef(0);
 
     useEffect(() => {
-        fetchUsers();
+        let isMounted = true;
+        const requestId = ++requestIdRef.current;
+
+        const loadUsers = async () => {
+            setLoadingUsers(true);
+            setUsersError(null);
+
+            try {
+                const result = await getAdminUsersService({
+                    page,
+                    size: 10,
+                    search: debouncedSearch,
+                });
+
+                if (!isMounted || requestId !== requestIdRef.current) {
+                    return;
+                }
+
+                if (!result.success) {
+                    setUsersError(
+                        result.message ||
+                            "We couldn't load the users. Please try again.",
+                    );
+                    setUsers([]);
+                    setTotalPages(0);
+                    return;
+                }
+
+                setUsers(result.data.content);
+                setTotalPages(result.data.totalPages);
+            } catch (error) {
+                if (!isMounted || requestId !== requestIdRef.current) {
+                    return;
+                }
+
+                console.error("Failed to load admin users:", error);
+
+                setUsersError(
+                    error.message ||
+                        "We couldn't load the users. Please try again.",
+                );
+
+                setUsers([]);
+                setTotalPages(0);
+            } finally {
+                if (isMounted && requestId === requestIdRef.current) {
+                    setLoadingUsers(false);
+                }
+            }
+        };
+
+        loadUsers();
+
+        return () => {
+            isMounted = false;
+        };
     }, [page, debouncedSearch]);
 
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         setLoadingUsers(true);
         setUsersError(null);
 
@@ -93,13 +133,17 @@ export default function UserManagement() {
         } finally {
             setLoadingUsers(false);
         }
-    };
+    }, [page, debouncedSearch]);
 
-    const handleUsersRetry = () => {
+    useEffect(() => {
         fetchUsers();
-    };
+    }, [fetchUsers]);
 
-    const handleDelete = async (userId) => {
+    const handleUsersRetry = useCallback(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    const handleDelete = useCallback(async (userId) => {
         setDeletingUserId(userId);
 
         try {
@@ -122,7 +166,27 @@ export default function UserManagement() {
         } finally {
             setDeletingUserId(null);
         }
-    };
+    }, []);
+
+    const confirmDelete = useCallback(
+        (userId) => {
+            toast(
+                ({ closeToast }) => (
+                    <ConfirmToast
+                        message="Are you sure you want to delete this user? This action cannot be undone."
+                        confirmLabel="Delete"
+                        onConfirm={() => {
+                            handleDelete(userId);
+                            closeToast();
+                        }}
+                        onCancel={closeToast}
+                    />
+                ),
+                { autoClose: false },
+            );
+        },
+        [handleDelete],
+    );
 
     useEffect(() => {
         const delay = setTimeout(() => {
