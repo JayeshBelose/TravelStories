@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Home, Users, Map, User, LogOut, Compass } from "lucide-react";
 import logo from "@/assets/icons/travel_stories_icon.svg";
+import { memo } from "react";
 
 const navItems = [
     { name: "Explore", path: "/user", icon: Home },
@@ -10,8 +11,12 @@ const navItems = [
     { name: "Profile", path: "/user/profile", icon: User },
 ];
 
-export default function Sidebar({ user, onLogout }) {
-    const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`;
+function Sidebar({ user, onLogout }) {
+    const imageUrl = useMemo(
+        () =>
+            `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`,
+        [user.userId],
+    );
 
     return (
         <div className="flex flex-col w-64 bg-primary text-primary-foreground min-h-screen px-4 py-6 justify-between flex-shrink-0">
@@ -95,3 +100,5 @@ export default function Sidebar({ user, onLogout }) {
         </div>
     );
 }
+
+export default memo(Sidebar);

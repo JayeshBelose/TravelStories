@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, useEffect, useCallback } from "react";
 import { ImageOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,23 @@ import { cn } from "@/lib/utils";
 function ItineraryThumbnail({ itineraryId, alt, className, imgClassName }) {
     const [status, setStatus] = useState("loading"); // loading | loaded | error
 
-    const src = `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`;
+    useEffect(() => {
+        setStatus("loading");
+    }, [itineraryId]);
+
+    const src = useMemo(
+        () =>
+            `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`,
+        [itineraryId],
+    );
+
+    const handleLoad = useCallback(() => {
+        setStatus("loaded");
+    }, []);
+
+    const handleError = useCallback(() => {
+        setStatus("error");
+    }, []);
 
     return (
         <div
@@ -30,8 +46,8 @@ function ItineraryThumbnail({ itineraryId, alt, className, imgClassName }) {
                 <img
                     src={src}
                     alt={alt}
-                    onLoad={() => setStatus("loaded")}
-                    onError={() => setStatus("error")}
+                    onLoad={handleLoad}
+                    onError={handleError}
                     className={cn(
                         "h-full w-full object-cover transition-opacity duration-300",
                         status === "loaded" ? "opacity-100" : "opacity-0",

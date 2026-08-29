@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, memo } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { Heart, Bookmark, MapPin, User } from "lucide-react";
 import { toast } from "react-toastify";
 import ItineraryThumbnail from "./ItineraryThumbnail";
@@ -10,7 +10,13 @@ import {
 } from "@/services/userService";
 
 function ItineraryCard({ itinerary, onClick }) {
-    const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
+    const loggedInUser = useMemo(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("user"));
+        } catch {
+            return null;
+        }
+    }, []);
 
     const [likes, setLikes] = useState(itinerary.likeCount);
     const [saves, setSaves] = useState(itinerary.saveCount);
@@ -21,12 +27,24 @@ function ItineraryCard({ itinerary, onClick }) {
     const [saveLoading, setSaveLoading] = useState(false);
     const [statusLoading, setStatusLoading] = useState(true);
 
+    const isOwner = loggedInUser?.username === itinerary.createdBy;
+
+    useEffect(() => {
+        setLikes(itinerary.likeCount);
+    }, [itinerary.likeCount]);
+
+    useEffect(() => {
+        setSaves(itinerary.saveCount);
+    }, [itinerary.saveCount]);
+
     // Fetching itinerary likes and saves
     useEffect(() => {
         if (!loggedInUser?.userId) {
             setStatusLoading(false);
             return;
         }
+
+        let cancelled = false;
 
         const fetchStatus = async () => {
             setStatusLoading(true);
@@ -35,108 +53,133 @@ function ItineraryCard({ itinerary, onClick }) {
                 const [likeResult, saveResult] = await Promise.all([
                     getLikedStatusService({
                         userId: loggedInUser.userId,
+
                         itineraryId: itinerary.itineraryId,
                     }),
+
                     getSavedStatusService({
                         userId: loggedInUser.userId,
+
                         itineraryId: itinerary.itineraryId,
                     }),
                 ]);
 
+                if (cancelled) return;
+
                 if (likeResult.success) {
                     setLiked(likeResult.data);
-                } else {
-                    console.error(likeResult.message);
-                    toast.error(
-                        likeResult.message ||
-                            "Unable to load the like status. Please try again.",
-                    );
                 }
 
                 if (saveResult.success) {
                     setSaved(saveResult.data);
-                } else {
-                    console.error(saveResult.message);
-                    toast.error(
-                        saveResult.message ||
-                            "Unable to load the save status. Please try again.",
-                    );
                 }
             } finally {
-                setStatusLoading(false);
+                if (!cancelled) {
+                    setStatusLoading(false);
+                }
             }
         };
 
         fetchStatus();
+
+        return () => {
+            cancelled = true;
+        };
     }, [itinerary.itineraryId, loggedInUser?.userId]);
 
     // Like and save functions
-    const handleLike = async (e) => {
-        e.stopPropagation();
+    const handleLike = useCallback(
+        async (e) => {
+            e.stopPropagation();
 
-        if (!loggedInUser?.userId || likeLoading || statusLoading) return;
+            if (!loggedInUser?.userId || likeLoading || statusLoading) return;
 
-        setLikeLoading(true);
+            setLikeLoading(true);
 
-        try {
-            const result = await toggleLikeItineraryService({
-                userId: loggedInUser.userId,
-                itineraryId: itinerary.itineraryId,
-            });
+            try {
+                const result = await toggleLikeItineraryService({
+                    userId: loggedInUser.userId,
+                    itineraryId: itinerary.itineraryId,
+                });
 
-            if (result.success) {
-                const newLikedState = !liked;
+                if (result.success) {
+                    const newLikedState = !liked;
 
-                setLiked(newLikedState);
-                setLikes((prev) => (newLikedState ? prev + 1 : prev - 1));
-            } else {
-                toast.error(
-                    result.message ||
-                        "Unable to update the like. Please try again.",
-                );
+                    setLiked(newLikedState);
+                    setLikes((prev) => (newLikedState ? prev + 1 : prev - 1));
+                } else {
+                    toast.error(
+                        result.message ||
+                            "Unable to update the like. Please try again.",
+                    );
+                }
+            } finally {
+                setLikeLoading(false);
             }
-        } finally {
-            setLikeLoading(false);
-        }
-    };
+        },
+        [
+            liked,
+            likeLoading,
+            statusLoading,
+            loggedInUser?.userId,
+            itinerary.itineraryId,
+        ],
+    );
 
-    const handleSave = async (e) => {
-        e.stopPropagation();
+    const handleSave = useCallback(
+        async (e) => {
+            e.stopPropagation();
 
-        if (!loggedInUser?.userId || isOwner || saveLoading || statusLoading)
-            return;
+            if (
+                !loggedInUser?.userId ||
+                isOwner ||
+                saveLoading ||
+                statusLoading
+            )
+                return;
 
-        setSaveLoading(true);
+            setSaveLoading(true);
 
-        try {
-            const result = await toggleSaveItineraryService({
-                userId: loggedInUser.userId,
-                itineraryId: itinerary.itineraryId,
-            });
+            try {
+                const result = await toggleSaveItineraryService({
+                    userId: loggedInUser.userId,
+                    itineraryId: itinerary.itineraryId,
+                });
 
-            if (result.success) {
-                const newSavedState = !saved;
+                if (result.success) {
+                    const newSavedState = !saved;
 
-                setSaved(newSavedState);
-                setSaves((prev) => (newSavedState ? prev + 1 : prev - 1));
-            } else {
-                toast.error(
-                    result.message ||
-                        "Unable to update the save. Please try again.",
-                );
+                    setSaved(newSavedState);
+                    setSaves((prev) => (newSavedState ? prev + 1 : prev - 1));
+                } else {
+                    toast.error(
+                        result.message ||
+                            "Unable to update the save. Please try again.",
+                    );
+                }
+            } finally {
+                setSaveLoading(false);
             }
-        } finally {
-            setSaveLoading(false);
-        }
-    };
+        },
+        [
+            saved,
+            saveLoading,
+            statusLoading,
+            isOwner,
+            loggedInUser?.userId,
+            itinerary.itineraryId,
+        ],
+    );
 
-    const isOwner = loggedInUser?.username === itinerary.createdBy;
+    const handleCardClick = useCallback(() => {
+        onClick(itinerary);
+    }, [onClick, itinerary]);
 
     return (
         <div
             role="button"
             tabIndex={0}
-            onClick={() => onClick(itinerary)}
+            onClick={handleCardClick}
             className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 flex flex-col"
         >
             {/* Thumbnail */}

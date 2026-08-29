@@ -7,10 +7,11 @@ import {
     Lock,
     Image as ImageIcon,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo, memo } from "react";
 import UserItineraryListOverlay from "./UserItineraryListOverlay";
 import ItineraryThumbnail from "./ItineraryThumbnail";
 import ErrorState from "@/components/common/ErrorState";
+import ImagePreviewModal from "./ImagePreviewModel";
 import { getUserByUsernameService } from "@/services/userService";
 import { getItineraryDaysService } from "@/services/dayService";
 import { getDayLocationsService } from "@/services/locationService";
@@ -187,14 +188,14 @@ export default function ItineraryOverlay({
         return () => {
             cancelled = true;
         };
-    }, [itinerary, retryKey]);
+    }, [itinerary?.itineraryId, itinerary?.createdBy, retryKey]);
 
     /*
      * Retry the primary itinerary request.
      */
-    const handleRetry = () => {
+    const handleRetry = useCallback(() => {
         setRetryKey((prev) => prev + 1);
-    };
+    }, []);
 
     /*
      * Load locations for all itinerary days.
@@ -283,6 +284,11 @@ export default function ItineraryOverlay({
         };
     }, [days, locationsRetryKey]);
 
+    const allLocations = useMemo(
+        () => Object.values(locationsByDay).flat(),
+        [locationsByDay],
+    );
+
     /*
      * Load images for every location.
      *
@@ -301,8 +307,6 @@ export default function ItineraryOverlay({
         let cancelled = false;
 
         const loadImages = async () => {
-            const allLocations = Object.values(locationsByDay).flat();
-
             if (!allLocations.length) {
                 setImagesByLocation({});
                 setImagesError(null);
@@ -380,23 +384,46 @@ export default function ItineraryOverlay({
     /*
      * Retry locations independently.
      */
-    const handleLocationsRetry = () => {
+    const handleLocationsRetry = useCallback(() => {
         setLocationsRetryKey((prev) => prev + 1);
-    };
+    }, []);
 
     /*
      * Retry images independently.
      */
-    const handleImagesRetry = () => {
+    const handleImagesRetry = useCallback(() => {
         setImagesRetryKey((prev) => prev + 1);
-    };
+    }, []);
+
+    const handleDaySelect = useCallback((dayId) => {
+        setActiveDay(dayId);
+    }, []);
+
+    const handleUserSelect = useCallback((user) => {
+        setSelectedUser(user);
+    }, []);
+
+    const handleCreatorClick = useCallback(() => {
+        if (allowRelatedItineraries && itineraryCreator) {
+            setSelectedUser(itineraryCreator);
+        }
+    }, [allowRelatedItineraries, itineraryCreator]);
+
+    const totalLocations = useMemo(
+        () =>
+            Object.values(locationsByDay).reduce(
+                (total, locations) => total + locations.length,
+                0,
+            ),
+        [locationsByDay],
+    );
+
+    const activeDayData = useMemo(
+        () => days.find((day) => day.dayId === activeDay),
+        [days, activeDay],
+    );
 
     if (!itinerary) return null;
-
-    const totalLocations = Object.values(locationsByDay).reduce(
-        (total, locations) => total + locations.length,
-        0,
-    );
 
     return (
         <>
@@ -522,14 +549,7 @@ export default function ItineraryOverlay({
 
                             <button
                                 type="button"
-                                onClick={() => {
-                                    if (
-                                        allowRelatedItineraries &&
-                                        itineraryCreator
-                                    ) {
-                                        setSelectedUser(itineraryCreator);
-                                    }
-                                }}
+                                onClick={handleCreatorClick}
                                 disabled={!itineraryCreator}
                                 className="text-sm font-bold text-gray-900 truncate max-w-full cursor-pointer disabled:cursor-default"
                             >
@@ -580,7 +600,9 @@ export default function ItineraryOverlay({
                                                     id={`itinerary-day-tab-${day.dayId}`}
                                                     type="button"
                                                     onClick={() =>
-                                                        setActiveDay(day.dayId)
+                                                        handleDaySelect(
+                                                            day.dayId,
+                                                        )
                                                     }
                                                     className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer bg-transparent
         ${
@@ -627,163 +649,161 @@ export default function ItineraryOverlay({
                                             onRetry={handleLocationsRetry}
                                         />
                                     ) : (
-                                        days
-                                            .filter(
-                                                (day) =>
-                                                    day.dayId === activeDay,
-                                            )
-                                            .map((day) => (
-                                                <div
-                                                    key={day.dayId}
-                                                    className="px-5 pt-5"
-                                                >
-                                                    {day.description && (
-                                                        <p className="text-sm text-gray-500 italic mb-4 leading-relaxed">
-                                                            {day.description}
-                                                        </p>
-                                                    )}
+                                        activeDayData && (
+                                            <div
+                                                key={activeDayData.dayId}
+                                                className="px-5 pt-5"
+                                            >
+                                                {activeDayData.description && (
+                                                    <p className="text-sm text-gray-500 italic mb-4 leading-relaxed">
+                                                        {
+                                                            activeDayData.description
+                                                        }
+                                                    </p>
+                                                )}
 
-                                                    {locationsByDay[day.dayId]
-                                                        ?.length > 0 ? (
-                                                        <div className="flex flex-col">
-                                                            {locationsByDay[
-                                                                day.dayId
-                                                            ].map(
-                                                                (
-                                                                    location,
-                                                                    index,
-                                                                ) => (
-                                                                    <div
-                                                                        key={
-                                                                            location.locationId
-                                                                        }
-                                                                        className="flex gap-3 items-start"
-                                                                    >
-                                                                        {/* Timeline */}
-                                                                        <div className="flex flex-col items-center flex-shrink-0 pt-3.5">
-                                                                            <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-                                                                                {index +
-                                                                                    1}
-                                                                            </span>
+                                                {locationsByDay[
+                                                    activeDayData.dayId
+                                                ]?.length > 0 ? (
+                                                    <div className="flex flex-col">
+                                                        {locationsByDay[
+                                                            activeDayData.dayId
+                                                        ].map(
+                                                            (
+                                                                location,
+                                                                index,
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        location.locationId
+                                                                    }
+                                                                    className="flex gap-3 items-start"
+                                                                >
+                                                                    {/* Timeline */}
+                                                                    <div className="flex flex-col items-center flex-shrink-0 pt-3.5">
+                                                                        <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                                                                            {index +
+                                                                                1}
+                                                                        </span>
 
-                                                                            {index <
-                                                                                locationsByDay[
-                                                                                    day
-                                                                                        .dayId
-                                                                                ]
-                                                                                    .length -
-                                                                                    1 && (
-                                                                                <span className="w-px flex-1 min-h-4 bg-gray-200 my-1.5" />
-                                                                            )}
-                                                                        </div>
-
-                                                                        {/* Location */}
-                                                                        <div className="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-3.5 mb-3">
-                                                                            <h5 className="text-sm font-semibold text-gray-900 mb-0.5 font-primary">
-                                                                                {
-                                                                                    location.locationName
-                                                                                }
-                                                                            </h5>
-
-                                                                            {location.locationAddress && (
-                                                                                <p className="inline-flex items-center gap-1 text-xs text-gray-400">
-                                                                                    <MapPin
-                                                                                        size={
-                                                                                            10
-                                                                                        }
-                                                                                        aria-hidden="true"
-                                                                                    />
-                                                                                    {
-                                                                                        location.locationAddress
-                                                                                    }
-                                                                                </p>
-                                                                            )}
-
-                                                                            {/* Images */}
-                                                                            {imagesLoading ? (
-                                                                                <div className="mt-3 text-xs text-gray-400">
-                                                                                    Loading
-                                                                                    images…
-                                                                                </div>
-                                                                            ) : imagesError ? (
-                                                                                <div className="mt-3">
-                                                                                    <ErrorState
-                                                                                        compact
-                                                                                        title="Images unavailable"
-                                                                                        message={
-                                                                                            imagesError
-                                                                                        }
-                                                                                        onRetry={
-                                                                                            handleImagesRetry
-                                                                                        }
-                                                                                    />
-                                                                                </div>
-                                                                            ) : (
-                                                                                imagesByLocation[
-                                                                                    location
-                                                                                        .locationId
-                                                                                ]
-                                                                                    ?.length >
-                                                                                    0 && (
-                                                                                    <div className="flex flex-wrap gap-2 mt-3">
-                                                                                        {imagesByLocation[
-                                                                                            location
-                                                                                                .locationId
-                                                                                        ].map(
-                                                                                            (
-                                                                                                image,
-                                                                                            ) => {
-                                                                                                const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${image.imageId}`;
-
-                                                                                                return (
-                                                                                                    <button
-                                                                                                        key={
-                                                                                                            image.imageId
-                                                                                                        }
-                                                                                                        type="button"
-                                                                                                        onClick={() =>
-                                                                                                            setSelectedImage(
-                                                                                                                imageUrl,
-                                                                                                            )
-                                                                                                        }
-                                                                                                        aria-label={`View image from ${location.locationName}`}
-                                                                                                        className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
-                                                                                                    >
-                                                                                                        <img
-                                                                                                            src={
-                                                                                                                imageUrl
-                                                                                                            }
-                                                                                                            alt={`Photo from ${location.locationName}`}
-                                                                                                            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
-                                                                                                        />
-
-                                                                                                        <div className="absolute inset-0 bg-black/35 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                                                                            <ImageIcon
-                                                                                                                size={
-                                                                                                                    13
-                                                                                                                }
-                                                                                                            />
-                                                                                                        </div>
-                                                                                                    </button>
-                                                                                                );
-                                                                                            },
-                                                                                        )}
-                                                                                    </div>
-                                                                                )
-                                                                            )}
-                                                                        </div>
+                                                                        {index <
+                                                                            locationsByDay[
+                                                                                activeDayData
+                                                                                    .dayId
+                                                                            ]
+                                                                                .length -
+                                                                                1 && (
+                                                                            <span className="w-px flex-1 min-h-4 bg-gray-200 my-1.5" />
+                                                                        )}
                                                                     </div>
-                                                                ),
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-sm text-gray-400 text-center py-8">
-                                                            No locations added
-                                                            for this day.
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            ))
+
+                                                                    {/* Location */}
+                                                                    <div className="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-3.5 mb-3">
+                                                                        <h5 className="text-sm font-semibold text-gray-900 mb-0.5 font-primary">
+                                                                            {
+                                                                                location.locationName
+                                                                            }
+                                                                        </h5>
+
+                                                                        {location.locationAddress && (
+                                                                            <p className="inline-flex items-center gap-1 text-xs text-gray-400">
+                                                                                <MapPin
+                                                                                    size={
+                                                                                        10
+                                                                                    }
+                                                                                    aria-hidden="true"
+                                                                                />
+                                                                                {
+                                                                                    location.locationAddress
+                                                                                }
+                                                                            </p>
+                                                                        )}
+
+                                                                        {/* Images */}
+                                                                        {imagesLoading ? (
+                                                                            <div className="mt-3 text-xs text-gray-400">
+                                                                                Loading
+                                                                                images…
+                                                                            </div>
+                                                                        ) : imagesError ? (
+                                                                            <div className="mt-3">
+                                                                                <ErrorState
+                                                                                    compact
+                                                                                    title="Images unavailable"
+                                                                                    message={
+                                                                                        imagesError
+                                                                                    }
+                                                                                    onRetry={
+                                                                                        handleImagesRetry
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        ) : (
+                                                                            imagesByLocation[
+                                                                                location
+                                                                                    .locationId
+                                                                            ]
+                                                                                ?.length >
+                                                                                0 && (
+                                                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                                                    {imagesByLocation[
+                                                                                        location
+                                                                                            .locationId
+                                                                                    ].map(
+                                                                                        (
+                                                                                            image,
+                                                                                        ) => {
+                                                                                            const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${image.imageId}`;
+
+                                                                                            return (
+                                                                                                <button
+                                                                                                    key={
+                                                                                                        image.imageId
+                                                                                                    }
+                                                                                                    type="button"
+                                                                                                    onClick={() =>
+                                                                                                        setSelectedImage(
+                                                                                                            imageUrl,
+                                                                                                        )
+                                                                                                    }
+                                                                                                    aria-label={`View image from ${location.locationName}`}
+                                                                                                    className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+                                                                                                >
+                                                                                                    <img
+                                                                                                        src={
+                                                                                                            imageUrl
+                                                                                                        }
+                                                                                                        alt={`Photo from ${location.locationName}`}
+                                                                                                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                                                                                                    />
+
+                                                                                                    <div className="absolute inset-0 bg-black/35 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                                                                        <ImageIcon
+                                                                                                            size={
+                                                                                                                13
+                                                                                                            }
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </button>
+                                                                                            );
+                                                                                        },
+                                                                                    )}
+                                                                                </div>
+                                                                            )
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-gray-400 text-center py-8">
+                                                        No locations added for
+                                                        this day.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )
                                     )}
                                 </>
                             )}
@@ -809,7 +829,7 @@ export default function ItineraryOverlay({
                                                 key={member.userId}
                                                 type="button"
                                                 onClick={() =>
-                                                    setSelectedUser(member)
+                                                    handleUserSelect(member)
                                                 }
                                                 className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-full pl-1.5 pr-3 py-1 cursor-pointer hover:bg-gray-200 transition-colors"
                                             >
@@ -833,31 +853,10 @@ export default function ItineraryOverlay({
             </div>
 
             {/* Lightbox */}
-            {selectedImage && (
-                <div
-                    className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] cursor-zoom-out"
-                    onClick={() => setSelectedImage(null)}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Image preview"
-                >
-                    <button
-                        type="button"
-                        onClick={() => setSelectedImage(null)}
-                        aria-label="Close image preview"
-                        className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer"
-                    >
-                        <X size={17} />
-                    </button>
-
-                    <img
-                        src={selectedImage}
-                        alt="Location preview"
-                        className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain"
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                </div>
-            )}
+            <ImagePreviewModal
+                image={selectedImage}
+                onClose={() => setSelectedImage(null)}
+            />
 
             {/* User Itinerary List Overlay */}
             <UserItineraryListOverlay

@@ -26,6 +26,8 @@ import {
     getAdminItinerariesService,
     getItineraryTypesAdminService,
 } from "@/services/adminService";
+import ItineraryTableRow from "@/components/admin/ItineraryTableRow";
+import ItineraryTypeManagement from "@/components/admin/ItineraryTypeManagement";
 
 const SORT_OPTIONS = [
     { value: "none", label: "No Filter" },
@@ -72,41 +74,85 @@ export default function ItineraryManagement() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    // Itinerary deletion confirmation
-    const confirmDelete = (itineraryId) => {
-        toast(
-            ({ closeToast }) => (
-                <ConfirmToast
-                    message="Delete this itinerary? This cannot be undone."
-                    confirmLabel="Delete"
-                    onConfirm={async () => {
-                        await handleDelete(itineraryId);
-                        closeToast();
-                    }}
-                    onCancel={closeToast}
-                />
-            ),
-            { autoClose: false },
-        );
-    };
+    // Fetching itinerary types
+    const fetchTypes = useCallback(async () => {
+        setLoadingTypes(true);
+        setTypeError("");
 
-    // Itinerary type deletion confirmation
-    const confirmDeleteType = (typeId) => {
-        toast(
-            ({ closeToast }) => (
-                <ConfirmToast
-                    message="Delete this itinerary type? This cannot be undone."
-                    confirmLabel="Delete"
-                    onConfirm={async () => {
-                        await deleteType(typeId);
-                        closeToast();
-                    }}
-                    onCancel={closeToast}
-                />
-            ),
-            { autoClose: false },
-        );
-    };
+        try {
+            const result = await getItineraryTypesAdminService();
+
+            if (result.success) {
+                setTypes(result.data || []);
+            } else {
+                setTypes([]);
+                setTypeError(
+                    result.message || "Failed to load itinerary types.",
+                );
+            }
+        } catch (error) {
+            console.error("Failed to load itinerary types:", error);
+
+            setTypes([]);
+            setTypeError("Unable to load itinerary types. Please try again.");
+        } finally {
+            setLoadingTypes(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchTypes();
+    }, [fetchTypes]);
+
+    // Itinerary delete function
+    const handleDelete = useCallback(
+        async (itineraryId) => {
+            const result = await deleteItineraryByAdminService({
+                itineraryId,
+            });
+
+            if (result.success) {
+                setItineraries((prev) => {
+                    const remaining = prev.filter(
+                        (itinerary) => itinerary.itineraryId !== itineraryId,
+                    );
+
+                    if (remaining.length === 0 && page > 0) {
+                        setPage((p) => p - 1);
+                        return prev;
+                    }
+
+                    return remaining;
+                });
+
+                toast.success("Itinerary deleted.");
+            } else {
+                toast.error(result.message);
+            }
+        },
+        [page],
+    );
+
+    // Itinerary deletion confirmation
+    const confirmDelete = useCallback(
+        (itineraryId) => {
+            toast(
+                ({ closeToast }) => (
+                    <ConfirmToast
+                        message="Delete this itinerary? This cannot be undone."
+                        confirmLabel="Delete"
+                        onConfirm={async () => {
+                            await handleDelete(itineraryId);
+                            closeToast();
+                        }}
+                        onCancel={closeToast}
+                    />
+                ),
+                { autoClose: false },
+            );
+        },
+        [handleDelete],
+    );
 
     // Fetching itineraries
     const fetchItineraries = useCallback(async () => {
@@ -152,82 +198,10 @@ export default function ItineraryManagement() {
         }
     }, [page, search, filter, typeFilter, sortFilter]);
 
-    // Fetching itinerary types
-    const fetchTypes = useCallback(async () => {
-        setLoadingTypes(true);
-        setTypeError("");
-
-        try {
-            const result = await getItineraryTypesAdminService();
-
-            if (result.success) {
-                setTypes(result.data || []);
-            } else {
-                setTypes([]);
-                setTypeError(
-                    result.message || "Failed to load itinerary types.",
-                );
-            }
-        } catch (error) {
-            console.error("Failed to load itinerary types:", error);
-
-            setTypes([]);
-            setTypeError("Unable to load itinerary types. Please try again.");
-        } finally {
-            setLoadingTypes(false);
-        }
-    }, []);
-
     const itineraryTypes = useMemo(
         () => [{ typeId: "all", name: "All Types" }, ...types],
         [types],
     );
-
-    useEffect(() => {
-        fetchTypes();
-    }, [fetchTypes]);
-
-    // Add and delete functions for itinerary types
-    const addType = async () => {
-        if (!newType.trim()) {
-            toast.error("Type name cannot be empty");
-            return;
-        }
-
-        if (
-            types.some(
-                (t) => t.name.toLowerCase() === newType.trim().toLowerCase(),
-            )
-        ) {
-            toast.error("Type already exists");
-            return;
-        }
-
-        const result = await addItineraryTypeService({
-            typeName: newType.trim(),
-        });
-
-        if (result.success) {
-            toast.success("Type added.");
-            setNewType("");
-            fetchTypes();
-        } else {
-            toast.error(result.message);
-        }
-    };
-
-    const deleteType = async (typeId) => {
-        const result = await deleteItineraryTypeService({
-            typeId,
-        });
-
-        if (result.success) {
-            toast.success("Type deleted.");
-            fetchTypes();
-        } else {
-            toast.error(result.message);
-        }
-    };
 
     // Fetching itineraries after filters or searching
     useEffect(() => {
@@ -235,32 +209,6 @@ export default function ItineraryManagement() {
 
         return () => clearTimeout(delay);
     }, [fetchItineraries]);
-
-    // Itinerary delete function
-    const handleDelete = async (itineraryId) => {
-        const result = await deleteItineraryByAdminService({
-            itineraryId,
-        });
-
-        if (result.success) {
-            setItineraries((prev) => {
-                const remaining = prev.filter(
-                    (itinerary) => itinerary.itineraryId !== itineraryId,
-                );
-
-                if (remaining.length === 0 && page > 0) {
-                    setPage((p) => p - 1);
-                    return prev;
-                }
-
-                return remaining;
-            });
-
-            toast.success("Itinerary deleted.");
-        } else {
-            toast.error(result.message);
-        }
-    };
 
     const sortLabel = useMemo(
         () =>
@@ -289,19 +237,29 @@ export default function ItineraryManagement() {
         );
     };
 
-    const handleEdit = (e, itinerary) => {
+    const handleEdit = useCallback((e, itinerary) => {
         e.stopPropagation();
         setSelectedItinerary(itinerary);
         setOpenView(false);
         setOpenCreate(true);
-    };
+    }, []);
 
-    const handleView = (e, itinerary) => {
+    const handleView = useCallback((e, itinerary) => {
         e.stopPropagation();
         setSelectedItinerary(itinerary);
         setOpenView(true);
         setOpenCreate(false);
-    };
+    }, []);
+
+    const handleCloseCreate = useCallback(() => {
+        setOpenCreate(false);
+        setSelectedItinerary(null);
+    }, []);
+
+    const handleCloseView = useCallback(() => {
+        setOpenView(false);
+        setSelectedItinerary(null);
+    }, []);
 
     const sortActive = useMemo(() => sortFilter !== "none", [sortFilter]);
     const typeActive = useMemo(() => typeFilter !== "all", [typeFilter]);
@@ -568,115 +526,14 @@ export default function ItineraryManagement() {
 
                             {!loadingItineraries &&
                                 !itineraryError &&
-                                itineraries.map((item) => (
-                                    <tr
-                                        key={item.itineraryId}
-                                        className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors"
-                                    >
-                                        {/* Title */}
-                                        <td className="px-4 py-3">
-                                            <button
-                                                onClick={(e) =>
-                                                    handleView(e, item)
-                                                }
-                                                className="text-sm font-semibold text-gray-900 hover:underline underline-offset-2 cursor-pointer text-left font-primary"
-                                            >
-                                                {item.title}
-                                            </button>
-                                        </td>
-
-                                        {/* Place */}
-                                        <td className="px-4 py-3 text-sm text-gray-500">
-                                            {item.place}
-                                        </td>
-
-                                        {/* Creator */}
-                                        <td className="px-4 py-3 text-sm text-gray-600 capitalize">
-                                            {item.createdBy}
-                                        </td>
-
-                                        {/* Type */}
-                                        <td className="px-4 py-3">
-                                            <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full capitalize">
-                                                <Tag size={9} />{" "}
-                                                {item.type || "—"}
-                                            </span>
-                                        </td>
-
-                                        {/* Visibility */}
-                                        <td className="px-4 py-3">
-                                            <span
-                                                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border
-                                        ${
-                                            item.public
-                                                ? "bg-emerald-50 border-emerald-200 text-emerald-600"
-                                                : "bg-red-50 border-red-200 text-red-500"
-                                        }`}
-                                            >
-                                                {item.public ? (
-                                                    <>
-                                                        <Globe size={9} />{" "}
-                                                        Public
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Lock size={9} />{" "}
-                                                        Private
-                                                    </>
-                                                )}
-                                            </span>
-                                        </td>
-
-                                        {/* Date */}
-                                        <td className="px-4 py-3 text-sm text-gray-400">
-                                            {new Date(
-                                                item.createdAt,
-                                            ).toLocaleDateString("en-GB", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            })}
-                                        </td>
-
-                                        {/* Likes */}
-                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                            {item.likeCount}
-                                        </td>
-
-                                        {/* Saves */}
-                                        <td className="px-4 py-3 text-sm text-gray-600 text-center">
-                                            {item.saveCount}
-                                        </td>
-
-                                        {/* Actions */}
-                                        <td className="px-4 py-3 text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) =>
-                                                        handleEdit(e, item)
-                                                    }
-                                                    aria-label={`Edit itinerary ${item.title}`}
-                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer"
-                                                >
-                                                    <Pencil size={14} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        confirmDelete(
-                                                            item.itineraryId,
-                                                        )
-                                                    }
-                                                    aria-label={`Delete itinerary ${item.title}`}
-                                                    className="w-9 h-9 rounded-full inline-flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
-                                                >
-                                                    <Trash size={14} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                itineraries.map((itinerary) => (
+                                    <ItineraryTableRow
+                                        key={itinerary.itineraryId}
+                                        itinerary={itinerary}
+                                        handleView={handleView}
+                                        handleEdit={handleEdit}
+                                        confirmDelete={confirmDelete}
+                                    />
                                 ))}
                         </tbody>
                     </table>
@@ -735,129 +592,18 @@ export default function ItineraryManagement() {
             </div>
 
             {/* Type Management */}
-            <div className="border-t border-gray-100 pt-10">
-                <div className="mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 font-primary tracking-tight mb-1">
-                        Itinerary Types
-                    </h2>
-                    <p className="text-sm text-gray-400">
-                        Add or remove itinerary categories
-                    </p>
-                </div>
-
-                {/* Type management state */}
-                {loadingTypes ? (
-                    <div className="flex flex-wrap gap-2 mb-5">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                            <Skeleton
-                                key={index}
-                                className="h-8 w-24 rounded-full"
-                            />
-                        ))}
-                    </div>
-                ) : typeError ? (
-                    <div className="mb-5 text-sm text-gray-500">
-                        <p className="mb-2">{typeError}</p>
-
-                        <button
-                            type="button"
-                            onClick={fetchTypes}
-                            className="font-medium text-gray-700 hover:text-gray-900 underline underline-offset-2 cursor-pointer"
-                        >
-                            Try again
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        {/* Type chips */}
-                        <div className="flex flex-wrap gap-2 mb-5">
-                            {[...types]
-                                .sort((a, b) =>
-                                    a.name
-                                        .trim()
-                                        .toLowerCase()
-                                        .localeCompare(
-                                            b.name.trim().toLowerCase(),
-                                            undefined,
-                                            {
-                                                sensitivity: "base",
-                                            },
-                                        ),
-                                )
-                                .map((type) => (
-                                    <div
-                                        key={type.typeId}
-                                        className="group inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm hover:border-gray-300 transition-colors"
-                                    >
-                                        <Tag
-                                            size={12}
-                                            className="text-gray-400"
-                                        />
-
-                                        {type.name}
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                confirmDeleteType(type.typeId)
-                                            }
-                                            aria-label={`Delete itinerary type ${type.name}`}
-                                            className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                        >
-                                            <X size={12} />
-                                        </button>
-                                    </div>
-                                ))}
-                        </div>
-
-                        {/* Add type input */}
-                        <div className="flex items-center gap-2 max-w-sm">
-                            <div
-                                className={`${ui.searchContainer} flex-1 flex items-center gap-2.5`}
-                            >
-                                <Tag
-                                    size={14}
-                                    className="text-gray-300 flex-shrink-0"
-                                    aria-hidden="true"
-                                />
-
-                                <input
-                                    type="text"
-                                    value={newType}
-                                    placeholder="New type name…"
-                                    aria-label="New itinerary type name"
-                                    className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-300"
-                                    onChange={(e) => setNewType(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            addType();
-                                        }
-                                    }}
-                                />
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={addType}
-                                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors cursor-pointer flex-shrink-0"
-                            >
-                                <Plus size={14} aria-hidden="true" />
-                                Add
-                            </button>
-                        </div>
-                    </>
-                )}
-            </div>
+            <ItineraryTypeManagement
+                types={types}
+                typeError={typeError}
+                loadingTypes={loadingTypes}
+                fetchTypes={fetchTypes}
+            />
 
             {openCreate && (
                 <CreateItineraryOverlay
                     open={openCreate}
                     existingItinerary={selectedItinerary}
-                    onClose={() => {
-                        setOpenCreate(false);
-                        setSelectedItinerary(null);
-                    }}
+                    onClose={handleCloseCreate}
                     onSaved={handleItinerarySaved}
                 />
             )}
@@ -865,10 +611,7 @@ export default function ItineraryManagement() {
             {openView && (
                 <ItineraryOverlay
                     itinerary={selectedItinerary}
-                    onClose={() => {
-                        setOpenView(false);
-                        setSelectedItinerary(null);
-                    }}
+                    onClose={handleCloseView}
                 />
             )}
         </div>

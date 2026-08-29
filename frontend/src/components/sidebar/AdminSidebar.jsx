@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Users, Map, LogOut, Shield } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { memo, useMemo } from "react";
 
 const navItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
@@ -12,8 +13,12 @@ const navItems = [
     },
 ];
 
-export default function AdminSidebar({ user, onLogout }) {
-    const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`;
+function AdminSidebar({ user, onLogout }) {
+    const imageUrl = useMemo(
+        () =>
+            `${import.meta.env.VITE_API_BASE_URL}/users/${user.userId}/profilePicture`,
+        [user.userId],
+    );
 
     return (
         <div className="flex flex-col w-64 bg-primary text-primary-foreground min-h-screen px-4 py-6 justify-between flex-shrink-0">
@@ -107,3 +112,5 @@ export default function AdminSidebar({ user, onLogout }) {
         </div>
     );
 }
+
+export default memo(AdminSidebar);

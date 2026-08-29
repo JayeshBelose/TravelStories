@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { itinerarySchema } from "@/schemas/itinerarySchemas";
@@ -17,6 +17,7 @@ import {
 import { toast } from "react-toastify";
 import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
+import DayCard from "@/components/itinerary/DayCard";
 import {
     addMemberService,
     createItineraryService,
@@ -68,7 +69,13 @@ export default function CreateItineraryOverlay({
     existingItinerary = null,
     onSaved,
 }) {
-    const user = JSON.parse(sessionStorage.getItem("user"));
+    const user = useMemo(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("user"));
+        } catch {
+            return null;
+        }
+    }, []);
 
     // Allowing edit mode to both creator and Admin
     const isEditMode = !!existingItinerary || user?.role === "admin";
@@ -119,8 +126,6 @@ export default function CreateItineraryOverlay({
             description: "",
         },
     });
-
-    const titleValue = watch("title");
 
     useEffect(() => {
         if (!open) {
@@ -387,6 +392,20 @@ export default function CreateItineraryOverlay({
         };
     }, [open, existingItinerary, loadAttempt]);
 
+    useEffect(() => {
+        return () => {
+            days.forEach((day) => {
+                day.locations?.forEach((location) => {
+                    location.images?.forEach((image) => {
+                        if (image.isNew && image.previewUrl) {
+                            URL.revokeObjectURL(image.previewUrl);
+                        }
+                    });
+                });
+            });
+        };
+    }, []);
+
     const resetForm = () => {
         setItineraryId(null);
         reset({
@@ -416,6 +435,127 @@ export default function CreateItineraryOverlay({
         setDeletedLocations([]);
         setDeletedImages([]);
     };
+
+    // Remove functions
+    const removeDay = useCallback((index) => {
+        setDays((prev) => {
+            const day = prev[index];
+
+            if (day?.dayId) {
+                setDeletedDays((deleted) => [...deleted, day.dayId]);
+            }
+
+            return prev.filter((_, i) => i !== index);
+        });
+    }, []);
+
+    const removeLocation = useCallback((dayIndex, locIndex) => {
+        setDays((prev) => {
+            const location = prev[dayIndex]?.locations?.[locIndex];
+
+            if (location?.locationId) {
+                setDeletedLocations((deleted) => [
+                    ...deleted,
+                    {
+                        dayId: prev[dayIndex].dayId,
+                        locationId: location.locationId,
+                    },
+                ]);
+            }
+
+            return prev.map((day, index) =>
+                index === dayIndex
+                    ? {
+                          ...day,
+                          locations: day.locations.filter(
+                              (_, i) => i !== locIndex,
+                          ),
+                      }
+                    : day,
+            );
+        });
+    }, []);
+
+    const removeImage = useCallback((dayIndex, locIndex, imgIndex) => {
+        setDays((prev) =>
+            prev.map((day, dIndex) => {
+                if (dIndex !== dayIndex) return day;
+
+                return {
+                    ...day,
+                    locations: day.locations.map((location, lIndex) => {
+                        if (lIndex !== locIndex) return location;
+
+                        const image = location.images[imgIndex];
+
+                        if (!image.isNew && image.imageId) {
+                            setDeletedImages((deleted) => [
+                                ...deleted,
+                                image.imageId,
+                            ]);
+                        }
+
+                        if (image.isNew && image.previewUrl) {
+                            URL.revokeObjectURL(image.previewUrl);
+                        }
+
+                        return {
+                            ...location,
+                            images: location.images.filter(
+                                (_, i) => i !== imgIndex,
+                            ),
+                        };
+                    }),
+                };
+            }),
+        );
+    }, []);
+
+    const followerIds = useMemo(
+        () => new Set(followersList.map((f) => f.userId)),
+        [followersList],
+    );
+
+    const friendsList = useMemo(
+        () => followingList.filter((user) => followerIds.has(user.userId)),
+        [followingList, followerIds],
+    );
+
+    const memberIds = useMemo(
+        () => new Set(members.map((m) => m.userId)),
+        [members],
+    );
+
+    const filteredMembers = useMemo(() => {
+        const search = memberSearch.trim().toLowerCase();
+
+        if (!search) return [];
+
+        return friendsList.filter(
+            (user) =>
+                user.username.toLowerCase().includes(search) &&
+                !memberIds.has(user.userId),
+        );
+    }, [friendsList, memberIds, memberSearch]);
+
+    const sortedTypes = useMemo(() => {
+        return [...types].sort((a, b) =>
+            a.name
+                .trim()
+                .toLowerCase()
+                .localeCompare(b.name.trim().toLowerCase(), undefined, {
+                    sensitivity: "base",
+                }),
+        );
+    }, [types]);
+
+    const thumbnailUrl = useMemo(() => {
+        if (thumbnailPreview) return thumbnailPreview;
+
+        if (!itineraryId) return null;
+
+        return `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`;
+    }, [thumbnailPreview, itineraryId]);
 
     if (!open) return null;
 
@@ -733,77 +873,6 @@ export default function CreateItineraryOverlay({
         }
     };
 
-    // Remove functions
-    const removeDay = (index) => {
-        const day = days[index];
-
-        if (day.dayId) {
-            setDeletedDays((prev) => [...prev, day.dayId]);
-        }
-
-        setDays((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const removeLocation = (dayIndex, locIndex) => {
-        const loc = days[dayIndex].locations[locIndex];
-
-        if (loc.locationId) {
-            setDeletedLocations((prev) => [
-                ...prev,
-                {
-                    dayId: days[dayIndex].dayId,
-                    locationId: loc.locationId,
-                },
-            ]);
-        }
-
-        const updated = [...days];
-
-        updated[dayIndex].locations = updated[dayIndex].locations.filter(
-            (_, index) => index !== locIndex,
-        );
-
-        setDays(updated);
-    };
-
-    const removeImage = (dayIndex, locIndex, imgIndex) => {
-        const updated = [...days];
-
-        const img = updated[dayIndex].locations[locIndex].images[imgIndex];
-
-        if (!img.isNew && img.imageId) {
-            setDeletedImages((prev) => [...prev, img.imageId]);
-        }
-
-        /*
-         * If this is a newly-selected local file, no server deletion
-         * is necessary. Its object URL is generated only during render
-         * and does not need to be stored.
-         */
-        updated[dayIndex].locations[locIndex].images = updated[
-            dayIndex
-        ].locations[locIndex].images.filter((_, index) => index !== imgIndex);
-
-        setDays(updated);
-    };
-
-    // Filter to get friends only
-    const friendsList = followingList.filter((user) =>
-        followersList.some((follower) => follower.userId === user.userId),
-    );
-
-    // Searching for members
-    const filteredMembers =
-        memberSearch.trim().length === 0
-            ? []
-            : friendsList.filter(
-                  (user) =>
-                      user.username
-                          .toLowerCase()
-                          .includes(memberSearch.toLowerCase()) &&
-                      !members.some((member) => member.userId === user.userId),
-              );
-
     return (
         <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-end z-50"
@@ -837,10 +906,7 @@ export default function CreateItineraryOverlay({
                             (isEditMode && existingItinerary)) && (
                             <div className="relative h-36 w-full">
                                 <img
-                                    src={
-                                        thumbnailPreview ||
-                                        `${import.meta.env.VITE_API_BASE_URL}/itineraries/${itineraryId}/thumbnail`
-                                    }
+                                    src={thumbnailUrl}
                                     alt="Itinerary thumbnail"
                                     className="w-full h-full object-cover"
                                 />
@@ -991,25 +1057,11 @@ export default function CreateItineraryOverlay({
                                 >
                                     <option value="">Select a type</option>
 
-                                    {[...types]
-                                        .sort((a, b) =>
-                                            a.name
-                                                .trim()
-                                                .toLowerCase()
-                                                .localeCompare(
-                                                    b.name.trim().toLowerCase(),
-                                                    undefined,
-                                                    { sensitivity: "base" },
-                                                ),
-                                        )
-                                        .map((t) => (
-                                            <option
-                                                key={t.typeId}
-                                                value={t.name}
-                                            >
-                                                {t.name}
-                                            </option>
-                                        ))}
+                                    {sortedTypes.map((t) => (
+                                        <option key={t.typeId} value={t.name}>
+                                            {t.name}
+                                        </option>
+                                    ))}
                                 </select>
 
                                 <ChevronDown
@@ -1128,7 +1180,10 @@ export default function CreateItineraryOverlay({
                                         key={member.userId}
                                         type="button"
                                         onClick={() => {
-                                            setMembers([...members, member]);
+                                            setMembers((prev) => [
+                                                ...prev,
+                                                member,
+                                            ]);
                                             setMemberSearch("");
                                         }}
                                         disabled={saving}
@@ -1160,8 +1215,8 @@ export default function CreateItineraryOverlay({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                setMembers(
-                                                    members.filter(
+                                                setMembers((prev) =>
+                                                    prev.filter(
                                                         (m) =>
                                                             m.userId !==
                                                             member.userId,
@@ -1188,8 +1243,8 @@ export default function CreateItineraryOverlay({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    setDays([
-                                        ...days,
+                                    setDays((prev) => [
+                                        ...prev,
                                         {
                                             description: "",
                                             locations: [],
@@ -1206,351 +1261,16 @@ export default function CreateItineraryOverlay({
 
                         <div className="space-y-3">
                             {days.map((day, dayIndex) => (
-                                <div
+                                <DayCard
                                     key={day.dayId ?? `day-${dayIndex}`}
-                                    className="bg-white border border-gray-100 rounded-2xl overflow-hidden"
-                                >
-                                    {/* Day header */}
-                                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
-                                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                                            Day {dayIndex + 1}
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => removeDay(dayIndex)}
-                                            disabled={saving}
-                                            aria-label={`Remove day ${dayIndex + 1}`}
-                                            className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <Trash size={12} />
-                                        </button>
-                                    </div>
-
-                                    <div className="p-4 space-y-3">
-                                        <textarea
-                                            value={day.description}
-                                            placeholder="Notes for this day…"
-                                            rows={2}
-                                            onChange={(e) => {
-                                                const updated = [...days];
-
-                                                updated[dayIndex] = {
-                                                    ...updated[dayIndex],
-                                                    description: e.target.value,
-                                                };
-
-                                                setDays(updated);
-                                            }}
-                                            className={`${ui.textarea} resize-none`}
-                                            disabled={saving}
-                                        />
-
-                                        {/* Locations */}
-                                        <div className="space-y-2">
-                                            {day.locationsLoadError && (
-                                                <div
-                                                    role="alert"
-                                                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-600"
-                                                >
-                                                    Some locations could not be
-                                                    loaded. You can continue
-                                                    editing the itinerary, but
-                                                    those locations may need to
-                                                    be added again.
-                                                </div>
-                                            )}
-                                            {day.locations?.map(
-                                                (loc, locIndex) => (
-                                                    <div
-                                                        key={
-                                                            loc.locationId ??
-                                                            `loc-${locIndex}`
-                                                        }
-                                                        className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2"
-                                                    >
-                                                        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                                                            <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-                                                                {locIndex + 1}
-                                                            </span>
-
-                                                            <input
-                                                                placeholder="Location name"
-                                                                value={
-                                                                    loc.name ||
-                                                                    ""
-                                                                }
-                                                                onChange={(
-                                                                    e,
-                                                                ) => {
-                                                                    const updated =
-                                                                        [
-                                                                            ...days,
-                                                                        ];
-
-                                                                    updated[
-                                                                        dayIndex
-                                                                    ].locations =
-                                                                        updated[
-                                                                            dayIndex
-                                                                        ].locations.map(
-                                                                            (
-                                                                                item,
-                                                                                index,
-                                                                            ) =>
-                                                                                index ===
-                                                                                locIndex
-                                                                                    ? {
-                                                                                          ...item,
-                                                                                          name: e
-                                                                                              .target
-                                                                                              .value,
-                                                                                      }
-                                                                                    : item,
-                                                                        );
-
-                                                                    setDays(
-                                                                        updated,
-                                                                    );
-                                                                }}
-                                                                className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
-                                                                disabled={
-                                                                    saving
-                                                                }
-                                                            />
-
-                                                            <input
-                                                                placeholder="Address"
-                                                                value={
-                                                                    loc.address ||
-                                                                    ""
-                                                                }
-                                                                onChange={(
-                                                                    e,
-                                                                ) => {
-                                                                    const updated =
-                                                                        [
-                                                                            ...days,
-                                                                        ];
-
-                                                                    updated[
-                                                                        dayIndex
-                                                                    ].locations =
-                                                                        updated[
-                                                                            dayIndex
-                                                                        ].locations.map(
-                                                                            (
-                                                                                item,
-                                                                                index,
-                                                                            ) =>
-                                                                                index ===
-                                                                                locIndex
-                                                                                    ? {
-                                                                                          ...item,
-                                                                                          address:
-                                                                                              e
-                                                                                                  .target
-                                                                                                  .value,
-                                                                                      }
-                                                                                    : item,
-                                                                        );
-
-                                                                    setDays(
-                                                                        updated,
-                                                                    );
-                                                                }}
-                                                                className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-gray-400 bg-white"
-                                                                disabled={
-                                                                    saving
-                                                                }
-                                                            />
-
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    removeLocation(
-                                                                        dayIndex,
-                                                                        locIndex,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    saving
-                                                                }
-                                                                aria-label={`Remove ${loc.name || "location"}`}
-                                                                className="w-6 h-6 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            >
-                                                                <Trash
-                                                                    size={11}
-                                                                />
-                                                            </button>
-                                                        </div>
-
-                                                        {/* Image previews */}
-                                                        {(loc.images?.length >
-                                                            0 ||
-                                                            loc.imagesLoadError) && (
-                                                            <div className="space-y-2 pt-1">
-                                                                {loc.imagesLoadError && (
-                                                                    <div
-                                                                        role="alert"
-                                                                        className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600"
-                                                                    >
-                                                                        Some
-                                                                        images
-                                                                        could
-                                                                        not be
-                                                                        loaded.
-                                                                        You can
-                                                                        continue
-                                                                        editing
-                                                                        this
-                                                                        location.
-                                                                    </div>
-                                                                )}
-
-                                                                {loc.images
-                                                                    ?.length >
-                                                                    0 && (
-                                                                    <div className="flex gap-2 flex-wrap">
-                                                                        {loc.images.map(
-                                                                            (
-                                                                                img,
-                                                                                imgIndex,
-                                                                            ) => (
-                                                                                <div
-                                                                                    key={
-                                                                                        img.imageId ??
-                                                                                        `new-${imgIndex}`
-                                                                                    }
-                                                                                    className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 group"
-                                                                                >
-                                                                                    <img
-                                                                                        src={
-                                                                                            img.isNew
-                                                                                                ? URL.createObjectURL(
-                                                                                                      img.file,
-                                                                                                  )
-                                                                                                : `${import.meta.env.VITE_API_BASE_URL}/itineraries/days/locations/images/${img.imageId}`
-                                                                                        }
-                                                                                        alt=""
-                                                                                        className="w-full h-full object-cover"
-                                                                                    />
-
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        onClick={() =>
-                                                                                            removeImage(
-                                                                                                dayIndex,
-                                                                                                locIndex,
-                                                                                                imgIndex,
-                                                                                            )
-                                                                                        }
-                                                                                        disabled={
-                                                                                            saving
-                                                                                        }
-                                                                                        aria-label="Remove image"
-                                                                                        className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed"
-                                                                                    >
-                                                                                        <Trash
-                                                                                            size={
-                                                                                                12
-                                                                                            }
-                                                                                            className="text-white"
-                                                                                        />
-                                                                                    </button>
-                                                                                </div>
-                                                                            ),
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Upload image */}
-                                                        <label className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 cursor-pointer transition-colors">
-                                                            <ImageIcon
-                                                                size={12}
-                                                            />
-                                                            Add photo
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                disabled={
-                                                                    saving
-                                                                }
-                                                                onChange={(
-                                                                    e,
-                                                                ) => {
-                                                                    const file =
-                                                                        e.target
-                                                                            .files?.[0];
-
-                                                                    if (!file)
-                                                                        return;
-
-                                                                    const updated =
-                                                                        [
-                                                                            ...days,
-                                                                        ];
-
-                                                                    updated[
-                                                                        dayIndex
-                                                                    ].locations[
-                                                                        locIndex
-                                                                    ].images = [
-                                                                        ...updated[
-                                                                            dayIndex
-                                                                        ]
-                                                                            .locations[
-                                                                            locIndex
-                                                                        ]
-                                                                            .images,
-                                                                        {
-                                                                            isNew: true,
-                                                                            file,
-                                                                        },
-                                                                    ];
-
-                                                                    setDays(
-                                                                        updated,
-                                                                    );
-
-                                                                    e.target.value =
-                                                                        "";
-                                                                }}
-                                                            />
-                                                        </label>
-                                                    </div>
-                                                ),
-                                            )}
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const updated = [...days];
-
-                                                updated[dayIndex].locations = [
-                                                    ...(updated[dayIndex]
-                                                        .locations || []),
-                                                    {
-                                                        name: "",
-                                                        address: "",
-                                                        images: [],
-                                                    },
-                                                ];
-
-                                                setDays(updated);
-                                            }}
-                                            disabled={saving}
-                                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer pt-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <Plus size={11} />
-                                            Add location
-                                        </button>
-                                    </div>
-                                </div>
+                                    day={day}
+                                    dayIndex={dayIndex}
+                                    saving={saving}
+                                    removeDay={removeDay}
+                                    removeLocation={removeLocation}
+                                    removeImage={removeImage}
+                                    setDays={setDays}
+                                />
                             ))}
                         </div>
                     </div>

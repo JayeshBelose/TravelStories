@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback, memo } from "react";
 import { X, MapIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,7 +7,7 @@ import ItineraryOverlay from "./ItineraryOverlay";
 import ErrorState from "@/components/common/ErrorState";
 import { getUserCreatedItinerariesService } from "@/services/itineraryService";
 
-export default function UserItineraryListOverlay({ open, onClose, user }) {
+function UserItineraryListOverlay({ open, onClose, user }) {
     const [itineraries, setItineraries] = useState([]);
     const [loadingItineraries, setLoadingItineraries] = useState(false);
     const [error, setError] = useState(null);
@@ -17,8 +17,14 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
     const dialogRef = useRef(null);
     const previousFocusRef = useRef(null);
 
-    const currentUser = JSON.parse(sessionStorage.getItem("user"));
-    const isAdmin = currentUser?.role === "admin";
+    const isAdmin = useMemo(() => {
+        try {
+            const currentUser = JSON.parse(sessionStorage.getItem("user"));
+            return currentUser?.role === "admin";
+        } catch {
+            return false;
+        }
+    }, []);
 
     useEffect(() => {
         if (!open) {
@@ -114,9 +120,9 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
         }
     }, [open]);
 
-    const handleRetry = () => {
+    const handleRetry = useCallback(() => {
         setRetryKey((prev) => prev + 1);
-    };
+    }, []);
 
     if (!open || !user) {
         return null;
@@ -271,3 +277,5 @@ export default function UserItineraryListOverlay({ open, onClose, user }) {
         </>
     );
 }
+
+export default memo(UserItineraryListOverlay);

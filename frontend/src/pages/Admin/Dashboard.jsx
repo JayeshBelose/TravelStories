@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
     Users,
@@ -10,11 +10,11 @@ import {
     MapPin,
 } from "lucide-react";
 import ItineraryOverlay from "@/components/itinerary/ItineraryOverlay";
-import ItineraryThumbnail from "@/components/itinerary/ItineraryThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ui } from "@/styles/uiPrimitives";
 import ErrorState from "@/components/common/ErrorState";
 import ConfirmToast from "@/components/common/ConfirmToast";
+import StatCard from "@/components/admin/StatCard";
 import { useAuth } from "@/context/AuthContext";
 import {
     deleteItineraryByAdminService,
@@ -22,39 +22,7 @@ import {
     getRecentItinerariesService,
     getWeeklyActivityService,
 } from "@/services/adminService";
-
-// Stat card
-function StatCard({ title, value, icon: Icon, color, loading, error }) {
-    return (
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm">
-            <div>
-                <p className={`${ui.sectionLabel} mb-1`}>{title}</p>
-
-                {loading ? (
-                    <Skeleton
-                        className="h-7 w-16"
-                        aria-label={`Loading ${title}`}
-                    />
-                ) : error ? (
-                    <p className="text-xs font-medium text-red-400">
-                        Unavailable
-                    </p>
-                ) : (
-                    <p className="text-2xl font-bold text-gray-900">
-                        {value.toLocaleString()}
-                    </p>
-                )}
-            </div>
-
-            <div
-                className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}
-                aria-hidden="true"
-            >
-                <Icon size={18} />
-            </div>
-        </div>
-    );
-}
+import RecentItineraries from "@/components/admin/RecentItineraries";
 
 export default function Dashboard() {
     const { user, loading } = useAuth();
@@ -70,17 +38,17 @@ export default function Dashboard() {
 
     const [recentItineraries, setRecentItineraries] = useState([]);
     const [activity, setActivity] = useState([]);
-    const [loadingDashboard, setLoadingDashboard] = useState(true);
 
     const [loadingStats, setLoadingStats] = useState(true);
     const [loadingItineraries, setLoadingItineraries] = useState(true);
     const [loadingActivity, setLoadingActivity] = useState(true);
+    const [loadingDashboard, setLoadingDashboard] = useState(true);
 
     const [statsError, setStatsError] = useState(null);
     const [itinerariesError, setItinerariesError] = useState(null);
     const [activityError, setActivityError] = useState(null);
 
-    const fetchDashboard = async () => {
+    const fetchDashboard = useCallback(async () => {
         setLoadingDashboard(true);
 
         setLoadingStats(true);
@@ -156,16 +124,16 @@ export default function Dashboard() {
             setLoadingItineraries(false);
             setLoadingActivity(false);
         }
-    };
+    }, []);
 
     // Fetch dashboard data once authentication is ready.
     useEffect(() => {
         if (loading || !user) return;
 
         fetchDashboard();
-    }, [loading, user]);
+    }, [loading, user, fetchDashboard]);
 
-    const handleStatsRetry = () => {
+    const handleStatsRetry = useCallback(() => {
         setLoadingStats(true);
         setStatsError(null);
 
@@ -191,9 +159,9 @@ export default function Dashboard() {
             .finally(() => {
                 setLoadingStats(false);
             });
-    };
+    }, []);
 
-    const handleActivityRetry = () => {
+    const handleActivityRetry = useCallback(() => {
         setLoadingActivity(true);
         setActivityError(null);
 
@@ -219,9 +187,9 @@ export default function Dashboard() {
             .finally(() => {
                 setLoadingActivity(false);
             });
-    };
+    }, []);
 
-    const handleItinerariesRetry = () => {
+    const handleItinerariesRetry = useCallback(() => {
         setLoadingItineraries(true);
         setItinerariesError(null);
 
@@ -247,10 +215,10 @@ export default function Dashboard() {
             .finally(() => {
                 setLoadingItineraries(false);
             });
-    };
+    }, []);
 
     // Itinerary delete function
-    const handleDelete = async (itineraryId) => {
+    const handleDelete = useCallback(async (itineraryId) => {
         const result = await deleteItineraryByAdminService({
             itineraryId,
         });
@@ -266,27 +234,35 @@ export default function Dashboard() {
         } else {
             toast.error(result.message);
         }
-    };
+    }, []);
 
     // Itinerary deletion confirmation
-    const confirmDelete = (itineraryId) => {
-        toast(
-            ({ closeToast }) => (
-                <ConfirmToast
-                    message="Are you sure you want to delete this itinerary? This action cannot be undone."
-                    confirmLabel="Delete"
-                    onConfirm={() => {
-                        handleDelete(itineraryId);
-                        closeToast();
-                    }}
-                    onCancel={closeToast}
-                />
-            ),
-            {
-                autoClose: false,
-            },
-        );
-    };
+    const confirmDelete = useCallback(
+        (itineraryId) => {
+            toast(
+                ({ closeToast }) => (
+                    <ConfirmToast
+                        message="Are you sure you want to delete this itinerary? This action cannot be undone."
+                        confirmLabel="Delete"
+                        onConfirm={() => {
+                            handleDelete(itineraryId);
+                            closeToast();
+                        }}
+                        onCancel={closeToast}
+                    />
+                ),
+                {
+                    autoClose: false,
+                },
+            );
+        },
+        [handleDelete],
+    );
+
+    const handleCloseOverlay = useCallback(() => {
+        setOpenView(false);
+        setSelectedItinerary(null);
+    }, []);
 
     return (
         <div>
@@ -461,75 +437,13 @@ export default function Dashboard() {
                             />
                         ) : recentItineraries.length > 0 ? (
                             recentItineraries.map((itinerary) => (
-                                <div
+                                <RecentItineraries
                                     key={itinerary.itineraryId}
-                                    className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors"
-                                >
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setSelectedItinerary(itinerary);
-                                            setOpenView(true);
-                                        }}
-                                        className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
-                                        aria-label={`View itinerary ${itinerary.title}`}
-                                    >
-                                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                                            <ItineraryThumbnail
-                                                itineraryId={
-                                                    itinerary.itineraryId
-                                                }
-                                                alt={itinerary.title}
-                                            />
-                                        </div>
-
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-semibold text-gray-900 truncate font-primary">
-                                                {itinerary.title}
-                                            </p>
-
-                                            <p className="text-xs text-gray-400 flex items-center gap-1">
-                                                <MapPin
-                                                    size={10}
-                                                    className="flex-shrink-0"
-                                                    aria-hidden="true"
-                                                />
-                                                {itinerary.place} ·{" "}
-                                                {itinerary.createdBy}
-                                            </p>
-                                        </div>
-                                    </button>
-
-                                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                                        <span
-                                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                                                itinerary.public
-                                                    ? "border-emerald-200 text-emerald-600 bg-emerald-50"
-                                                    : "border-red-200 text-red-500 bg-red-50"
-                                            }`}
-                                        >
-                                            {itinerary.public
-                                                ? "Public"
-                                                : "Private"}
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                confirmDelete(
-                                                    itinerary.itineraryId,
-                                                )
-                                            }
-                                            className="w-9 h-9 rounded-full flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all cursor-pointer focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
-                                            aria-label={`Delete itinerary ${itinerary.title}`}
-                                        >
-                                            <Trash
-                                                size={13}
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </div>
-                                </div>
+                                    itinerary={itinerary}
+                                    setSelectedItinerary={setSelectedItinerary}
+                                    setOpenView={setOpenView}
+                                    confirmDelete={confirmDelete}
+                                />
                             ))
                         ) : (
                             <p className="text-sm text-gray-400 py-4 text-center">
@@ -544,10 +458,7 @@ export default function Dashboard() {
             {openView && selectedItinerary && (
                 <ItineraryOverlay
                     itinerary={selectedItinerary}
-                    onClose={() => {
-                        setOpenView(false);
-                        setSelectedItinerary(null);
-                    }}
+                    onClose={handleCloseOverlay}
                 />
             )}
         </div>
