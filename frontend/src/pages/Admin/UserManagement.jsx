@@ -239,48 +239,25 @@ export default function UserManagement() {
                     <table className="w-full min-w-[900px] text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 text-left">
-                                <th
-                                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
-                                    scope="col"
-                                >
-                                    User
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
-                                    scope="col"
-                                >
-                                    Email
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
-                                    scope="col"
-                                >
-                                    Role
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400"
-                                    scope="col"
-                                >
-                                    Joined
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center"
-                                    scope="col"
-                                >
-                                    Followers
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center"
-                                    scope="col"
-                                >
-                                    Following
-                                </th>
-                                <th
-                                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right"
-                                    scope="col"
-                                >
-                                    Actions
-                                </th>
+                                {[
+                                    "User",
+                                    "Email",
+                                    "Role",
+                                    "Joined",
+                                    "Followers",
+                                    "Following",
+                                    "Actions",
+                                ].map((h) => (
+                                    <th
+                                        key={h}
+                                        className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 ${
+                                            h === "Actions" ? "text-right" : ""
+                                        }`}
+                                        scope="col"
+                                    >
+                                        {h}
+                                    </th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody
@@ -504,6 +481,7 @@ export default function UserManagement() {
                     setSelectedItinerary(itinerary)
                 }
             />
+
             <ItineraryOverlay
                 open={!!selectedItinerary}
                 itinerary={selectedItinerary}
