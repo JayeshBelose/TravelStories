@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useMemo,
+    useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -40,22 +47,22 @@ export function AuthProvider({ children }) {
         };
     }, [navigate]);
 
-    const login = (data) => {
+    const login = useCallback((data) => {
         sessionStorage.setItem("token", data.accessToken);
         sessionStorage.setItem("refreshToken", data.refreshToken);
         sessionStorage.setItem("user", JSON.stringify(data.user));
 
         setUser(data.user);
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("refreshToken");
         sessionStorage.removeItem("user");
 
         setUser(null);
         navigate("/login");
-    };
+    }, [navigate]);
 
     const contextValue = useMemo(
         () => ({

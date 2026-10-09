@@ -297,6 +297,18 @@ export default function Community() {
         [activeTab, following, followers],
     );
 
+    const closeItinerary = useCallback(() => {
+        setSelectedItinerary(null);
+    }, []);
+
+    const closeUserOverlay = useCallback(() => {
+        setSelectedUser(null);
+    }, []);
+
+    const handleSelectItinerary = useCallback((itinerary) => {
+        setSelectedItinerary(itinerary);
+    }, []);
+
     const currentError =
         activeTab === "following" ? followingError : followersError;
 
@@ -463,7 +475,6 @@ export default function Community() {
                 )}
             </div>
 
-            {/* Tabs */}
             {/* Tabs */}
             <div className="mb-5 flex items-center gap-1 border-b border-gray-200">
                 <button
@@ -693,16 +704,14 @@ export default function Community() {
             <UserItineraryListOverlay
                 open={!!selectedUser}
                 user={selectedUser}
-                onClose={() => setSelectedUser(null)}
-                onSelectItinerary={(itinerary) =>
-                    setSelectedItinerary(itinerary)
-                }
+                onClose={closeUserOverlay}
+                onSelectItinerary={handleSelectItinerary}
             />
 
             <ItineraryOverlay
                 open={!!selectedItinerary}
                 itinerary={selectedItinerary}
-                onClose={() => setSelectedItinerary(null)}
+                onClose={closeItinerary}
             />
         </div>
     );

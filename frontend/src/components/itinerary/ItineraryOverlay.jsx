@@ -50,6 +50,10 @@ export default function ItineraryOverlay({
     const [imagesRetryKey, setImagesRetryKey] = useState(0);
 
     useEffect(() => {
+        if (!open) {
+            return;
+        }
+
         previousFocusRef.current = document.activeElement;
 
         if (dialogRef.current) {
@@ -74,7 +78,7 @@ export default function ItineraryOverlay({
                 previousFocusRef.current.focus();
             }
         };
-    }, [onClose]);
+    }, [open, onClose]);
 
     /*
      * Load itinerary creator and days.

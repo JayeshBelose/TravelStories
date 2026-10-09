@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema } from "../../schemas/authSchemas";
 import { signupService } from "@/services/authService";
+import { ui } from "@/styles/uiPrimitives";
 
 export default function Signup() {
     const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function Signup() {
                     autoClose: 3000,
                 });
             }
-        } catch (error) {
+        } catch (_error) {
             toast.update(loadingToast, {
                 render: "Unable to create your account. Please try again.",
                 type: "error",
@@ -78,11 +79,6 @@ export default function Signup() {
             });
         }
     };
-
-    const inputBase =
-        "w-full border rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors";
-    const inputIdle = "border-gray-200 focus:border-gray-400";
-    const inputError = "border-red-300 focus:border-red-400 bg-red-50/30";
 
     const usernameError = Boolean(errors.username);
     const emailError = Boolean(errors.email);
@@ -134,8 +130,8 @@ export default function Signup() {
                                         : undefined
                                 }
                                 autoComplete="username"
-                                className={`${inputBase} ${
-                                    usernameError ? inputError : inputIdle
+                                className={`${ui.inputBase} ${
+                                    usernameError ? ui.inputError : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
@@ -178,8 +174,8 @@ export default function Signup() {
                                         : undefined
                                 }
                                 autoComplete="email"
-                                className={`${inputBase} ${
-                                    emailError ? inputError : inputIdle
+                                className={`${ui.inputBase} ${
+                                    emailError ? ui.inputError : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
@@ -222,8 +218,8 @@ export default function Signup() {
                                         : undefined
                                 }
                                 autoComplete="new-password"
-                                className={`${inputBase} pr-10 ${
-                                    passwordError ? inputError : inputIdle
+                                className={`${ui.inputBase} pr-10 ${
+                                    passwordError ? ui.inputError : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
 

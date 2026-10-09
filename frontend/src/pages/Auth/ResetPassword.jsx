@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
     Lock,
@@ -13,11 +13,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resetPasswordSchema } from "../../schemas/authSchemas";
 import { resetPasswordService } from "@/services/authService";
+import { ui } from "@/styles/uiPrimitives";
 
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const token = searchParams.get("token");
 
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -50,18 +50,14 @@ export default function ResetPassword() {
                 toast.error(result.message);
             }
         } catch (error) {
-            console.error("Password reset failed:", error);
             toast.error("Unable to reset your password. Please try again.");
         }
     };
 
-    const inputBase =
-        "w-full border rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors";
-    const inputIdle = "border-gray-200 focus:border-gray-400";
-    const inputError = "border-red-300 focus:border-red-400 bg-red-50/30";
-
     const newPasswordError = Boolean(errors.newPassword);
     const confirmPasswordError = Boolean(errors.confirmPassword);
+
+    const token = useMemo(() => searchParams.get("token"), [searchParams]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -116,8 +112,10 @@ export default function ResetPassword() {
                                         : undefined
                                 }
                                 autoComplete="new-password"
-                                className={`${inputBase} ${
-                                    newPasswordError ? inputError : inputIdle
+                                className={`${ui.inputBase} ${
+                                    newPasswordError
+                                        ? ui.inputError
+                                        : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
 
@@ -180,10 +178,10 @@ export default function ResetPassword() {
                                         : undefined
                                 }
                                 autoComplete="new-password"
-                                className={`${inputBase} ${
+                                className={`${ui.inputBase} ${
                                     confirmPasswordError
-                                        ? inputError
-                                        : inputIdle
+                                        ? ui.inputError
+                                        : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:text-gray-400`}
                             />
 

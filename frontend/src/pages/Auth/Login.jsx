@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../schemas/authSchemas";
 import { loginService, forgotPasswordService } from "@/services/authService";
+import { ui } from "@/styles/uiPrimitives";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -114,11 +115,6 @@ export default function Login() {
         }
     };
 
-    const inputBase =
-        "w-full border rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors";
-    const inputIdle = "border-gray-200 focus:border-gray-400";
-    const inputError = "border-red-300 focus:border-red-400 bg-red-50/30";
-
     const emailError = Boolean(errors.email);
     const passwordError = Boolean(errors.password);
 
@@ -166,8 +162,8 @@ export default function Login() {
                                     emailError ? "login-email-error" : undefined
                                 }
                                 autoComplete="email"
-                                className={`${inputBase} ${
-                                    emailError ? inputError : inputIdle
+                                className={`${ui.inputBase} ${
+                                    emailError ? ui.inputError : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
                         </div>
@@ -210,8 +206,8 @@ export default function Login() {
                                         : undefined
                                 }
                                 autoComplete="current-password"
-                                className={`${inputBase} pr-10 ${
-                                    passwordError ? inputError : inputIdle
+                                className={`${ui.inputBase} pr-10 ${
+                                    passwordError ? ui.inputError : ui.inputIdle
                                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                             />
 
