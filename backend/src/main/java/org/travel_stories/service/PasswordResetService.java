@@ -163,11 +163,25 @@ public class PasswordResetService {
              * Record the failed attempt in a separate transaction
              * so the increment is not rolled back when we throw.
              */
-            passwordResetAttemptService
-                    .recordFailedAttempt(resetRequest);
+            int attemptCount =
+                    passwordResetAttemptService
+                            .recordFailedAttempt(resetRequest);
+
+            int attemptsRemaining =
+                    Math.max(0, MAX_OTP_ATTEMPTS - attemptCount);
+
+            if (attemptsRemaining == 0) {
+                throw new InvalidTokenException(
+                        "Too many invalid OTP attempts. Please request a new verification code."
+                );
+            }
 
             throw new InvalidTokenException(
-                    "Invalid OTP."
+                    "Invalid OTP. "
+                            + attemptsRemaining
+                            + " attempt"
+                            + (attemptsRemaining == 1 ? "" : "s")
+                            + " remaining."
             );
         }
 
@@ -218,7 +232,7 @@ public class PasswordResetService {
 
         PasswordResetToken resetRequest =
                 passwordResetTokenRepository
-                        .findByResetTokenHashAndUsedFalse(
+                        .findByResetTokenHashAndUsedFalseForUpdate(
                                 resetTokenHash
                         )
                         .orElseThrow(() ->

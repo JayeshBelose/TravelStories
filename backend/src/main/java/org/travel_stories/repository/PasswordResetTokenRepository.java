@@ -1,6 +1,8 @@
 package org.travel_stories.repository;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,12 +30,26 @@ public interface PasswordResetTokenRepository
 
     @Modifying
     @Query("""
-            DELETE FROM PasswordResetToken p
-            WHERE p.expiresAt < :now
-            """)
-    long deleteExpiredOtpRecords(
-            @Param("now") Instant now
-    );
+    DELETE FROM PasswordResetToken p
+    WHERE p.verified = false
+      AND p.expiresAt < :now
+""")
+    long deleteExpiredOtpRecords(@Param("now") Instant now);
+
+    @Modifying
+    @Query("""
+    DELETE FROM PasswordResetToken p
+    WHERE p.verified = true
+      AND p.resetTokenExpiresAt < :now
+""")
+    long deleteExpiredResetTokens(@Param("now") Instant now);
+
+    @Modifying
+    @Query("""
+    DELETE FROM PasswordResetToken p
+    WHERE p.used = true
+""")
+    long deleteUsedResetTokens();
 
     @Modifying
     @Query("""
@@ -43,4 +59,16 @@ public interface PasswordResetTokenRepository
     long deleteByUserUserId(
             @Param("userId") UUID userId
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        SELECT p
+        FROM PasswordResetToken p
+        WHERE p.resetTokenHash = :resetTokenHash
+          AND p.used = false
+        """)
+    Optional<PasswordResetToken> findByResetTokenHashAndUsedFalseForUpdate(
+            @Param("resetTokenHash") String resetTokenHash
+    );
+
 }

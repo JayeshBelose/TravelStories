@@ -1,5 +1,6 @@
 package org.travel_stories.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
@@ -12,7 +13,10 @@ import org.travel_stories.dto.*;
 import org.travel_stories.entity.RefreshToken;
 import org.travel_stories.entity.User;
 import org.travel_stories.security.JwtUtil;
+import org.travel_stories.security.ratelimit.BucketKey;
+import org.travel_stories.security.ratelimit.EndpointCategory;
 import org.travel_stories.service.PasswordResetService;
+import org.travel_stories.service.RateLimitingService;
 import org.travel_stories.service.RefreshTokenService;
 import org.travel_stories.service.UserService;
 
@@ -29,6 +33,7 @@ public class AuthController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetService passwordResetService;
+    private final RateLimitingService rateLimitingService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthTokenResponseDto>> login(
@@ -149,8 +154,15 @@ public class AuthController {
 
     @PostMapping("/forgotPassword")
     public ResponseEntity<ApiResponse<Void>> forgotPassword(
-            @RequestParam String email
+            @RequestParam String email,
+            HttpServletRequest request
     ) {
+        rateLimitingService.validateRateLimit(
+                new BucketKey(
+                        request.getRemoteAddr(),
+                        EndpointCategory.FORGOT_PASSWORD
+                )
+        );
 
         passwordResetService.requestPasswordReset(email);
 
@@ -167,26 +179,28 @@ public class AuthController {
     }
 
     @PostMapping("/verifyResetOtp")
-    public ResponseEntity<ApiResponse<Map<String, String>>> verifyResetOtp(
+    public ResponseEntity<ApiResponse<String>> verifyResetOtp(
             @RequestParam String email,
-            @RequestParam String otp) {
+            @RequestParam String otp,
+            HttpServletRequest request
+    ) {
+        rateLimitingService.validateRateLimit(
+                new BucketKey(
+                        request.getRemoteAddr(),
+                        EndpointCategory.VERIFY_RESET_OTP
+                )
+        );
 
-        String resetToken =
-                passwordResetService.verifyOtp(
-                        email,
-                        otp
-                );
+        String resetToken = passwordResetService.verifyOtp(email, otp);
 
-        Map<String, String> response =
-                Map.of("resetToken", resetToken);
-
-        return ResponseEntity
-                .ok()
-                .cacheControl(CacheControl.noStore())
+        return ResponseEntity.ok()
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
                 .body(
                         ApiResponse.success(
-                                "OTP verified successfully",
-                                response
+                                "OTP verified successfully.",
+                                resetToken
                         )
                 );
     }
@@ -194,19 +208,25 @@ public class AuthController {
     @PostMapping("/resetPassword")
     public ResponseEntity<ApiResponse<Void>> resetPassword(
             @RequestParam String resetToken,
-            @RequestParam String newPassword) {
-
-        passwordResetService.resetPassword(
-                resetToken,
-                newPassword
+            @RequestParam String newPassword,
+            HttpServletRequest request
+    ) {
+        rateLimitingService.validateRateLimit(
+                new BucketKey(
+                        request.getRemoteAddr(),
+                        EndpointCategory.RESET_PASSWORD
+                )
         );
 
-        return ResponseEntity
-                .ok()
-                .cacheControl(CacheControl.noStore())
+        passwordResetService.resetPassword(resetToken, newPassword);
+
+        return ResponseEntity.ok()
+                .cacheControl(NO_STORE)
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
                 .body(
                         ApiResponse.success(
-                                "Password updated successfully"
+                                "Password reset successfully."
                         )
                 );
     }

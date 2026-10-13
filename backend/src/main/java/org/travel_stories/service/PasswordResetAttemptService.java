@@ -14,16 +14,14 @@ public class PasswordResetAttemptService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void recordFailedAttempt(
-            PasswordResetToken resetRequest
-    ) {
+    public int recordFailedAttempt(PasswordResetToken resetRequest) {
 
-        resetRequest.setAttemptCount(
-                resetRequest.getAttemptCount() + 1
-        );
+        int newAttemptCount = resetRequest.getAttemptCount() + 1;
 
-        passwordResetTokenRepository.save(
-                resetRequest
-        );
+        resetRequest.setAttemptCount(newAttemptCount);
+
+        passwordResetTokenRepository.save(resetRequest);
+
+        return newAttemptCount;
     }
 }

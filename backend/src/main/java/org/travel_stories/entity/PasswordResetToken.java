@@ -22,6 +22,10 @@ import java.util.UUID;
                 @Index(
                         name = "idx_password_reset_expiry",
                         columnList = "expires_at"
+                ),
+                @Index(
+                        name = "idx_password_reset_token_hash",
+                        columnList = "reset_token_hash"
                 )
         }
 )
