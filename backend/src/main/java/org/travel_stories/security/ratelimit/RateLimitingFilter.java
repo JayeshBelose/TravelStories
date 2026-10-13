@@ -26,6 +26,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                     "/api/auth/signup", EndpointCategory.SIGNUP,
                     "/api/auth/refresh", EndpointCategory.REFRESH,
                     "/api/auth/forgotPassword", EndpointCategory.FORGOT_PASSWORD,
+                    "/api/auth/verifyResetOtp", EndpointCategory.VERIFY_RESET_OTP,
                     "/api/auth/resetPassword", EndpointCategory.RESET_PASSWORD
             );
     private final RateLimitingService rateLimitingService;

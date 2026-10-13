@@ -29,6 +29,9 @@ public class RateLimitProperties {
     private EndpointLimit forgotPassword = new EndpointLimit();
 
     @Valid
+    private EndpointLimit verifyResetOtp = new EndpointLimit();
+
+    @Valid
     private EndpointLimit resetPassword = new EndpointLimit();
 
     @Valid

@@ -12,6 +12,7 @@ import org.travel_stories.dto.*;
 import org.travel_stories.entity.RefreshToken;
 import org.travel_stories.entity.User;
 import org.travel_stories.security.JwtUtil;
+import org.travel_stories.service.PasswordResetService;
 import org.travel_stories.service.RefreshTokenService;
 import org.travel_stories.service.UserService;
 
@@ -27,6 +28,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthTokenResponseDto>> login(
@@ -146,34 +148,67 @@ public class AuthController {
     }
 
     @PostMapping("/forgotPassword")
-    public ResponseEntity<ApiResponse<Map<String, String>>> forgotPassword(
-            @RequestParam String email) {
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @RequestParam String email
+    ) {
 
-        String token = userService.forgotPassword(email);
-
-        Map<String, String> response = Map.of(
-                "token", token
-        );
+        passwordResetService.requestPasswordReset(email);
 
         return ResponseEntity.ok()
                 .cacheControl(NO_STORE)
                 .header(HttpHeaders.PRAGMA, "no-cache")
                 .header(HttpHeaders.EXPIRES, "0")
                 .body(
-                        ApiResponse.success("Use this token to reset password", response)
+                        ApiResponse.success(
+                                "If an account exists for this email, " +
+                                        "a password reset OTP has been sent."
+                        )
+                );
+    }
+
+    @PostMapping("/verifyResetOtp")
+    public ResponseEntity<ApiResponse<Map<String, String>>> verifyResetOtp(
+            @RequestParam String email,
+            @RequestParam String otp) {
+
+        String resetToken =
+                passwordResetService.verifyOtp(
+                        email,
+                        otp
+                );
+
+        Map<String, String> response =
+                Map.of("resetToken", resetToken);
+
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noStore())
+                .body(
+                        ApiResponse.success(
+                                "OTP verified successfully",
+                                response
+                        )
                 );
     }
 
     @PostMapping("/resetPassword")
     public ResponseEntity<ApiResponse<Void>> resetPassword(
-            @RequestParam String token,
+            @RequestParam String resetToken,
             @RequestParam String newPassword) {
 
-        userService.resetPassword(token, newPassword);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Password updated successfully")
+        passwordResetService.resetPassword(
+                resetToken,
+                newPassword
         );
+
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noStore())
+                .body(
+                        ApiResponse.success(
+                                "Password updated successfully"
+                        )
+                );
     }
 
     @PostMapping("/refresh")

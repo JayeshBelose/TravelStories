@@ -194,7 +194,6 @@ public class UserService {
                 });
 
         try {
-
             if (!passwordEncoder.matches(password, user.getPassword())) {
 
                 log.warn(

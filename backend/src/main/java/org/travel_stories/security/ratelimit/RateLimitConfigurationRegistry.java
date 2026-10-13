@@ -20,6 +20,7 @@ public class RateLimitConfigurationRegistry {
         map.put(EndpointCategory.SIGNUP, properties.getSignup());
         map.put(EndpointCategory.REFRESH, properties.getRefresh());
         map.put(EndpointCategory.FORGOT_PASSWORD, properties.getForgotPassword());
+        map.put(EndpointCategory.VERIFY_RESET_OTP, properties.getVerifyResetOtp());
         map.put(EndpointCategory.RESET_PASSWORD, properties.getResetPassword());
         map.put(EndpointCategory.UPLOAD, properties.getUpload());
 

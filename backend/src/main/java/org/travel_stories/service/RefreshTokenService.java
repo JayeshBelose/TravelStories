@@ -220,4 +220,10 @@ public class RefreshTokenService {
         );
     }
 
+    @Transactional
+    public long deleteAllRefreshTokensByUserId(UUID userId) {
+
+        return refreshTokenRepository.deleteByUserUserId(userId);
+    }
+
 }

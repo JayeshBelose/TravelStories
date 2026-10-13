@@ -10,6 +10,8 @@ public enum EndpointCategory {
 
     FORGOT_PASSWORD,
 
+    VERIFY_RESET_OTP,
+
     RESET_PASSWORD,
 
     UPLOAD

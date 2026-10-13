@@ -5,15 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8da3f00-67bc-4bb9-8787-51c06209ed2a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/entity/PasswordResetToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/PasswordResetTokenRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/PasswordResetAttemptService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/PasswordResetService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/sidebar/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/sidebar/Sidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/context/AuthContext.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Admin/UserManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Admin/UserManagement.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Auth/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Auth/Login.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Auth/ResetPassword.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Auth/ResetPassword.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/Auth/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/Auth/Signup.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/User/Community.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/User/Community.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/styles/uiPrimitives.js" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/styles/uiPrimitives.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/config/RateLimitProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/config/RateLimitProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/repository/RefreshTokenRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/EndpointCategory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/EndpointCategory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/RateLimitConfigurationRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/RateLimitConfigurationRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/RateLimitingFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/security/ratelimit/RateLimitingFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/RefreshTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/RefreshTokenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/travel_stories/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryThumbnail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/itinerary/ItineraryThumbnail.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +33,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Exception" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -86,6 +96,10 @@
         <env name="DB_USERNAME" value="postgres" />
         <env name="FILE_STORAGE_PATH" value="../../travel-stories-storage" />
         <env name="JWT_SECRET" value="travelstoriesjwtsecuritytokensecretkey" />
+        <env name="MAIL_HOST" value="smtp.gmail.com" />
+        <env name="MAIL_PORT" value="587" />
+        <env name="MAIL_USERNAME" value="travelstories.web@gmail.com" />
+        <env name="MAIL_PASSWORD" value="ghiz qnyo oabg vgfo" />
       </envs>
       <option name="MAIN_CLASS_NAME" value="org.travel_stories.Main" />
       <module name="backend" />
