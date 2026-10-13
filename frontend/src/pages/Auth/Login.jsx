@@ -70,46 +70,33 @@ export default function Login() {
     };
 
     const handleForgotPassword = async () => {
-        const isEmailValid = await trigger("email");
-
-        if (!isEmailValid) {
-            return;
-        }
-
-        if (isSubmitting || forgotPasswordLoading) {
-            return;
-        }
-
         const email = getValues("email");
 
-        setForgotPasswordLoading(true);
+        const isValid = await trigger("email");
 
-        const loadingToast = toast.loading("Generating link...");
+        if (!isValid) {
+            return;
+        }
 
         try {
-            const result = await forgotPasswordService({ email });
+            setForgotPasswordLoading(true);
 
-            if (result.success) {
-                const { token } = result.data;
+            await forgotPasswordService({ email });
 
-                toast.update(loadingToast, {
-                    render: "Reset link generated!",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 1000,
-                });
+            toast.success(
+                "If an account exists, a verification code has been sent.",
+            );
 
-                setTimeout(() => {
-                    navigate(`/reset-password?token=${token}`);
-                }, 1500);
-            } else {
-                toast.update(loadingToast, {
-                    render: result.message,
-                    type: "error",
-                    isLoading: false,
-                    autoClose: 3000,
-                });
-            }
+            navigate("/reset-password", {
+                state: { email },
+            });
+        } catch (error) {
+            console.error("Forgot password error:", error);
+
+            toast.error(
+                error.response?.data?.message ||
+                    "Unable to process your request.",
+            );
         } finally {
             setForgotPasswordLoading(false);
         }

@@ -1,5 +1,14 @@
-import { loginApi, signupApi, forgotPasswordApi, resetPasswordApi } from "@/api/authApi";
-import { executeServiceRequest, handleServiceMessageResponse } from "./serviceUtils";
+import {
+    loginApi,
+    signupApi,
+    forgotPasswordApi,
+    resetPasswordApi,
+    verifyResetOtpApi,
+} from "@/api/authApi";
+import {
+    executeServiceRequest,
+    handleServiceMessageResponse,
+} from "./serviceUtils";
 
 export const loginService = async ({ email, password }) => {
     return executeServiceRequest(
@@ -21,24 +30,16 @@ export const signupService = async ({ username, email, password }) => {
 };
 
 export const forgotPasswordService = async ({ email }) => {
-    return executeServiceRequest(
-        () => forgotPasswordApi({ email }),
-        "Failed to generate reset token.",
-    );
+    return await forgotPasswordApi({ email });
 };
 
-export const resetPasswordService = async ({ token, newPassword }) => {
-    return executeServiceRequest(
-        () =>
-            resetPasswordApi({
-                token,
-                newPassword,
-            }),
-        "Invalid or expired reset link. Please try again.",
-        response =>
-            handleServiceMessageResponse(
-                response,
-                "Invalid or expired reset link. Please try again.",
-            ),
-    );
+export const verifyResetOtpService = async ({ email, otp }) => {
+    return await verifyResetOtpApi({ email, otp });
+};
+
+export const resetPasswordService = async ({ resetToken, newPassword }) => {
+    return await resetPasswordApi({
+        resetToken,
+        newPassword,
+    });
 };

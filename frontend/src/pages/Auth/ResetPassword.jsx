@@ -1,32 +1,91 @@
-import { useMemo, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import {
-    Lock,
-    Eye,
-    EyeOff,
-    ArrowRight,
-    ShieldCheck,
-    Loader2,
-} from "lucide-react";
-import { toast } from "react-toastify";
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { resetPasswordSchema } from "../../schemas/authSchemas";
-import { resetPasswordService } from "@/services/authService";
+import { toast } from "react-toastify";
+import {
+    Eye,
+    EyeOff,
+    Mail,
+    Lock,
+    KeyRound,
+    ArrowRight,
+    Loader2,
+} from "lucide-react";
+
+import {
+    forgotPasswordService,
+    verifyResetOtpService,
+    resetPasswordService,
+} from "@/services/authService";
+
+import {
+    forgotPasswordSchema,
+    resetPasswordSchema,
+} from "@/schemas/authSchemas";
 import { ui } from "@/styles/uiPrimitives";
 
-export default function ResetPassword() {
-    const [searchParams] = useSearchParams();
+const STEP_COPY = {
+    email: {
+        title: "Forgot password?",
+        subtitle: "Enter your email and we'll send you a code",
+    },
+    otp: {
+        title: "Check your email",
+        subtitle: "Enter the 6-digit code we sent you",
+    },
+    password: {
+        title: "Set a new password",
+        subtitle: "Choose a password you haven't used before",
+    },
+};
+
+const labelClass =
+    "block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest";
+
+const iconClass =
+    "absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none";
+
+const errorTextClass = "text-xs text-red-400 mt-1";
+
+const textButtonClass =
+    "text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50";
+
+const eyeButtonClass =
+    "absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed";
+
+const submitClass = (disabled) =>
+    `w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2 ${
+        !disabled
+            ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
+            : "bg-gray-100 text-gray-300 cursor-not-allowed"
+    }`;
+
+const ResetPassword = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const [showNew, setShowNew] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+    const emailFromLogin = location.state?.email || "";
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm({
+    const [step, setStep] = useState(emailFromLogin ? "otp" : "email");
+
+    const [email, setEmail] = useState(emailFromLogin);
+    const [resetToken, setResetToken] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [otpError, setOtpError] = useState("");
+
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const emailForm = useForm({
+        resolver: zodResolver(forgotPasswordSchema),
+        mode: "onChange",
+        defaultValues: {
+            email: emailFromLogin,
+        },
+    });
+
+    const passwordForm = useForm({
         resolver: zodResolver(resetPasswordSchema),
         mode: "onChange",
         defaultValues: {
@@ -35,224 +94,509 @@ export default function ResetPassword() {
         },
     });
 
-    const handlePasswordReset = async (data) => {
+    const handleSendOtp = async (data) => {
         try {
-            const result = await resetPasswordService({
-                token,
-                newPassword: data.newPassword,
+            setLoading(true);
+
+            await forgotPasswordService({
+                email: data.email.trim(),
             });
 
-            if (result.success) {
-                toast.success(result.message);
+            setEmail(data.email.trim());
+            setResetToken(null);
+            setOtpError("");
+            setStep("otp");
 
-                setTimeout(() => navigate("/login"), 1500);
-            } else {
-                toast.error(result.message);
-            }
+            toast.success(
+                "If an account exists, a verification code has been sent.",
+            );
         } catch (error) {
-            toast.error("Unable to reset your password. Please try again.");
+            toast.error(
+                error.response?.data?.message ||
+                    "Unable to process your request.",
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
-    const newPasswordError = Boolean(errors.newPassword);
-    const confirmPasswordError = Boolean(errors.confirmPassword);
+    const handleVerifyOtp = async (event) => {
+        event.preventDefault();
 
-    const token = useMemo(() => searchParams.get("token"), [searchParams]);
+        const formData = new FormData(event.currentTarget);
+        const otp = String(formData.get("otp") || "").trim();
+
+        if (!/^\d{6}$/.test(otp)) {
+            setOtpError("Enter a valid 6-digit OTP.");
+            return;
+        }
+
+        setOtpError("");
+
+        try {
+            setLoading(true);
+
+            const result = await verifyResetOtpService({
+                email,
+                otp,
+            });
+
+            const token = result.data?.data?.resetToken;
+
+            if (!token) {
+                throw new Error("Reset token was not returned by the server.");
+            }
+
+            setResetToken(token);
+            setStep("password");
+
+            toast.success("OTP verified successfully.");
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Invalid or expired OTP.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOtp = async () => {
+        if (!email) {
+            setStep("email");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await forgotPasswordService({
+                email,
+            });
+
+            // A new OTP invalidates the previous reset attempt.
+            setResetToken(null);
+
+            toast.success(
+                "If an account exists, a new verification code has been sent.",
+            );
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                    "Unable to resend the verification code.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (data) => {
+        if (!resetToken) {
+            toast.error(
+                "Your reset session has expired. Please request a new OTP.",
+            );
+
+            setStep("email");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await resetPasswordService({
+                resetToken,
+                newPassword: data.newPassword,
+            });
+
+            toast.success("Password updated successfully.");
+
+            // Remove the sensitive reset token from memory.
+            setResetToken(null);
+
+            passwordForm.reset();
+
+            navigate("/login", {
+                replace: true,
+            });
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Unable to reset password.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUseAnotherEmail = () => {
+        setEmail("");
+        setResetToken(null);
+        setOtpError("");
+
+        emailForm.reset({
+            email: "",
+        });
+
+        setStep("email");
+    };
+
+    const emailErrors = emailForm.formState.errors;
+    const passwordErrors = passwordForm.formState.errors;
+
+    const emailError = Boolean(emailErrors.email);
+    const newPasswordError = Boolean(passwordErrors.newPassword);
+    const confirmPasswordError = Boolean(passwordErrors.confirmPassword);
+
+    const copy = STEP_COPY[step];
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="w-full max-w-sm">
-                {/* Header */}
+                {/* Heading */}
                 <div className="text-center mb-8">
-                    <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-4">
-                        <ShieldCheck size={22} className="text-white" />
-                    </div>
-
                     <h1 className="text-2xl font-bold text-gray-900 font-primary tracking-tight mb-1">
-                        Reset password
+                        {copy.title}
                     </h1>
-
-                    <p className="text-sm text-gray-400">
-                        Enter your new password below
-                    </p>
+                    <p className="text-sm text-gray-400">{copy.subtitle}</p>
                 </div>
 
-                {/* Card */}
-                <form
-                    onSubmit={handleSubmit(handlePasswordReset)}
-                    className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4"
-                >
-                    {/* New Password */}
-                    <div>
-                        <label
-                            htmlFor="reset-new-password"
-                            className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest"
-                        >
-                            New Password
-                        </label>
-
-                        <div className="relative">
-                            <Lock
-                                size={14}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
-                            />
-
-                            <input
-                                id="reset-new-password"
-                                type={showNew ? "text" : "password"}
-                                placeholder="12–16 characters"
-                                {...register("newPassword")}
-                                disabled={isSubmitting}
-                                aria-invalid={
-                                    newPasswordError ? "true" : "false"
-                                }
-                                aria-describedby={
-                                    newPasswordError
-                                        ? "reset-new-password-error"
-                                        : undefined
-                                }
-                                autoComplete="new-password"
-                                className={`${ui.inputBase} ${
-                                    newPasswordError
-                                        ? ui.inputError
-                                        : ui.inputIdle
-                                } disabled:bg-gray-50 disabled:text-gray-400`}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() => setShowNew((value) => !value)}
-                                disabled={isSubmitting}
-                                aria-label={
-                                    showNew
-                                        ? "Hide new password"
-                                        : "Show new password"
-                                }
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {showNew ? (
-                                    <EyeOff size={15} />
-                                ) : (
-                                    <Eye size={15} />
-                                )}
-                            </button>
-                        </div>
-
-                        {errors.newPassword && (
-                            <p
-                                id="reset-new-password-error"
-                                className="text-xs text-red-400 mt-1"
-                            >
-                                {errors.newPassword.message}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Confirm Password */}
-                    <div>
-                        <label
-                            htmlFor="reset-confirm-password"
-                            className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-widest"
-                        >
-                            Confirm Password
-                        </label>
-
-                        <div className="relative">
-                            <Lock
-                                size={14}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
-                            />
-
-                            <input
-                                id="reset-confirm-password"
-                                type={showConfirm ? "text" : "password"}
-                                placeholder="Repeat your password"
-                                {...register("confirmPassword")}
-                                disabled={isSubmitting}
-                                aria-invalid={
-                                    confirmPasswordError ? "true" : "false"
-                                }
-                                aria-describedby={
-                                    confirmPasswordError
-                                        ? "reset-confirm-password-error"
-                                        : undefined
-                                }
-                                autoComplete="new-password"
-                                className={`${ui.inputBase} ${
-                                    confirmPasswordError
-                                        ? ui.inputError
-                                        : ui.inputIdle
-                                } disabled:bg-gray-50 disabled:text-gray-400`}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setShowConfirm((value) => !value)
-                                }
-                                disabled={isSubmitting}
-                                aria-label={
-                                    showConfirm
-                                        ? "Hide confirm password"
-                                        : "Show confirm password"
-                                }
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {showConfirm ? (
-                                    <EyeOff size={15} />
-                                ) : (
-                                    <Eye size={15} />
-                                )}
-                            </button>
-                        </div>
-
-                        {errors.confirmPassword && (
-                            <p
-                                id="reset-confirm-password-error"
-                                className="text-xs text-red-400 mt-1"
-                            >
-                                {errors.confirmPassword.message}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        aria-busy={isSubmitting}
-                        className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2
-                            ${
-                                !isSubmitting
-                                    ? "bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
-                                    : "bg-gray-100 text-gray-300 cursor-not-allowed"
-                            }`}
+                {/* Step 1: Email */}
+                {step === "email" && (
+                    <form
+                        onSubmit={emailForm.handleSubmit(handleSendOtp)}
+                        className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4"
                     >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2
-                                    size={14}
-                                    className="animate-spin"
-                                    aria-hidden="true"
-                                />
-                                Updating…
-                            </>
-                        ) : (
-                            <>
-                                Update password
-                                <ArrowRight size={14} aria-hidden="true" />
-                            </>
-                        )}
-                    </button>
-                </form>
+                        <div>
+                            <label htmlFor="reset-email" className={labelClass}>
+                                Email
+                            </label>
 
-                {/* Back to login */}
+                            <div className="relative">
+                                <Mail size={14} className={iconClass} />
+
+                                <input
+                                    id="reset-email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    autoComplete="email"
+                                    {...emailForm.register("email")}
+                                    disabled={loading}
+                                    aria-invalid={emailError ? "true" : "false"}
+                                    aria-describedby={
+                                        emailError
+                                            ? "reset-email-error"
+                                            : undefined
+                                    }
+                                    className={`${ui.inputBase} ${
+                                        emailError
+                                            ? ui.inputError
+                                            : ui.inputIdle
+                                    } disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                />
+                            </div>
+
+                            {emailErrors.email && (
+                                <p
+                                    id="reset-email-error"
+                                    className={errorTextClass}
+                                >
+                                    {emailErrors.email.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={submitClass(loading)}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2
+                                        size={14}
+                                        className="animate-spin"
+                                    />
+                                    Sending…
+                                </>
+                            ) : (
+                                <>
+                                    Send OTP
+                                    <ArrowRight size={14} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                )}
+
+                {/* Step 2: OTP */}
+                {step === "otp" && (
+                    <form
+                        onSubmit={handleVerifyOtp}
+                        className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4"
+                    >
+                        <div>
+                            <label htmlFor="reset-otp" className={labelClass}>
+                                Verification code
+                            </label>
+
+                            <div className="relative">
+                                <KeyRound size={14} className={iconClass} />
+
+                                <input
+                                    id="reset-otp"
+                                    name="otp"
+                                    type="text"
+                                    inputMode="numeric"
+                                    autoComplete="one-time-code"
+                                    maxLength={6}
+                                    pattern="[0-9]{6}"
+                                    placeholder="6-digit code"
+                                    disabled={loading}
+                                    onChange={() => otpError && setOtpError("")}
+                                    aria-invalid={otpError ? "true" : "false"}
+                                    aria-describedby={
+                                        otpError ? "reset-otp-error" : undefined
+                                    }
+                                    className={`${ui.inputBase} ${
+                                        otpError ? ui.inputError : ui.inputIdle
+                                    } disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                />
+                            </div>
+
+                            {otpError && (
+                                <p
+                                    id="reset-otp-error"
+                                    className={errorTextClass}
+                                >
+                                    {otpError}
+                                </p>
+                            )}
+
+                            {email && (
+                                <p className="text-xs text-gray-400 mt-2 break-all">
+                                    Sent to {email}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Resend / change email */}
+                        <div className="flex items-center justify-between">
+                            <button
+                                type="button"
+                                onClick={handleUseAnotherEmail}
+                                disabled={loading}
+                                className={textButtonClass}
+                            >
+                                Use another email
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleResendOtp}
+                                disabled={loading}
+                                className={textButtonClass}
+                            >
+                                Resend OTP
+                            </button>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={submitClass(loading)}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2
+                                        size={14}
+                                        className="animate-spin"
+                                    />
+                                    Verifying…
+                                </>
+                            ) : (
+                                <>
+                                    Verify OTP
+                                    <ArrowRight size={14} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                )}
+
+                {/* Step 3: New password */}
+                {step === "password" && (
+                    <form
+                        onSubmit={passwordForm.handleSubmit(
+                            handleResetPassword,
+                        )}
+                        className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-4"
+                    >
+                        {/* New password */}
+                        <div>
+                            <label
+                                htmlFor="reset-new-password"
+                                className={labelClass}
+                            >
+                                New password
+                            </label>
+
+                            <div className="relative">
+                                <Lock size={14} className={iconClass} />
+
+                                <input
+                                    id="reset-new-password"
+                                    type={showNewPassword ? "text" : "password"}
+                                    placeholder="12–16 characters"
+                                    autoComplete="new-password"
+                                    {...passwordForm.register("newPassword")}
+                                    disabled={loading}
+                                    aria-invalid={
+                                        newPasswordError ? "true" : "false"
+                                    }
+                                    aria-describedby={
+                                        newPasswordError
+                                            ? "reset-new-password-error"
+                                            : undefined
+                                    }
+                                    className={`${ui.inputBase} pr-10 ${
+                                        newPasswordError
+                                            ? ui.inputError
+                                            : ui.inputIdle
+                                    } disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowNewPassword((value) => !value)
+                                    }
+                                    disabled={loading}
+                                    aria-label={
+                                        showNewPassword
+                                            ? "Hide password"
+                                            : "Show password"
+                                    }
+                                    className={eyeButtonClass}
+                                >
+                                    {showNewPassword ? (
+                                        <EyeOff size={15} />
+                                    ) : (
+                                        <Eye size={15} />
+                                    )}
+                                </button>
+                            </div>
+
+                            {passwordErrors.newPassword && (
+                                <p
+                                    id="reset-new-password-error"
+                                    className={errorTextClass}
+                                >
+                                    {passwordErrors.newPassword.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Confirm password */}
+                        <div>
+                            <label
+                                htmlFor="reset-confirm-password"
+                                className={labelClass}
+                            >
+                                Confirm password
+                            </label>
+
+                            <div className="relative">
+                                <Lock size={14} className={iconClass} />
+
+                                <input
+                                    id="reset-confirm-password"
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    placeholder="Re-enter your password"
+                                    autoComplete="new-password"
+                                    {...passwordForm.register(
+                                        "confirmPassword",
+                                    )}
+                                    disabled={loading}
+                                    aria-invalid={
+                                        confirmPasswordError ? "true" : "false"
+                                    }
+                                    aria-describedby={
+                                        confirmPasswordError
+                                            ? "reset-confirm-password-error"
+                                            : undefined
+                                    }
+                                    className={`${ui.inputBase} pr-10 ${
+                                        confirmPasswordError
+                                            ? ui.inputError
+                                            : ui.inputIdle
+                                    } disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowConfirmPassword(
+                                            (value) => !value,
+                                        )
+                                    }
+                                    disabled={loading}
+                                    aria-label={
+                                        showConfirmPassword
+                                            ? "Hide password"
+                                            : "Show password"
+                                    }
+                                    className={eyeButtonClass}
+                                >
+                                    {showConfirmPassword ? (
+                                        <EyeOff size={15} />
+                                    ) : (
+                                        <Eye size={15} />
+                                    )}
+                                </button>
+                            </div>
+
+                            {passwordErrors.confirmPassword && (
+                                <p
+                                    id="reset-confirm-password-error"
+                                    className={errorTextClass}
+                                >
+                                    {passwordErrors.confirmPassword.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading || !resetToken}
+                            className={submitClass(loading || !resetToken)}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2
+                                        size={14}
+                                        className="animate-spin"
+                                    />
+                                    Updating…
+                                </>
+                            ) : (
+                                <>
+                                    Reset password
+                                    <ArrowRight size={14} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                )}
+
+                {/* Footer link */}
                 <p className="text-center text-sm text-gray-400 mt-6">
-                    Remember your password?{" "}
+                    Remembered your password?{" "}
                     <button
                         type="button"
                         onClick={() => navigate("/login")}
-                        disabled={isSubmitting}
+                        disabled={loading}
                         className="text-gray-700 font-medium hover:underline underline-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Sign in
@@ -261,4 +605,6 @@ export default function ResetPassword() {
             </div>
         </div>
     );
-}
+};
+
+export default ResetPassword;

@@ -11,9 +11,19 @@ export const signupApi = ({ username, email, password }) =>
     });
 
 export const forgotPasswordApi = ({ email }) =>
-    api.post(`/auth/forgotPassword?email=${email}`);
+    api.post("/auth/forgotPassword", null, {
+        params: { email },
+    });
 
-export const resetPasswordApi = ({ token, newPassword }) =>
+export const verifyResetOtpApi = ({ email, otp }) =>
+    api.post("/auth/verifyResetOtp", null, {
+        params: { email, otp },
+    });
+
+export const resetPasswordApi = ({ resetToken, newPassword }) =>
     api.post("/auth/resetPassword", null, {
-        params: { token, newPassword },
+        params: {
+            resetToken,
+            newPassword,
+        },
     });
