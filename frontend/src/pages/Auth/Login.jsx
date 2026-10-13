@@ -83,9 +83,7 @@ export default function Login() {
 
             await forgotPasswordService({ email });
 
-            toast.success(
-                "If an account exists, a verification code has been sent.",
-            );
+            toast.success("A verification code has been sent.");
 
             navigate("/reset-password", {
                 state: { email },

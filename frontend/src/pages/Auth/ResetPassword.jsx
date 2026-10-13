@@ -73,6 +73,7 @@ const ResetPassword = () => {
     const [resetToken, setResetToken] = useState(null);
     const [loading, setLoading] = useState(false);
     const [otpError, setOtpError] = useState("");
+    const [attemptsRemaining, setAttemptsRemaining] = useState(null);
 
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -141,7 +142,7 @@ const ResetPassword = () => {
                 otp,
             });
 
-            const token = result.data?.data?.resetToken;
+            const token = result.data?.data;
 
             if (!token) {
                 throw new Error("Reset token was not returned by the server.");
@@ -152,9 +153,12 @@ const ResetPassword = () => {
 
             toast.success("OTP verified successfully.");
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Invalid or expired OTP.",
-            );
+            const message =
+                error.response?.data?.message || "Unable to verify OTP.";
+
+            setOtpError(message);
+
+            toast.error(message);
         } finally {
             setLoading(false);
         }
