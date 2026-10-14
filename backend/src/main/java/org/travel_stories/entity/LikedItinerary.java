@@ -17,7 +17,18 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "liked_itinerary",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "itinerary_id"})
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {
+                        "user_id",
+                        "itinerary_id"
+                }
+        ),
+        indexes = {
+                @Index(
+                        name = "idx_liked_itinerary_itinerary",
+                        columnList = "itinerary_id"
+                )
+        }
 )
 public class LikedItinerary {
 

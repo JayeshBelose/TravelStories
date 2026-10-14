@@ -15,7 +15,6 @@ import java.util.UUID;
 @Table(
         name = "refresh_tokens",
         indexes = {
-                @Index(name = "idx_refresh_token", columnList = "token"),
                 @Index(name = "idx_refresh_expiry", columnList = "expiryDate")
         }
 )
