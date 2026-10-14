@@ -2,14 +2,12 @@ package org.travel_stories.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -47,15 +45,6 @@ public class Itinerary {
             nullable = false
     )
     private String title;
-
-    @OneToOne(
-            mappedBy = "itinerary",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private Thumbnail thumbnail;
 
     @Column(
             name = "description",
@@ -147,6 +136,7 @@ public class Itinerary {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @BatchSize(size = 50)
     private List<ItineraryMember> members = new ArrayList<>();
 
     @OneToMany(

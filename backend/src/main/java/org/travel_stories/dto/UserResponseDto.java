@@ -20,8 +20,8 @@ public class UserResponseDto {
 
     private Instant createdAt;
 
-    private Integer followersCount;
+    private long followersCount;
 
-    private Integer followingCount;
+    private long followingCount;
 
 }

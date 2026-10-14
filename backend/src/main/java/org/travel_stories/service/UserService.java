@@ -17,6 +17,7 @@ import org.travel_stories.security.AuthorizationService;
 import org.travel_stories.security.JwtUtil;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,14 +50,71 @@ public class UserService {
         userResponseDto.setCreatedAt(user.getCreatedAt());
 
         userResponseDto.setFollowersCount(
-                followRepository.findFollowers(user.getUserId()).size()
+                followRepository.countFollowers(user.getUserId())
         );
 
         userResponseDto.setFollowingCount(
-                followRepository.findFollowing(user.getUserId()).size()
+                followRepository.countFollowing(user.getUserId())
         );
 
         return userResponseDto;
+    }
+
+    public List<UserResponseDto> mapUsers(List<User> users) {
+
+        if (users.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> userIds = users.stream()
+                .map(User::getUserId)
+                .toList();
+
+        Map<UUID, Long> followersCount =
+                followRepository.countFollowersByUserIds(userIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                row -> (UUID) row[0],
+                                row -> (Long) row[1]
+                        ));
+
+        Map<UUID, Long> followingCount =
+                followRepository.countFollowingByUserIds(userIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                row -> (UUID) row[0],
+                                row -> (Long) row[1]
+                        ));
+
+        return users.stream()
+                .map(user -> {
+
+                    UserResponseDto dto = new UserResponseDto();
+
+                    dto.setUserId(user.getUserId());
+                    dto.setUsername(user.getUsername());
+                    dto.setEmail(user.getEmail());
+                    dto.setRole(user.getRole());
+                    dto.setBio(user.getBio());
+                    dto.setCreatedAt(user.getCreatedAt());
+
+                    dto.setFollowersCount(
+                            followersCount.getOrDefault(
+                                    user.getUserId(),
+                                    0L
+                            )
+                    );
+
+                    dto.setFollowingCount(
+                            followingCount.getOrDefault(
+                                    user.getUserId(),
+                                    0L
+                            )
+                    );
+
+                    return dto;
+                })
+                .toList();
     }
 
 
@@ -129,10 +187,9 @@ public class UserService {
 
     public List<UserResponseDto> getAllUsers() {
 
-        return userRepository.findAll()
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+        List<User> users = userRepository.findAll();
+
+        return mapUsers(users);
     }
 
 

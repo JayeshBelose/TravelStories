@@ -24,4 +24,38 @@ public interface FollowRepository extends JpaRepository<Follow, UUID> {
 
     void deleteByFollowingUserId(UUID userId);
 
+    @Query("""
+        SELECT COUNT(f)
+        FROM Follow f
+        WHERE f.following.userId = :userId
+        """)
+    long countFollowers(@Param("userId") UUID userId);
+
+    @Query("""
+        SELECT COUNT(f)
+        FROM Follow f
+        WHERE f.follower.userId = :userId
+        """)
+    long countFollowing(@Param("userId") UUID userId);
+
+    @Query("""
+        SELECT f.following.userId, COUNT(f)
+        FROM Follow f
+        WHERE f.following.userId IN :userIds
+        GROUP BY f.following.userId
+        """)
+    List<Object[]> countFollowersByUserIds(
+            @Param("userIds") List<UUID> userIds
+    );
+
+    @Query("""
+        SELECT f.follower.userId, COUNT(f)
+        FROM Follow f
+        WHERE f.follower.userId IN :userIds
+        GROUP BY f.follower.userId
+        """)
+    List<Object[]> countFollowingByUserIds(
+            @Param("userIds") List<UUID> userIds
+    );
+
 }

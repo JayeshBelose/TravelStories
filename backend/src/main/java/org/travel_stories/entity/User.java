@@ -54,14 +54,6 @@ public class User {
     )
     private String password;
 
-    @OneToOne(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    private ProfilePicture profilePicture;
-
     @Column(
             name = "bio",
             nullable = true,
