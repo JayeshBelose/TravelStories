@@ -208,7 +208,7 @@ export default function Signup() {
                             <input
                                 id="signup-password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="12–16 characters"
+                                placeholder="8–12 characters"
                                 {...register("password")}
                                 disabled={isSubmitting}
                                 aria-invalid={passwordError ? "true" : "false"}

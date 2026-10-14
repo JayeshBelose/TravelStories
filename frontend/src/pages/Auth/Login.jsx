@@ -181,7 +181,7 @@ export default function Login() {
                             <input
                                 id="login-password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="12–16 characters"
+                                placeholder="8–12 characters"
                                 {...register("password")}
                                 disabled={isSubmitting || forgotPasswordLoading}
                                 aria-invalid={passwordError ? "true" : "false"}

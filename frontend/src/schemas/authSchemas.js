@@ -13,8 +13,8 @@ export const emailSchema = z
  */
 export const passwordSchema = z
     .string()
-    .min(12, "Password must be at least 12 characters long")
-    .max(16, "Password must not exceed 16 characters");
+    .min(8, "Password must be at least 8 characters long")
+    .max(12, "Password must not exceed 12 characters");
 
 /**
  * Shared username validation

@@ -448,7 +448,7 @@ const ResetPassword = () => {
                                 <input
                                     id="reset-new-password"
                                     type={showNewPassword ? "text" : "password"}
-                                    placeholder="12–16 characters"
+                                    placeholder="8–12 characters"
                                     autoComplete="new-password"
                                     {...passwordForm.register("newPassword")}
                                     disabled={loading}

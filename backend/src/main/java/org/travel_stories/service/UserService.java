@@ -12,10 +12,7 @@ import org.travel_stories.entity.User;
 import org.travel_stories.exception.InvalidCredentialsException;
 import org.travel_stories.exception.InvalidOperationException;
 import org.travel_stories.exception.ResourceNotFoundException;
-import org.travel_stories.repository.FollowRepository;
-import org.travel_stories.repository.LikedItineraryRepository;
-import org.travel_stories.repository.SavedItineraryRepository;
-import org.travel_stories.repository.UserRepository;
+import org.travel_stories.repository.*;
 import org.travel_stories.security.AuthorizationService;
 import org.travel_stories.security.JwtUtil;
 
@@ -31,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final LikedItineraryRepository likedItineraryRepository;
     private final SavedItineraryRepository savedItineraryRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final FollowRepository followRepository;
     private final JwtUtil jwtUtil;
     private final AuthorizationService authorizationService;
@@ -348,6 +346,7 @@ public class UserService {
     public void deleteUser(UUID userId) {
         authorizationService.verifyOwnership(userId);
         refreshTokenService.deleteRefreshTokenByUserId(userId);
+        passwordResetTokenRepository.deleteByUserUserId(userId);
         performUserDeletion(userId);
     }
 

@@ -171,27 +171,26 @@ public class RefreshTokenService {
     @Transactional
     public void deleteRefreshTokenByUserId(UUID userId) {
 
-        RefreshToken refreshToken =
-                refreshTokenRepository.findByUserUserId(userId)
-                        .orElseThrow(() -> {
+        int deletedCount =
+                refreshTokenRepository.deleteByUserUserId(userId);
 
-                            log.warn(
-                                    "Deletion failed. Refresh token not found."
-                            );
+        if (deletedCount == 0) {
 
-                            return new InvalidTokenException(
-                                    "Invalid refresh token."
-                            );
+            log.warn(
+                    "Deletion failed. No refresh token found for userId={}",
+                    userId
+            );
 
-                        });
-
-        refreshTokenRepository.delete(refreshToken);
+            throw new InvalidTokenException(
+                    "Invalid refresh token."
+            );
+        }
 
         log.info(
-                "Deleted {} refresh token",
-                refreshToken.getRefreshTokenId()
+                "Deleted {} refresh token(s) for userId={}",
+                deletedCount,
+                userId
         );
-
     }
 
     @Transactional
