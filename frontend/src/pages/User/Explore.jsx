@@ -45,6 +45,7 @@ export default function Explore() {
     const typeRef = useRef(null);
     const loadMoreRef = useRef(null);
     const loadingMoreRef = useRef(false);
+    const abortControllerRef = useRef(null);
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -89,10 +90,63 @@ export default function Explore() {
                 loadingMoreRef.current = true;
                 setLoadingMore(true);
             } else {
+                // Cancel the previous Explore request because
+                // this request supersedes it.
+                abortControllerRef.current?.abort();
+
+                const controller = new AbortController();
+                abortControllerRef.current = controller;
+
                 setLoading(true);
                 setError(null);
+
+                try {
+                    const result = await getItinerariesService({
+                        search: appliedSearch,
+                        type: typeFilter ?? undefined,
+                        sort: sortFilter,
+                        page: page - 1,
+                        size: 15,
+                        signal: controller.signal,
+                    });
+
+                    if (currentRequestId !== requestRef.current) return;
+
+                    if (result.success) {
+                        const content = result.data.content ?? [];
+
+                        setItineraries(content);
+                        setTotalPages(result.data.totalPages);
+                        setCurrentPage(page);
+                    } else {
+                        setItineraries([]);
+                        setTotalPages(1);
+                        setError(result.message);
+                    }
+                } catch (error) {
+                    if (error?.code === "ERR_CANCELED") {
+                        return;
+                    }
+
+                    if (currentRequestId !== requestRef.current) return;
+
+                    setItineraries([]);
+                    setTotalPages(1);
+                    setError("Failed to load itineraries.");
+                } finally {
+                    if (abortControllerRef.current === controller) {
+                        abortControllerRef.current = null;
+                    }
+
+                    if (currentRequestId === requestRef.current) {
+                        setLoading(false);
+                    }
+                }
+
+                return;
             }
 
+            // Pagination request
             try {
                 const result = await getItinerariesService({
                     search: appliedSearch,
@@ -107,38 +161,48 @@ export default function Explore() {
                 if (result.success) {
                     const content = result.data.content ?? [];
 
-                    setItineraries((previous) =>
-                        append ? [...previous, ...content] : content,
-                    );
+                    setItineraries((previous) => {
+                        const existingIds = new Set(
+                            previous.map((itinerary) => itinerary.itineraryId),
+                        );
+
+                        const newItineraries = content.filter(
+                            (itinerary) =>
+                                !existingIds.has(itinerary.itineraryId),
+                        );
+
+                        return [...previous, ...newItineraries];
+                    });
 
                     setTotalPages(result.data.totalPages);
                     setCurrentPage(page);
-                } else if (!append) {
-                    setItineraries([]);
-                    setTotalPages(1);
-                    setError(result.message);
+                } else {
+                    console.error(
+                        "Failed to load more itineraries.",
+                        result.message,
+                    );
                 }
             } catch (error) {
+                if (error?.code === "ERR_CANCELED") {
+                    return;
+                }
+
                 if (currentRequestId !== requestRef.current) return;
 
-                if (!append) {
-                    setItineraries([]);
-                    setTotalPages(1);
-                    setError("Failed to load itineraries.");
-                } else {
-                    console.error("Failed to load more itineraries.", error);
-                }
+                console.error("Failed to load more itineraries.", error);
             } finally {
-                if (append) {
-                    loadingMoreRef.current = false;
-                    setLoadingMore(false);
-                } else if (currentRequestId === requestRef.current) {
-                    setLoading(false);
-                }
+                loadingMoreRef.current = false;
+                setLoadingMore(false);
             }
         },
         [appliedSearch, sortFilter, typeFilter],
     );
+
+    useEffect(() => {
+        return () => {
+            abortControllerRef.current?.abort();
+        };
+    }, []);
 
     useEffect(() => {
         const delay = setTimeout(() => {

@@ -103,7 +103,27 @@ export default function MyItineraries() {
     };
 
     const handleItinerarySaved = (updatedItinerary) => {
-        window.location.reload();
+        setCreatedItineraries((prev) => {
+            const existingIndex = prev.findIndex(
+                (itinerary) =>
+                    itinerary.itineraryId === updatedItinerary.itineraryId,
+            );
+
+            // New itinerary
+            if (existingIndex === -1) {
+                return [updatedItinerary, ...prev];
+            }
+
+            // Updated itinerary
+            return prev.map((itinerary) =>
+                itinerary.itineraryId === updatedItinerary.itineraryId
+                    ? updatedItinerary
+                    : itinerary,
+            );
+        });
+
+        setOpenCreate(false);
+        setSelectedItinerary(null);
     };
 
     const handleEdit = (e, itinerary) => {
@@ -332,7 +352,7 @@ export default function MyItineraries() {
     // Fetch saved itineraries
     useEffect(() => {
         fetchSavedItineraries();
-    }, [user?.userId]);
+    }, [activeTab, user?.userId]);
 
     useEffect(() => {
         const element = loadMoreRef.current;

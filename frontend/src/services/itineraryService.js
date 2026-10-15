@@ -28,8 +28,9 @@ export const getItinerariesService = async ({
     sort,
     page,
     size,
-}) => {
-    return executeServiceRequest(
+    signal,
+}) =>
+    executeServiceRequest(
         () =>
             getItinerariesApi({
                 search,
@@ -37,10 +38,10 @@ export const getItinerariesService = async ({
                 sort,
                 page,
                 size,
+                signal,
             }),
         "Failed to fetch itineraries.",
     );
-};
 
 export const deleteItineraryService = async ({ itineraryId }) => {
     return executeServiceRequest(

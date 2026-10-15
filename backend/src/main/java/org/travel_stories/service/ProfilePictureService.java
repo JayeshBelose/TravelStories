@@ -159,4 +159,8 @@ public class ProfilePictureService {
         );
     }
 
+    public long getProfilePictureLastModified(ProfilePicture profilePicture) {
+        return fileStorageService.getLastModified(profilePicture.getFilePath());
+    }
+
 }

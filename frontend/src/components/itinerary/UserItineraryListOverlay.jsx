@@ -84,9 +84,12 @@ function UserItineraryListOverlay({ open, onClose, user }) {
                     );
                 }
 
+                const data = result.data;
+                const items = data.content ?? [];
+
                 const visibleItineraries = isAdmin
-                    ? result.data
-                    : result.data.filter((itinerary) => itinerary.public);
+                    ? items
+                    : items.filter((itinerary) => itinerary.public);
 
                 setItineraries(visibleItineraries);
             } catch (error) {

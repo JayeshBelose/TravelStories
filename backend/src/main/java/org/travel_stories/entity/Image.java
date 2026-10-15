@@ -15,7 +15,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "image")
+@Table(
+        name = "image",
+        indexes = {
+                @Index(
+                        name = "idx_image_location_order",
+                        columnList = "location_id, order_number"
+                )
+        }
+)
 public class Image {
 
     @Id

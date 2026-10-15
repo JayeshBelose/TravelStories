@@ -2,10 +2,9 @@ package org.travel_stories.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.common.ApiResponse;
 import org.travel_stories.dto.ImageResponseDto;
@@ -81,21 +80,23 @@ public class ImageController {
 
     @GetMapping("/images/{imageId}")
     public ResponseEntity<Resource> getImageById(
-            @PathVariable UUID imageId
+            @PathVariable UUID imageId,
+            WebRequest request
     ) {
+        Image image = imageService.getImageById(imageId);
 
-        Image image =
-                imageService.getImageById(imageId);
+        long lastModified = imageService.getImageLastModified(image);
 
-        Resource resource =
-                imageService.getImageResource(image);
+        if (request.checkNotModified(lastModified)) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+
+        Resource resource = imageService.getImageResource(image);
 
         return ResponseEntity.ok()
-                .contentType(
-                        MediaType.parseMediaType(
-                                image.getContentType()
-                        )
-                )
+                .lastModified(lastModified)
+                .cacheControl(CacheControl.noCache())
+                .contentType(MediaType.parseMediaType(image.getContentType()))
                 .body(resource);
     }
 

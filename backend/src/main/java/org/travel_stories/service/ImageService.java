@@ -257,4 +257,8 @@ public class ImageService {
         );
     }
 
+    public long getImageLastModified(Image image) {
+        return fileStorageService.getLastModified(image.getFilePath());
+    }
+
 }

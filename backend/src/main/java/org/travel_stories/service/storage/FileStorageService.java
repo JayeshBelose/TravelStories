@@ -7,6 +7,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.travel_stories.exception.InvalidOperationException;
+import org.travel_stories.exception.ResourceNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -360,6 +361,21 @@ public class FileStorageService {
                     "Unable to initialize file storage.",
                     exception
             );
+        }
+    }
+
+    public long getLastModified(String relativePath) {
+        Path filePath = resolveStoredPath(relativePath);
+
+        try {
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                throw new ResourceNotFoundException("Stored file not found.");
+            }
+
+            return Files.getLastModifiedTime(filePath).toMillis();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file metadata.", e);
         }
     }
 }

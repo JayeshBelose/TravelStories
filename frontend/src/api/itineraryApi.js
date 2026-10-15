@@ -2,15 +2,10 @@ import api from "./axios";
 
 export const getItineraryTypesApi = () => api.get("/users/itineraries/types");
 
-export const getItinerariesApi = ({ search, type, sort, page, size }) =>
+export const getItinerariesApi = ({ search, type, sort, page, size, signal }) =>
     api.get("/itineraries", {
-        params: {
-            search,
-            type,
-            sort,
-            page,
-            size,
-        },
+        params: { search, type, sort, page, size },
+        signal,
     });
 
 export const deleteItineraryApi = ({ itineraryId }) =>

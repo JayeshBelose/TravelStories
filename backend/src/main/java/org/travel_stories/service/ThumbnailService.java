@@ -164,4 +164,8 @@ public class ThumbnailService {
         );
     }
 
+    public long getThumbnailLastModified(Thumbnail thumbnail) {
+        return fileStorageService.getLastModified(thumbnail.getFilePath());
+    }
+
 }
