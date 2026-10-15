@@ -2,8 +2,11 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.config.CacheConfig;
 import org.travel_stories.dto.ItineraryTypeDto;
 import org.travel_stories.entity.ItineraryType;
 import org.travel_stories.exception.ResourceAlreadyExistsException;
@@ -20,6 +23,10 @@ public class ItineraryTypeService {
     private final ItineraryTypeRepository itineraryTypeRepository;
 
 
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
     @Transactional
     public ItineraryTypeDto addType(ItineraryTypeDto requestDto) {
 
@@ -61,6 +68,10 @@ public class ItineraryTypeService {
     }
 
 
+    @Cacheable(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            key = "'all'"
+    )
     @Transactional(readOnly = true)
     public List<ItineraryTypeDto> getAllTypes() {
 
@@ -80,6 +91,10 @@ public class ItineraryTypeService {
     }
 
 
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
     @Transactional
     public void deleteTypeById(Long typeId) {
 

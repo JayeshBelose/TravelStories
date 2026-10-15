@@ -2,9 +2,12 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.config.CacheConfig;
 import org.travel_stories.dto.*;
 import org.travel_stories.entity.Itinerary;
 import org.travel_stories.entity.ItineraryType;
@@ -179,12 +182,20 @@ public class AdminService {
     }
 
 
+    @Cacheable(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            key = "'all'"
+    )
     @Transactional(readOnly = true)
     public List<ItineraryTypeDto> getAllTypes() {
         return itineraryTypeService.getAllTypes();
     }
 
 
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
     @Transactional
     public void addType(String name) {
 
@@ -212,6 +223,10 @@ public class AdminService {
     }
 
 
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
     @Transactional
     public void deleteType(Long typeId) {
 
