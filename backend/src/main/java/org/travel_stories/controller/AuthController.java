@@ -87,6 +87,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthTokenResponseDto>> signup(
             @Valid @RequestBody SignupDto signupDto) {
 
+        if (userService.existsByUsername(signupDto.getUsername())) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("Username taken."));
+        }
+
         if (userService.existsByEmail(signupDto.getEmail())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("Email already in use."));

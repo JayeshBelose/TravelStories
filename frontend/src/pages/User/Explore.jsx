@@ -37,11 +37,14 @@ export default function Explore() {
     const [openType, setOpenType] = useState(false);
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [itineraryTypes, setItineraryTypes] = useState([]);
 
     const requestRef = useRef(0);
     const sortRef = useRef(null);
     const typeRef = useRef(null);
+    const loadMoreRef = useRef(null);
+    const loadingMoreRef = useRef(false);
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -76,53 +79,106 @@ export default function Explore() {
         fetchTypes();
     }, []);
 
-    const fetchItineraries = useCallback(async () => {
-        const currentRequestId = ++requestRef.current;
+    const fetchItineraries = useCallback(
+        async (page = 1, append = false) => {
+            const currentRequestId = ++requestRef.current;
 
-        setLoading(true);
-        setError(null);
+            if (append) {
+                if (loadingMoreRef.current) return;
 
-        try {
-            const result = await getItinerariesService({
-                search: appliedSearch,
-                type: typeFilter ?? undefined,
-                sort: sortFilter,
-                page: currentPage - 1,
-                size: 9,
-            });
-
-            if (currentRequestId !== requestRef.current) return;
-
-            if (result.success) {
-                setItineraries(result.data.content);
-                setTotalPages(result.data.totalPages);
+                loadingMoreRef.current = true;
+                setLoadingMore(true);
             } else {
-                setItineraries([]);
-                setTotalPages(1);
-                setError(result.message);
+                setLoading(true);
+                setError(null);
             }
-        } catch (error) {
-            if (currentRequestId !== requestRef.current) return;
 
-            setItineraries([]);
-            setTotalPages(1);
-            setError("Failed to load itineraries.");
-        } finally {
-            if (currentRequestId === requestRef.current) {
-                setLoading(false);
+            try {
+                const result = await getItinerariesService({
+                    search: appliedSearch,
+                    type: typeFilter ?? undefined,
+                    sort: sortFilter,
+                    page: page - 1,
+                    size: 15,
+                });
+
+                if (currentRequestId !== requestRef.current) return;
+
+                if (result.success) {
+                    const content = result.data.content ?? [];
+
+                    setItineraries((previous) =>
+                        append ? [...previous, ...content] : content,
+                    );
+
+                    setTotalPages(result.data.totalPages);
+                    setCurrentPage(page);
+                } else if (!append) {
+                    setItineraries([]);
+                    setTotalPages(1);
+                    setError(result.message);
+                }
+            } catch (error) {
+                if (currentRequestId !== requestRef.current) return;
+
+                if (!append) {
+                    setItineraries([]);
+                    setTotalPages(1);
+                    setError("Failed to load itineraries.");
+                } else {
+                    console.error("Failed to load more itineraries.", error);
+                }
+            } finally {
+                if (append) {
+                    loadingMoreRef.current = false;
+                    setLoadingMore(false);
+                } else if (currentRequestId === requestRef.current) {
+                    setLoading(false);
+                }
             }
-        }
-    }, [appliedSearch, sortFilter, typeFilter, currentPage]);
+        },
+        [appliedSearch, sortFilter, typeFilter],
+    );
 
     useEffect(() => {
-        const delay = setTimeout(fetchItineraries, 400);
+        const delay = setTimeout(() => {
+            fetchItineraries(1, false);
+        }, 400);
 
         return () => clearTimeout(delay);
     }, [fetchItineraries]);
 
     useEffect(() => {
         setCurrentPage(1);
+        setItineraries([]);
+        setTotalPages(1);
     }, [sortFilter, typeFilter]);
+
+    useEffect(() => {
+        const target = loadMoreRef.current;
+
+        if (!target) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+
+                if (!entry.isIntersecting) return;
+                if (loading) return;
+                if (loadingMoreRef.current) return;
+                if (currentPage >= totalPages) return;
+
+                fetchItineraries(currentPage + 1, true);
+            },
+            {
+                rootMargin: "400px",
+            },
+        );
+
+        observer.observe(target);
+
+        return () => observer.disconnect();
+    }, [currentPage, totalPages, loading, fetchItineraries]);
 
     const sortLabel = useMemo(
         () =>
@@ -143,22 +199,6 @@ export default function Explore() {
     const sortActive = sortFilter !== "random";
     const typeActive = typeFilter !== null;
     const searchActive = appliedSearch.trim().length > 0;
-
-    // Page numbers with ellipsis
-    const pageNumbers = useMemo(() => {
-        if (totalPages <= 7)
-            return Array.from({ length: totalPages }, (_, i) => i + 1);
-        const pages = new Set([
-            1,
-            totalPages,
-            currentPage,
-            currentPage - 1,
-            currentPage + 1,
-        ]);
-        return [...pages]
-            .filter((p) => p >= 1 && p <= totalPages)
-            .sort((a, b) => a - b);
-    }, [totalPages, currentPage]);
 
     return (
         <div className="min-h-screen">
@@ -424,64 +464,28 @@ export default function Explore() {
                     </button>
                 </div>
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {itineraries.map((itinerary) => (
-                        <ItineraryCard
-                            key={itinerary.itineraryId}
-                            itinerary={itinerary}
-                            onClick={setSelectedItinerary}
-                        />
-                    ))}
-                </div>
-            )}
-
-            {/* Pagination */}
-            {!loading && !error && totalPages > 1 && (
-                <div className="flex justify-center items-center gap-1.5 mt-12">
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((p) => p - 1)}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                <>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        {itineraries.map((itinerary) => (
+                            <ItineraryCard
+                                key={itinerary.itineraryId}
+                                itinerary={itinerary}
+                                onClick={setSelectedItinerary}
+                            />
+                        ))}
+                    </div>
+                    <div
+                        ref={loadMoreRef}
+                        className="h-10 flex items-center justify-center mt-8"
+                        aria-live="polite"
                     >
-                        <ChevronLeft size={15} />
-                    </button>
-
-                    {pageNumbers.map((page, idx) => {
-                        const prev = pageNumbers[idx - 1];
-                        const showEllipsis = prev && page - prev > 1;
-                        return (
-                            <span
-                                key={page}
-                                className="flex items-center gap-1.5"
-                            >
-                                {showEllipsis && (
-                                    <span className="text-gray-300 text-sm px-1">
-                                        …
-                                    </span>
-                                )}
-                                <button
-                                    onClick={() => setCurrentPage(page)}
-                                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer
-                                        ${
-                                            currentPage === page
-                                                ? "bg-gray-900 text-white"
-                                                : "text-gray-500 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            </span>
-                        );
-                    })}
-
-                    <button
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage((p) => p + 1)}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                    >
-                        <ChevronRight size={15} />
-                    </button>
-                </div>
+                        {loadingMore && (
+                            <div className="text-sm text-gray-400">
+                                Loading more trips...
+                            </div>
+                        )}
+                    </div>
+                </>
             )}
 
             <ItineraryOverlay

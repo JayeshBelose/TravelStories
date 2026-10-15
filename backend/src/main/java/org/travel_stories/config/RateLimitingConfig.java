@@ -17,7 +17,8 @@ public class RateLimitingConfig {
     @Bean
     public Cache<BucketKey, Bucket> rateLimitCache() {
 
-        return Caffeine.newBuilder()
+        return Caffeine
+                .newBuilder()
                 .maximumSize(10_000)
                 .expireAfterAccess(Duration.ofMinutes(30))
                 .recordStats()

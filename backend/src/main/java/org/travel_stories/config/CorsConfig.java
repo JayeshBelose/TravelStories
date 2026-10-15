@@ -37,24 +37,27 @@ public class CorsConfig {
                 "OPTIONS"
         ));
 
-        config.setAllowedHeaders(List.of(
-                HttpHeaders.AUTHORIZATION,
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT,
-                HttpHeaders.ORIGIN,
-                "X-Requested-With"
-        ));
+        config.setAllowedHeaders(
+                List.of(
+                        HttpHeaders.AUTHORIZATION,
+                        HttpHeaders.CONTENT_TYPE,
+                        HttpHeaders.ACCEPT,
+                        HttpHeaders.ORIGIN,
+                        "X-Requested-With"
+                )
+        );
 
-        config.setExposedHeaders(List.of(
-                HttpHeaders.RETRY_AFTER
-        ));
+        config.setExposedHeaders(
+                List.of(
+                        HttpHeaders.RETRY_AFTER
+                )
+        );
 
         config.setAllowCredentials(true);
 
         config.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", config);
 

@@ -16,15 +16,17 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
-    Boolean existsByEmail(String email);
-
     User findByUsername(String username);
 
+    Boolean existsByEmail(String email);
+
+    Boolean existsByUsername(String username);
+
     @Query("""
-                SELECT u FROM User u
-                WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
-            """)
-    List<User> searchUsers(String query);
+            SELECT u FROM User u
+            WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
+        """)
+    List<User> searchUsers(String query, Pageable pageable);
 
     @Query("""
                 SELECT u FROM User u

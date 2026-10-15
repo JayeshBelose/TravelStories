@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.travel_stories.common.ApiResponse;
+import org.travel_stories.dto.ItineraryListResponseDto;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.service.ItineraryService;
@@ -21,6 +22,9 @@ public class ItineraryController {
 
     private final ItineraryService itineraryService;
 
+    private static final int MAX_EXPLORE_PAGE_SIZE = 15;
+
+    private static final int MAX_USER_ITINERARY_PAGE_SIZE = 15;
 
     @PostMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<ItineraryResponseDto>> createItinerary(
@@ -80,13 +84,16 @@ public class ItineraryController {
 
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ItineraryResponseDto>>> getItineraries(
+    public ResponseEntity<ApiResponse<Page<ItineraryListResponseDto>>> getItineraries(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ) {
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, MAX_EXPLORE_PAGE_SIZE);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -95,8 +102,8 @@ public class ItineraryController {
                                 search,
                                 type,
                                 sort,
-                                page,
-                                size
+                                safePage,
+                                safeSize
                         )
                 )
         );
@@ -104,7 +111,7 @@ public class ItineraryController {
 
 
     @GetMapping("/types/{typeId}")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByType(
+    public ResponseEntity<ApiResponse<List<ItineraryListResponseDto>>> getAllItinerariesByType(
             @PathVariable Long typeId) {
 
         return ResponseEntity.ok(
@@ -117,13 +124,22 @@ public class ItineraryController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserId(
-            @PathVariable UUID userId) {
+    public ResponseEntity<ApiResponse<Page<ItineraryListResponseDto>>> getAllItinerariesByUserId(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, MAX_USER_ITINERARY_PAGE_SIZE);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "User itineraries fetched successfully",
-                        itineraryService.getAllItinerariesByUserId(userId)
+                        itineraryService.getAllItinerariesByUserId(
+                                userId,
+                                safePage,
+                                safeSize
+                        )
                 )
         );
     }
@@ -143,33 +159,52 @@ public class ItineraryController {
 
 
     @GetMapping("/{userId}/membership")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllItinerariesByUserMembership(
-            @PathVariable UUID userId) {
+    public ResponseEntity<ApiResponse<Page<ItineraryListResponseDto>>> getAllItinerariesByUserMembership(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, MAX_USER_ITINERARY_PAGE_SIZE);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Membership itineraries fetched successfully",
-                        itineraryService.getAllItinerariesByUserMembership(userId)
+                        itineraryService.getAllItinerariesByUserMembership(
+                                userId,
+                                safePage,
+                                safeSize
+                        )
                 )
         );
     }
 
 
     @GetMapping("/{userId}/saved")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getAllSavedItinerariesByUserId(
-            @PathVariable UUID userId) {
+    public ResponseEntity<ApiResponse<Page<ItineraryListResponseDto>>> getAllSavedItinerariesByUserId(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, MAX_USER_ITINERARY_PAGE_SIZE);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Saved itineraries fetched successfully",
-                        itineraryService.getAllSavedItinerariesByUserId(userId)
+                        itineraryService.getAllSavedItinerariesByUserId(
+                                userId,
+                                safePage,
+                                safeSize
+                        )
                 )
         );
     }
 
 
     @GetMapping("/mostSaved")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostSavedItineraries() {
+    public ResponseEntity<ApiResponse<List<ItineraryListResponseDto>>>
+    getMostSavedItineraries() {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -181,7 +216,8 @@ public class ItineraryController {
 
 
     @GetMapping("/mostLiked")
-    public ResponseEntity<ApiResponse<List<ItineraryResponseDto>>> getMostLikedItineraries() {
+    public ResponseEntity<ApiResponse<List<ItineraryListResponseDto>>>
+    getMostLikedItineraries() {
 
         return ResponseEntity.ok(
                 ApiResponse.success(

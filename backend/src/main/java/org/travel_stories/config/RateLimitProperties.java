@@ -40,7 +40,6 @@ public class RateLimitProperties {
     @Getter
     @Setter
     public static class EndpointLimit {
-
         @Min(1)
         private long capacity;
 

@@ -2,6 +2,7 @@ package org.travel_stories.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,8 @@ public class UserService {
     private final PasswordValidationService passwordValidationService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
+
+    private static final int USER_SEARCH_LIMIT = 20;
 
 
     public UserResponseDto map(User user) {
@@ -291,7 +294,10 @@ public class UserService {
 
 
         List<User> users =
-                userRepository.searchUsers(query.trim());
+                userRepository.searchUsers(
+                        query.trim(),
+                        PageRequest.of(0, USER_SEARCH_LIMIT)
+                );
 
 
         return users.stream()
@@ -396,6 +402,12 @@ public class UserService {
     public boolean existsByEmail(String email) {
 
         return userRepository.existsByEmail(email);
+
+    }
+
+    public boolean existsByUsername(String username) {
+
+        return userRepository.existsByUsername(username);
 
     }
 

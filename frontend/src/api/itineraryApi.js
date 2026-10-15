@@ -19,14 +19,29 @@ export const deleteItineraryApi = ({ itineraryId }) =>
 export const toggleSavedItineraryApi = ({ userId, itineraryId }) =>
     api.post(`/users/${userId}/savedItineraries/${itineraryId}`);
 
-export const getUserCreatedItinerariesApi = ({ userId }) =>
-    api.get(`/itineraries/users/${userId}`);
+export const getUserCreatedItinerariesApi = ({ userId, page, size }) =>
+    api.get(`/itineraries/users/${userId}`, {
+        params: {
+            page,
+            size,
+        },
+    });
 
-export const getSharedItinerariesApi = ({ userId }) =>
-    api.get(`/itineraries/${userId}/membership`);
+export const getSharedItinerariesApi = ({ userId, page, size }) =>
+    api.get(`/itineraries/${userId}/membership`, {
+        params: {
+            page,
+            size,
+        },
+    });
 
-export const getSavedItinerariesApi = ({ userId }) =>
-    api.get(`/itineraries/${userId}/saved`);
+export const getSavedItinerariesApi = ({ userId, page, size }) =>
+    api.get(`/itineraries/${userId}/saved`, {
+        params: {
+            page,
+            size,
+        },
+    });
 
 export const getItineraryDetailsApi = ({ itineraryId }) =>
     api.get(`/itineraries/${itineraryId}`);

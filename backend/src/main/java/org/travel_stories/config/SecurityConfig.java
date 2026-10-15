@@ -24,7 +24,9 @@ import org.travel_stories.security.ratelimit.RateLimitingFilter;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     private final RateLimitingFilter rateLimitingFilter;
 
     public SecurityConfig(

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     Plus,
     Trash,
@@ -39,6 +39,22 @@ export default function MyItineraries() {
     const [savedError, setSavedError] = useState(null);
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [unsaveLoadingId, setUnsaveLoadingId] = useState(null);
+
+    const PAGE_SIZE = 15;
+
+    const [createdPage, setCreatedPage] = useState(0);
+    const [sharedPage, setSharedPage] = useState(0);
+    const [savedPage, setSavedPage] = useState(0);
+
+    const [hasMoreCreated, setHasMoreCreated] = useState(true);
+    const [hasMoreShared, setHasMoreShared] = useState(true);
+    const [hasMoreSaved, setHasMoreSaved] = useState(true);
+
+    const [loadingMoreCreated, setLoadingMoreCreated] = useState(false);
+    const [loadingMoreShared, setLoadingMoreShared] = useState(false);
+    const [loadingMoreSaved, setLoadingMoreSaved] = useState(false);
+
+    const loadMoreRef = useRef(null);
 
     const user = JSON.parse(sessionStorage.getItem("user"));
 
@@ -87,13 +103,7 @@ export default function MyItineraries() {
     };
 
     const handleItinerarySaved = (updatedItinerary) => {
-        setCreatedItineraries((prev) =>
-            prev.map((it) =>
-                it.itineraryId === updatedItinerary.itineraryId
-                    ? updatedItinerary
-                    : it,
-            ),
-        );
+        window.location.reload();
     };
 
     const handleEdit = (e, itinerary) => {
@@ -152,60 +162,167 @@ export default function MyItineraries() {
         }
     };
 
-    const fetchCreatedItineraries = async () => {
+    const fetchCreatedItineraries = async ({
+        createdPageToLoad = 0,
+        sharedPageToLoad = 0,
+        append = false,
+    } = {}) => {
         if (!user?.userId) return;
 
-        setLoadingCreated(true);
-        setCreatedError(null);
-
-        const [createdResult, sharedResult] = await Promise.all([
-            getUserCreatedItinerariesService({
-                userId: user.userId,
-            }),
-            getSharedItinerariesService({
-                userId: user.userId,
-            }),
-        ]);
-
-        if (createdResult.success && sharedResult.success) {
-            const combined = [...createdResult.data, ...sharedResult.data];
-
-            const unique = Array.from(
-                new Map(
-                    combined.map((item) => [item.itineraryId, item]),
-                ).values(),
-            );
-
-            setCreatedItineraries(unique);
+        if (append) {
+            setLoadingMoreCreated(true);
+            setLoadingMoreShared(true);
         } else {
-            setCreatedError(
-                createdResult.success
-                    ? sharedResult.message
-                    : createdResult.message,
-            );
+            setLoadingCreated(true);
+            setCreatedError(null);
         }
 
-        setLoadingCreated(false);
+        try {
+            const [createdResult, sharedResult] = await Promise.all([
+                getUserCreatedItinerariesService({
+                    userId: user.userId,
+                    page: createdPageToLoad,
+                    size: PAGE_SIZE,
+                }),
+                getSharedItinerariesService({
+                    userId: user.userId,
+                    page: sharedPageToLoad,
+                    size: PAGE_SIZE,
+                }),
+            ]);
+
+            if (!createdResult.success || !sharedResult.success) {
+                setCreatedError(
+                    createdResult.success
+                        ? sharedResult.message
+                        : createdResult.message,
+                );
+                return;
+            }
+
+            const createdData = createdResult.data;
+            const sharedData = sharedResult.data;
+
+            const createdItems = createdData.content ?? [];
+            const sharedItems = sharedData.content ?? [];
+
+            setCreatedItineraries((prev) => {
+                const combined = append
+                    ? [...prev, ...createdItems, ...sharedItems]
+                    : [...createdItems, ...sharedItems];
+
+                return Array.from(
+                    new Map(
+                        combined.map((item) => [item.itineraryId, item]),
+                    ).values(),
+                );
+            });
+
+            setCreatedPage(createdPageToLoad);
+            setSharedPage(sharedPageToLoad);
+
+            setHasMoreCreated(!createdData.last);
+            setHasMoreShared(!sharedData.last);
+        } finally {
+            setLoadingCreated(false);
+            setLoadingMoreCreated(false);
+            setLoadingMoreShared(false);
+        }
     };
 
-    const fetchSavedItineraries = async () => {
+    const fetchSavedItineraries = async ({
+        pageToLoad = 0,
+        append = false,
+    } = {}) => {
         if (!user?.userId) return;
 
-        setLoadingSaved(true);
-        setSavedError(null);
+        if (append) {
+            setLoadingMoreSaved(true);
+        } else {
+            setLoadingSaved(true);
+            setSavedError(null);
+        }
 
-        const result = await getSavedItinerariesService({
-            userId: user.userId,
+        try {
+            const result = await getSavedItinerariesService({
+                userId: user.userId,
+                page: pageToLoad,
+                size: PAGE_SIZE,
+            });
+
+            if (result.success) {
+                const data = result.data;
+                const items = data.content ?? [];
+
+                setSavedItineraries((prev) =>
+                    append ? [...prev, ...items] : items,
+                );
+
+                setSavedPage(pageToLoad);
+                setHasMoreSaved(!data.last);
+            } else {
+                setSavedError(result.message);
+            }
+        } finally {
+            setLoadingSaved(false);
+            setLoadingMoreSaved(false);
+        }
+    };
+
+    const loadMoreCreated = async () => {
+        if (
+            loadingMoreCreated ||
+            loadingMoreShared ||
+            (!hasMoreCreated && !hasMoreShared)
+        ) {
+            return;
+        }
+
+        await fetchCreatedItineraries({
+            createdPageToLoad: hasMoreCreated ? createdPage + 1 : createdPage,
+            sharedPageToLoad: hasMoreShared ? sharedPage + 1 : sharedPage,
+            append: true,
         });
+    };
 
-        if (result.success) {
-            setSavedItineraries(result.data);
-        } else {
-            setSavedError(result.message);
+    const loadMoreSaved = async () => {
+        if (loadingMoreSaved || !hasMoreSaved) {
+            return;
         }
 
-        setLoadingSaved(false);
+        await fetchSavedItineraries({
+            pageToLoad: savedPage + 1,
+            append: true,
+        });
     };
+
+    const handleLoadMore = useCallback(
+        (entries) => {
+            const entry = entries[0];
+
+            if (!entry.isIntersecting) {
+                return;
+            }
+
+            if (activeTab === "created") {
+                loadMoreCreated();
+            } else {
+                loadMoreSaved();
+            }
+        },
+        [
+            activeTab,
+            createdPage,
+            sharedPage,
+            savedPage,
+            hasMoreCreated,
+            hasMoreShared,
+            hasMoreSaved,
+            loadingMoreCreated,
+            loadingMoreShared,
+            loadingMoreSaved,
+        ],
+    );
 
     // Fetch created & shared itineraries
     useEffect(() => {
@@ -216,6 +333,22 @@ export default function MyItineraries() {
     useEffect(() => {
         fetchSavedItineraries();
     }, [user?.userId]);
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(handleLoadMore, {
+            rootMargin: "400px",
+        });
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [handleLoadMore]);
 
     const TABS = [
         { key: "created", label: "Created & Shared", icon: LayoutList },
@@ -380,161 +513,182 @@ export default function MyItineraries() {
                     );
 
                 return (
-                    <div className="space-y-3">
-                        {itineraries.map((itinerary) => {
-                            const isCreator =
-                                user?.username === itinerary.createdBy;
+                    <>
+                        <div className="grid grid-cols-2 gap-3">
+                            {itineraries.map((itinerary) => {
+                                const isCreator =
+                                    user?.username === itinerary.createdBy;
 
-                            const isPublic = itinerary.public;
+                                const isPublic = itinerary.public;
 
-                            const deleteLoading =
-                                deleteLoadingId === itinerary.itineraryId;
+                                const deleteLoading =
+                                    deleteLoadingId === itinerary.itineraryId;
 
-                            const unsaveLoading =
-                                unsaveLoadingId === itinerary.itineraryId;
+                                const unsaveLoading =
+                                    unsaveLoadingId === itinerary.itineraryId;
 
-                            const actionLoading =
-                                deleteLoading || unsaveLoading;
+                                const actionLoading =
+                                    deleteLoading || unsaveLoading;
 
-                            return (
-                                <div
-                                    role="button"
-                                    tabIndex={0}
-                                    key={itinerary.itineraryId}
-                                    onClick={(e) => {
-                                        if (e.target.closest(".action-btn"))
-                                            return;
+                                return (
+                                    <div
+                                        role="button"
+                                        tabIndex={0}
+                                        key={itinerary.itineraryId}
+                                        onClick={(e) => {
+                                            if (e.target.closest(".action-btn"))
+                                                return;
 
-                                        handleOpenItinerary(itinerary);
-                                    }}
-                                    className="group relative flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
-                                >
-                                    {/* Action buttons */}
-                                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {isCreator && (
-                                            <button
-                                                type="button"
-                                                disabled={actionLoading}
-                                                onClick={(e) =>
-                                                    handleEdit(e, itinerary)
-                                                }
-                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                                            >
-                                                <Pencil
-                                                    size={13}
-                                                    className="text-gray-500"
-                                                />
-                                            </button>
-                                        )}
-
-                                        {(isCreator ||
-                                            activeTab === "saved") && (
-                                            <button
-                                                type="button"
-                                                disabled={actionLoading}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-
-                                                    if (isCreator) {
-                                                        confirmDelete(
-                                                            itinerary.itineraryId,
-                                                        );
-                                                    } else {
-                                                        confirmUnsave(
-                                                            itinerary.itineraryId,
-                                                        );
+                                            handleOpenItinerary(itinerary);
+                                        }}
+                                        className="group relative flex gap-5 p-5 bg-white border border-gray-100 rounded-2xl hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
+                                    >
+                                        {/* Action buttons */}
+                                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {isCreator && (
+                                                <button
+                                                    type="button"
+                                                    disabled={actionLoading}
+                                                    onClick={(e) =>
+                                                        handleEdit(e, itinerary)
                                                     }
-                                                }}
-                                                className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-red-300 hover:text-red-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                                            >
-                                                {actionLoading ? (
-                                                    <Loader2
+                                                    className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                                                >
+                                                    <Pencil
                                                         size={13}
-                                                        className="text-gray-400 animate-spin"
+                                                        className="text-gray-500"
                                                     />
-                                                ) : (
-                                                    <Trash
-                                                        size={13}
-                                                        className="text-red-400"
-                                                    />
-                                                )}
-                                            </button>
-                                        )}
-                                    </div>
+                                                </button>
+                                            )}
 
-                                    {/* Thumbnail */}
-                                    <div className="w-36 h-36 rounded-xl overflow-hidden flex-shrink-0">
-                                        <ItineraryThumbnail
-                                            itineraryId={itinerary.itineraryId}
-                                            alt={itinerary.title}
-                                            imgClassName="group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    </div>
+                                            {(isCreator ||
+                                                activeTab === "saved") && (
+                                                <button
+                                                    type="button"
+                                                    disabled={actionLoading}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
 
-                                    {/* Details */}
-                                    <div className="flex flex-col justify-between flex-1 min-w-0 py-0.5">
-                                        <div className="space-y-1.5">
-                                            <h2 className="text-base font-semibold text-gray-900 font-primary truncate pr-16">
-                                                {itinerary.title}
-                                            </h2>
-
-                                            <p className="inline-flex items-center gap-1 text-xs text-gray-400">
-                                                <MapPin
-                                                    size={11}
-                                                    className="flex-shrink-0"
-                                                />
-                                                {itinerary.place}
-                                            </p>
-
-                                            <p className="inline-flex items-center gap-1 text-xs text-gray-400">
-                                                <Calendar
-                                                    size={11}
-                                                    className="flex-shrink-0"
-                                                />
-                                                {itinerary.startDate} —{" "}
-                                                {itinerary.endDate}
-                                            </p>
+                                                        if (isCreator) {
+                                                            confirmDelete(
+                                                                itinerary.itineraryId,
+                                                            );
+                                                        } else {
+                                                            confirmUnsave(
+                                                                itinerary.itineraryId,
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="action-btn w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-red-300 hover:text-red-500 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                                                >
+                                                    {actionLoading ? (
+                                                        <Loader2
+                                                            size={13}
+                                                            className="text-gray-400 animate-spin"
+                                                        />
+                                                    ) : (
+                                                        <Trash
+                                                            size={13}
+                                                            className="text-red-400"
+                                                        />
+                                                    )}
+                                                </button>
+                                            )}
                                         </div>
 
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {/* Visibility */}
-                                            <span
-                                                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border
+                                        {/* Thumbnail */}
+                                        <div className="w-36 h-36 rounded-xl overflow-hidden flex-shrink-0">
+                                            <ItineraryThumbnail
+                                                itineraryId={
+                                                    itinerary.itineraryId
+                                                }
+                                                alt={itinerary.title}
+                                                imgClassName="group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="flex flex-col justify-between flex-1 min-w-0 py-0.5">
+                                            <div className="space-y-1.5">
+                                                <h2 className="text-base font-semibold text-gray-900 font-primary truncate pr-16">
+                                                    {itinerary.title}
+                                                </h2>
+
+                                                <div className="flex gap-4">
+                                                    <p className="inline-flex items-center gap-1 text-xs text-gray-400">
+                                                        <MapPin
+                                                            size={11}
+                                                            className="flex-shrink-0"
+                                                        />
+                                                        {itinerary.place}
+                                                    </p>
+
+                                                    <p className="inline-flex items-center gap-1 text-xs text-gray-400">
+                                                        <Calendar
+                                                            size={11}
+                                                            className="flex-shrink-0"
+                                                        />
+                                                        {itinerary.startDate} —{" "}
+                                                        {itinerary.endDate}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {/* Visibility */}
+                                                <span
+                                                    className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border
                                         ${
                                             isPublic
                                                 ? "border-emerald-200 text-emerald-600 bg-emerald-50"
                                                 : "border-red-200 text-red-500 bg-red-50"
                                         }`}
-                                            >
-                                                {isPublic ? (
-                                                    <Globe size={10} />
-                                                ) : (
-                                                    <Lock size={10} />
-                                                )}
+                                                >
+                                                    {isPublic ? (
+                                                        <Globe size={10} />
+                                                    ) : (
+                                                        <Lock size={10} />
+                                                    )}
 
-                                                {isPublic
-                                                    ? "Public"
-                                                    : "Private"}
-                                            </span>
+                                                    {isPublic
+                                                        ? "Public"
+                                                        : "Private"}
+                                                </span>
 
-                                            {/* Creator */}
-                                            <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 text-gray-500 bg-gray-50">
-                                                by {itinerary.createdBy}
-                                            </span>
+                                                {/* Creator */}
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 text-gray-500 bg-gray-50">
+                                                    by {itinerary.createdBy}
+                                                </span>
 
-                                            {/* Member badge */}
-                                            {!isCreator &&
-                                                activeTab === "created" && (
-                                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-blue-200 text-blue-500 bg-blue-50">
-                                                        Member
-                                                    </span>
-                                                )}
+                                                {/* Member badge */}
+                                                {!isCreator &&
+                                                    activeTab === "created" && (
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-blue-200 text-blue-500 bg-blue-50">
+                                                            Member
+                                                        </span>
+                                                    )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div
+                            ref={loadMoreRef}
+                            className="h-10 flex items-center justify-center"
+                            aria-hidden="true"
+                        >
+                            {(activeTab === "created"
+                                ? loadingMoreCreated || loadingMoreShared
+                                : loadingMoreSaved) && (
+                                <Loader2
+                                    size={18}
+                                    className="animate-spin text-gray-400"
+                                />
+                            )}
+                        </div>
+                    </>
                 );
             })()}
 

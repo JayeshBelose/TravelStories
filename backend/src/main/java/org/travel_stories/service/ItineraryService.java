@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.dto.ItineraryListResponseDto;
 import org.travel_stories.dto.ItineraryRequestDto;
 import org.travel_stories.dto.ItineraryResponseDto;
 import org.travel_stories.dto.MemberResponseDto;
@@ -39,6 +40,7 @@ public class ItineraryService {
     private final ImageRepository imageRepository;
     private final FileStorageService fileStorageService;
 
+    private static final int MAX_USER_ITINERARY_PAGE_SIZE = 15;
 
     public ItineraryResponseDto map(Itinerary itinerary) {
 
@@ -71,6 +73,24 @@ public class ItineraryService {
         );
 
         return itineraryResponseDto;
+    }
+
+    public ItineraryListResponseDto mapToListResponse(Itinerary itinerary) {
+
+        ItineraryListResponseDto dto = new ItineraryListResponseDto();
+
+        dto.setItineraryId(itinerary.getItineraryId());
+        dto.setPlace(itinerary.getPlace());
+        dto.setTitle(itinerary.getTitle());
+        dto.setStartDate(itinerary.getStartDate());
+        dto.setEndDate(itinerary.getEndDate());
+        dto.setPublic(itinerary.isPublic());
+        dto.setLikeCount(itinerary.getLikeCount());
+        dto.setSaveCount(itinerary.getSaveCount());
+        dto.setCreatedBy(itinerary.getCreatedBy().getUsername());
+        dto.setType(itinerary.getType().getName());
+
+        return dto;
     }
 
 
@@ -313,7 +333,7 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public Page<ItineraryResponseDto> getItineraries(
+    public Page<ItineraryListResponseDto> getItineraries(
             String search,
             String type,
             String sort,
@@ -321,38 +341,31 @@ public class ItineraryService {
             int size
     ) {
 
-        Sort sorting;
+        Sort sorting = switch (sort) {
+            case "likes" -> Sort.by(
+                    Sort.Order.desc("likeCount"),
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.asc("itineraryId")
+            );
 
-        switch (sort) {
-            case "likes":
-                sorting = Sort.by(
-                        Sort.Direction.DESC,
-                        "likeCount"
-                );
-                break;
+            case "saves" -> Sort.by(
+                    Sort.Order.desc("saveCount"),
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.asc("itineraryId")
+            );
 
-            case "saves":
-                sorting = Sort.by(
-                        Sort.Direction.DESC,
-                        "saveCount"
-                );
-                break;
+            case "recent" -> Sort.by(
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.asc("itineraryId")
+            );
 
-            case "recent":
-                sorting = Sort.by(
-                        Sort.Direction.DESC,
-                        "createdAt"
-                );
-                break;
+            default -> Sort.by(
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.asc("itineraryId")
+            );
+        };
 
-            default:
-                sorting = Sort.unsorted();
-        }
-
-
-        Pageable pageable =
-                PageRequest.of(page, size, sorting);
-
+        Pageable pageable = PageRequest.of(page, size, sorting);
 
         Page<Itinerary> result =
                 itineraryRepository.searchItineraries(
@@ -361,8 +374,7 @@ public class ItineraryService {
                         pageable
                 );
 
-
-        return result.map(this::map);
+        return result.map(this::mapToListResponse);
     }
 
 
@@ -382,61 +394,118 @@ public class ItineraryService {
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByType(Long typeId) {
+    public List<ItineraryListResponseDto> getAllItinerariesByType(Long typeId) {
 
         return itineraryRepository.findAllByTypeTypeId(typeId)
                 .stream()
-                .map(this::map)
+                .map(this::mapToListResponse)
                 .collect(Collectors.toList());
     }
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByUserId(UUID userId) {
+    public Page<ItineraryListResponseDto> getAllItinerariesByUserId(
+            UUID userId,
+            int page,
+            int size
+    ) {
+        int safePage = Math.max(page, 0);
 
-        return itineraryRepository.findAllByCreatedByUserId(userId)
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+        int safeSize = Math.clamp(
+                size,
+                1,
+                MAX_USER_ITINERARY_PAGE_SIZE
+        );
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(
+                        Sort.Order.desc("createdAt"),
+                        Sort.Order.asc("itineraryId")
+                )
+        );
+
+        return itineraryRepository
+                .findAllByCreatedByUserId(userId, pageable)
+                .map(this::mapToListResponse);
     }
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllItinerariesByUserMembership(UUID userId) {
+    public Page<ItineraryListResponseDto> getAllItinerariesByUserMembership(
+            UUID userId,
+            int page,
+            int size
+    ) {
+        int safePage = Math.max(page, 0);
 
-        return itineraryRepository.findAllByMembersUserUserId(userId)
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+        int safeSize = Math.clamp(
+                size,
+                1,
+                MAX_USER_ITINERARY_PAGE_SIZE
+        );
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(
+                        Sort.Order.desc("createdAt"),
+                        Sort.Order.asc("itineraryId")
+                )
+        );
+
+        return itineraryRepository
+                .findAllByMemberUserId(userId, pageable)
+                .map(this::mapToListResponse);
     }
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getAllSavedItinerariesByUserId(UUID userId) {
+    public Page<ItineraryListResponseDto> getAllSavedItinerariesByUserId(
+            UUID userId,
+            int page,
+            int size
+    ) {
+        int safePage = Math.max(page, 0);
 
-        return itineraryRepository.findAllBySavedByUserUserId(userId)
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+        int safeSize = Math.clamp(
+                size,
+                1,
+                MAX_USER_ITINERARY_PAGE_SIZE
+        );
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(
+                        Sort.Order.desc("createdAt"),
+                        Sort.Order.asc("itineraryId")
+                )
+        );
+
+        return itineraryRepository
+                .findAllBySavedUserId(userId, pageable)
+                .map(this::mapToListResponse);
     }
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getMostSavedItineraries() {
+    public List<ItineraryListResponseDto> getMostSavedItineraries() {
 
         return itineraryRepository.findMostSavedItineraries()
                 .stream()
-                .map(this::map)
+                .map(this::mapToListResponse)
                 .collect(Collectors.toList());
     }
 
 
     @Transactional(readOnly = true)
-    public List<ItineraryResponseDto> getMostLikedItineraries() {
+    public List<ItineraryListResponseDto> getMostLikedItineraries() {
 
         return itineraryRepository.findMostLikedItineraries()
                 .stream()
-                .map(this::map)
+                .map(this::mapToListResponse)
                 .collect(Collectors.toList());
     }
 

@@ -22,7 +22,13 @@ export const getItineraryTypesService = async () => {
     );
 };
 
-export const getItinerariesService = async ({ search, type, sort, page, size }) => {
+export const getItinerariesService = async ({
+    search,
+    type,
+    sort,
+    page,
+    size,
+}) => {
     return executeServiceRequest(
         () =>
             getItinerariesApi({
@@ -54,23 +60,50 @@ export const toggleSavedItineraryService = async ({ userId, itineraryId }) => {
     );
 };
 
-export const getUserCreatedItinerariesService = async ({ userId }) => {
+export const getUserCreatedItinerariesService = async ({
+    userId,
+    page = 0,
+    size = 15,
+}) => {
     return executeServiceRequest(
-        () => getUserCreatedItinerariesApi({ userId }),
+        () =>
+            getUserCreatedItinerariesApi({
+                userId,
+                page,
+                size,
+            }),
         "Failed to fetch created itineraries.",
     );
 };
 
-export const getSharedItinerariesService = async ({ userId }) => {
+export const getSharedItinerariesService = async ({
+    userId,
+    page = 0,
+    size = 15,
+}) => {
     return executeServiceRequest(
-        () => getSharedItinerariesApi({ userId }),
+        () =>
+            getSharedItinerariesApi({
+                userId,
+                page,
+                size,
+            }),
         "Failed to fetch shared itineraries.",
     );
 };
 
-export const getSavedItinerariesService = async ({ userId }) => {
+export const getSavedItinerariesService = async ({
+    userId,
+    page = 0,
+    size = 15,
+}) => {
     return executeServiceRequest(
-        () => getSavedItinerariesApi({ userId }),
+        () =>
+            getSavedItinerariesApi({
+                userId,
+                page,
+                size,
+            }),
         "Failed to fetch saved itineraries.",
     );
 };

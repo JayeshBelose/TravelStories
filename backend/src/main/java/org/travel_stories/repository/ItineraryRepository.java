@@ -15,11 +15,40 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
 
     List<Itinerary> findAllByTypeTypeId(Long typeId);
 
-    List<Itinerary> findAllByCreatedByUserId(UUID userId);
+    Page<Itinerary> findAllByCreatedByUserId(
+            UUID userId,
+            Pageable pageable
+    );
 
-    List<Itinerary> findAllByMembersUserUserId(UUID userId);
+    @Query("""
+        SELECT i
+        FROM Itinerary i
+        WHERE EXISTS (
+            SELECT 1
+            FROM ItineraryMember m
+            WHERE m.itinerary = i
+            AND m.user.userId = :userId
+        )
+        """)
+    Page<Itinerary> findAllByMemberUserId(
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
 
-    List<Itinerary> findAllBySavedByUserUserId(UUID userId);
+    @Query("""
+        SELECT i
+        FROM Itinerary i
+        WHERE EXISTS (
+            SELECT 1
+            FROM SavedItinerary s
+            WHERE s.itinerary = i
+            AND s.user.userId = :userId
+        )
+        """)
+    Page<Itinerary> findAllBySavedUserId(
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
 
     @Query("""
                 SELECT l.itinerary
