@@ -6,8 +6,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.travel_stories.exception.InvalidOperationException;
-import org.travel_stories.exception.ResourceNotFoundException;
+import org.travel_stories.exception.operation.InvalidOperationException;
+import org.travel_stories.exception.resource.ResourceNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;

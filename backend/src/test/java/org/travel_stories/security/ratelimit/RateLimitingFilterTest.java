@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.travel_stories.exception.RateLimitExceededException;
-import org.travel_stories.service.RateLimitingService;
+import org.travel_stories.exception.security.RateLimitExceededException;
+import org.travel_stories.service.security.RateLimitingService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

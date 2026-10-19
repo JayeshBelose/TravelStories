@@ -1,0 +1,55 @@
+package org.travel_stories.entity.itinerary;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.travel_stories.entity.user.User;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(
+        name = "saved_itinerary",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "itinerary_id"})
+)
+public class SavedItinerary {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(
+            name = "saving_id",
+            nullable = false
+    )
+    private UUID savingId;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            optional = false
+    )
+    @JoinColumn(
+            name = "user_id",
+            nullable = false
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            optional = false
+    )
+    @JoinColumn(
+            name = "itinerary_id",
+            nullable = false
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Itinerary itinerary;
+
+}

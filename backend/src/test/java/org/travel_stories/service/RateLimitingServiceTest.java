@@ -6,11 +6,12 @@ import io.github.bucket4j.Bucket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.travel_stories.config.RateLimitProperties;
-import org.travel_stories.exception.RateLimitExceededException;
+import org.travel_stories.config.ratelimit.RateLimitProperties;
+import org.travel_stories.exception.security.RateLimitExceededException;
 import org.travel_stories.security.ratelimit.BucketKey;
 import org.travel_stories.security.ratelimit.EndpointCategory;
 import org.travel_stories.security.ratelimit.RateLimitConfigurationRegistry;
+import org.travel_stories.service.security.RateLimitingService;
 
 import java.time.Duration;
 

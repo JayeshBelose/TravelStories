@@ -1,7 +1,7 @@
 package org.travel_stories.security.ratelimit;
 
 import org.springframework.stereotype.Component;
-import org.travel_stories.config.RateLimitProperties;
+import org.travel_stories.config.ratelimit.RateLimitProperties;
 
 import java.util.EnumMap;
 import java.util.Map;

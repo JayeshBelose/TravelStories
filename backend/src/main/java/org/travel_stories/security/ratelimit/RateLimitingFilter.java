@@ -10,8 +10,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.travel_stories.exception.RateLimitExceededException;
-import org.travel_stories.service.RateLimitingService;
+import org.travel_stories.exception.security.RateLimitExceededException;
+import org.travel_stories.service.security.RateLimitingService;
 
 import java.io.IOException;
 import java.util.Map;

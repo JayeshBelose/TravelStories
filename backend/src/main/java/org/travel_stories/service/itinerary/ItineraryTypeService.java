@@ -1,0 +1,126 @@
+package org.travel_stories.service.itinerary;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.travel_stories.config.cache.CacheConfig;
+import org.travel_stories.dto.itinerary.type.response.ItineraryTypeDto;
+import org.travel_stories.entity.itinerary.ItineraryType;
+import org.travel_stories.exception.resource.ResourceAlreadyExistsException;
+import org.travel_stories.exception.resource.ResourceNotFoundException;
+import org.travel_stories.repository.itinerary.ItineraryTypeRepository;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ItineraryTypeService {
+
+    private final ItineraryTypeRepository itineraryTypeRepository;
+
+
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
+    @Transactional
+    public ItineraryTypeDto addType(ItineraryTypeDto requestDto) {
+
+        if (itineraryTypeRepository.existsByNameIgnoreCase(requestDto.getName())) {
+            log.warn(
+                    "Failed to create itinerary type. Type '{}' already exists.",
+                    requestDto.getName()
+            );
+
+            throw new ResourceAlreadyExistsException(
+                    "Itinerary type already exists."
+            );
+        }
+
+
+        ItineraryType itineraryType = new ItineraryType();
+
+        itineraryType.setName(requestDto.getName());
+
+
+        ItineraryType savedType =
+                itineraryTypeRepository.save(itineraryType);
+
+
+        log.info(
+                "Itinerary type created: typeId={}, name={}",
+                savedType.getTypeId(),
+                savedType.getName()
+        );
+
+
+        ItineraryTypeDto responseDto = new ItineraryTypeDto();
+
+        responseDto.setTypeId(savedType.getTypeId());
+        responseDto.setName(savedType.getName());
+
+
+        return responseDto;
+    }
+
+
+    @Cacheable(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            key = "'all'"
+    )
+    @Transactional(readOnly = true)
+    public List<ItineraryTypeDto> getAllTypes() {
+
+        return itineraryTypeRepository.findAll()
+                .stream()
+                .map(type -> {
+
+                    ItineraryTypeDto dto = new ItineraryTypeDto();
+
+                    dto.setTypeId(type.getTypeId());
+                    dto.setName(type.getName());
+
+                    return dto;
+
+                })
+                .toList();
+    }
+
+
+    @CacheEvict(
+            cacheNames = CacheConfig.ITINERARY_TYPES_CACHE,
+            allEntries = true
+    )
+    @Transactional
+    public void deleteTypeById(Long typeId) {
+
+        ItineraryType itineraryType =
+                itineraryTypeRepository.findById(typeId)
+                        .orElseThrow(() -> {
+
+                            log.warn(
+                                    "Failed to delete itinerary type. Type not found: {}",
+                                    typeId
+                            );
+
+                            return new ResourceNotFoundException(
+                                    "Itinerary type not found."
+                            );
+                        });
+
+
+        itineraryTypeRepository.delete(itineraryType);
+
+
+        log.info(
+                "Itinerary type deleted: typeId={}, name={}",
+                itineraryType.getTypeId(),
+                itineraryType.getName()
+        );
+    }
+
+}
