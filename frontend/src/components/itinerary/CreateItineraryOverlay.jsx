@@ -627,6 +627,8 @@ export default function CreateItineraryOverlay({
     }
 
     const createOrUpdateItinerary = async (data) => {
+        if (saving) return;
+
         const itinerary = {
             title: data.title.trim(),
             place: data.place.trim(),
@@ -637,7 +639,25 @@ export default function CreateItineraryOverlay({
             public: isPublic,
         };
 
-        if (saving) return;
+        // Validate all days and locations before making any API mutation.
+        for (const day of days) {
+            const dayDescription = day.description?.trim();
+
+            if (!dayDescription) {
+                toast.error("Please enter a description for every day.");
+                return;
+            }
+
+            for (const location of day.locations || []) {
+                const locationName = location.name?.trim();
+                const locationAddress = location.address?.trim();
+
+                if (!locationName || !locationAddress) {
+                    toast.error("Please enter both location name and address.");
+                    return;
+                }
+            }
+        }
 
         setSaving(true);
 
@@ -723,11 +743,13 @@ export default function CreateItineraryOverlay({
                 /*
                  * Create or update day.
                  */
+                const dayDescription = day.description?.trim();
+
                 if (!dayId) {
                     const dayResult = await createDayService({
                         itineraryId: id,
                         day: {
-                            description: day.description,
+                            description: dayDescription,
                         },
                     });
 
@@ -742,7 +764,7 @@ export default function CreateItineraryOverlay({
                         itineraryId: id,
                         dayId,
                         day: {
-                            description: day.description,
+                            description: dayDescription,
                         },
                     });
 
@@ -756,14 +778,17 @@ export default function CreateItineraryOverlay({
                  * Create/update locations belonging to this day.
                  */
                 for (const location of day.locations || []) {
+                    const locationName = location.name?.trim();
+                    const locationAddress = location.address?.trim();
+
                     let locationId = location.locationId;
 
                     if (!locationId) {
                         const locationResult = await createLocationService({
                             dayId,
                             location: {
-                                locationName: location.name,
-                                locationAddress: location.address,
+                                locationName,
+                                locationAddress,
                             },
                         });
 
@@ -778,8 +803,8 @@ export default function CreateItineraryOverlay({
                             dayId,
                             locationId,
                             location: {
-                                locationName: location.name,
-                                locationAddress: location.address,
+                                locationName,
+                                locationAddress,
                             },
                         });
 
@@ -789,7 +814,7 @@ export default function CreateItineraryOverlay({
                         }
                     }
 
-                    /*
+                    /**
                      * Upload newly-added location images.
                      */
                     for (const image of location.images || []) {

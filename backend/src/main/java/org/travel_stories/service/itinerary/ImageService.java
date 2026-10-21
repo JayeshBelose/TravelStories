@@ -15,7 +15,7 @@ import org.travel_stories.repository.itinerary.LocationRepository;
 import org.travel_stories.security.auth.AuthorizationService;
 import org.travel_stories.service.storage.FileValidationService;
 import org.travel_stories.service.storage.FileStorageCategory;
-import org.travel_stories.service.storage.FileStorageService;
+import org.travel_stories.service.storage.StorageService;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class ImageService {
     private final LocationRepository locationRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
 
 
     public void uploadImage(
@@ -72,7 +72,7 @@ public class ImageService {
         try {
 
             filePath =
-                    fileStorageService.store(
+                    storageService.store(
                             file,
                             FileStorageCategory.IMAGE
                     );
@@ -98,24 +98,19 @@ public class ImageService {
             imageRepository.save(image);
 
             log.info(
-                    "Image uploaded: imageId={}, locationId={}, orderNumber={}, filePath={}",
+                    "Image uploaded: imageId={}, locationId={}, orderNumber={}",
                     image.getImageId(),
                     locationId,
-                    nextOrderNumber,
-                    filePath
+                    nextOrderNumber
             );
 
         } catch (RuntimeException exception) {
 
-            /*
-             * If database persistence fails after the physical
-             * file has been created, clean up the orphaned file.
-             */
             if (filePath != null) {
 
                 try {
 
-                    fileStorageService.delete(
+                    storageService.delete(
                             filePath
                     );
 
@@ -172,7 +167,7 @@ public class ImageService {
 
         imageRepository.flush();
 
-        fileStorageService.delete(
+        storageService.delete(
                 filePath
         );
 
@@ -251,13 +246,13 @@ public class ImageService {
     @Transactional(readOnly = true)
     public Resource getImageResource(Image image) {
 
-        return fileStorageService.load(
+        return storageService.load(
                 image.getFilePath()
         );
     }
 
     public long getImageLastModified(Image image) {
-        return fileStorageService.getLastModified(image.getFilePath());
+        return storageService.getLastModified(image.getFilePath());
     }
 
 }

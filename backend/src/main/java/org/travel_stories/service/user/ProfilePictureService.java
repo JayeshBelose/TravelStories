@@ -14,7 +14,7 @@ import org.travel_stories.repository.user.UserRepository;
 import org.travel_stories.security.auth.AuthorizationService;
 import org.travel_stories.service.storage.FileValidationService;
 import org.travel_stories.service.storage.FileStorageCategory;
-import org.travel_stories.service.storage.FileStorageService;
+import org.travel_stories.service.storage.StorageService;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +28,7 @@ public class ProfilePictureService {
     private final UserRepository userRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
 
 
     @Transactional
@@ -62,7 +62,7 @@ public class ProfilePictureService {
         try {
 
             newFilePath =
-                    fileStorageService.store(
+                    storageService.store(
                             file,
                             FileStorageCategory.PROFILE_PICTURE
                     );
@@ -81,7 +81,7 @@ public class ProfilePictureService {
                 if (oldFilePath != null
                         && !oldFilePath.equals(newFilePath)) {
 
-                    fileStorageService.delete(oldFilePath);
+                    storageService.delete(oldFilePath);
                 }
 
                 log.info(
@@ -117,7 +117,7 @@ public class ProfilePictureService {
 
                 try {
 
-                    fileStorageService.delete(
+                    storageService.delete(
                             newFilePath
                     );
 
@@ -155,13 +155,13 @@ public class ProfilePictureService {
     @Transactional(readOnly = true)
     public Resource getProfilePictureResource(ProfilePicture pfp) {
 
-        return fileStorageService.load(
+        return storageService.load(
                 pfp.getFilePath()
         );
     }
 
     public long getProfilePictureLastModified(ProfilePicture profilePicture) {
-        return fileStorageService.getLastModified(profilePicture.getFilePath());
+        return storageService.getLastModified(profilePicture.getFilePath());
     }
 
 }

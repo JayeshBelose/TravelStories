@@ -105,4 +105,24 @@
 
     </root>
 
+    <!-- =============================== -->
+    <!-- Production Logging -->
+    <!-- =============================== -->
+
+    <springProfile name="prod">
+        <logger name="org.travel_stories" level="INFO"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+    </springProfile>
+
+    <!-- =============================== -->
+    <!-- Development Logging -->
+    <!-- =============================== -->
+
+    <springProfile name="dev">
+        <logger name="org.travel_stories" level="DEBUG"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+    </springProfile>
+
 </configuration>

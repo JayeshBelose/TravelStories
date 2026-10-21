@@ -2,6 +2,7 @@ package org.travel_stories.service.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,12 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class FileStorageService {
+@ConditionalOnProperty(
+        name = "app.storage.provider",
+        havingValue = "local",
+        matchIfMissing = true
+)
+public class FileStorageService implements StorageService {
 
     private final Path storagePath;
 
@@ -35,11 +41,7 @@ public class FileStorageService {
         initializeStorageDirectory();
     }
 
-    /**
-     * Stores a file in the requested storage category.
-     *
-     * @return relative path that should be stored in the database
-     */
+    @Override
     public String store(
             MultipartFile file,
             FileStorageCategory category
@@ -116,9 +118,7 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Loads a file using the relative path stored in the database.
-     */
+    @Override
     public Resource load(String relativePath) {
 
         Path filePath =
@@ -184,9 +184,7 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Deletes a file using the relative path stored in the database.
-     */
+    @Override
     public void delete(String relativePath) {
 
         if (relativePath == null
@@ -232,9 +230,7 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Checks whether a file exists.
-     */
+    @Override
     public boolean exists(String relativePath) {
 
         if (relativePath == null
@@ -248,6 +244,34 @@ public class FileStorageService {
 
         return Files.exists(filePath)
                 && Files.isRegularFile(filePath);
+    }
+
+    @Override
+    public long getLastModified(String relativePath) {
+
+        Path filePath =
+                resolveStoredPath(relativePath);
+
+        try {
+
+            if (!Files.exists(filePath)
+                    || !Files.isRegularFile(filePath)) {
+
+                throw new ResourceNotFoundException(
+                        "Stored file not found."
+                );
+            }
+
+            return Files.getLastModifiedTime(
+                    filePath
+            ).toMillis();
+
+        } catch (IOException exception) {
+
+            throw new InvalidOperationException(
+                    "Failed to read file metadata."
+            );
+        }
     }
 
     private Path resolveStoredPath(
@@ -287,7 +311,9 @@ public class FileStorageService {
                         .toAbsolutePath()
                         .normalize();
 
-        if (!normalizedPath.startsWith(normalizedStoragePath)) {
+        if (!normalizedPath.startsWith(
+                normalizedStoragePath
+        )) {
 
             log.warn(
                     "Rejected file path outside storage directory: {}",
@@ -358,24 +384,9 @@ public class FileStorageService {
             );
 
             throw new IllegalStateException(
-                    "Unable to initialize file storage.",
+                    "Failed to initialize file storage.",
                     exception
             );
-        }
-    }
-
-    public long getLastModified(String relativePath) {
-        Path filePath = resolveStoredPath(relativePath);
-
-        try {
-            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                throw new ResourceNotFoundException("Stored file not found.");
-            }
-
-            return Files.getLastModifiedTime(filePath).toMillis();
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read file metadata.", e);
         }
     }
 }

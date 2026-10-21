@@ -10,4 +10,6 @@ public interface ThumbnailRepository extends JpaRepository<Thumbnail, UUID> {
 
     Optional<Thumbnail> findByItineraryItineraryId(UUID itineraryId);
 
+    void deleteByItineraryItineraryId(UUID itineraryId);
+
 }

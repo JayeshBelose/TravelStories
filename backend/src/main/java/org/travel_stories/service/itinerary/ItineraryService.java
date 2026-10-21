@@ -22,7 +22,7 @@ import org.travel_stories.exception.resource.ResourceNotFoundException;
 import org.travel_stories.repository.itinerary.*;
 import org.travel_stories.repository.user.UserRepository;
 import org.travel_stories.security.auth.AuthorizationService;
-import org.travel_stories.service.storage.FileStorageService;
+import org.travel_stories.service.storage.StorageService;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ItineraryService {
     private final AuthorizationService authorizationService;
     private final ThumbnailRepository thumbnailRepository;
     private final ImageRepository imageRepository;
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
 
     private static final int MAX_USER_ITINERARY_PAGE_SIZE = 15;
 
@@ -195,16 +195,21 @@ public class ItineraryService {
                         .orElse(null);
 
         /*
-         * Delete database records.
+         * Delete database records that are not handled
+         * automatically by the Itinerary cascade.
          *
-         * Cascade + orphanRemoval on Itinerary will remove
-         * the associated Days, Locations, Images and Thumbnail.
+         * Thumbnail is deleted explicitly because its
+         * relationship does not use cascade/orphanRemoval.
          */
         likedItineraryRepository.deleteByItineraryItineraryId(
                 itineraryId
         );
 
         savedItineraryRepository.deleteByItineraryItineraryId(
+                itineraryId
+        );
+
+        thumbnailRepository.deleteByItineraryItineraryId(
                 itineraryId
         );
 
@@ -224,7 +229,7 @@ public class ItineraryService {
 
             try {
 
-                fileStorageService.delete(filePath);
+                storageService.delete(filePath);
 
             } catch (RuntimeException exception) {
 
@@ -245,7 +250,7 @@ public class ItineraryService {
 
             try {
 
-                fileStorageService.delete(
+                storageService.delete(
                         thumbnailFilePath
                 );
 

@@ -14,7 +14,7 @@ import org.travel_stories.repository.itinerary.ThumbnailRepository;
 import org.travel_stories.security.auth.AuthorizationService;
 import org.travel_stories.service.storage.FileValidationService;
 import org.travel_stories.service.storage.FileStorageCategory;
-import org.travel_stories.service.storage.FileStorageService;
+import org.travel_stories.service.storage.StorageService;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +28,7 @@ public class ThumbnailService {
     private final ItineraryRepository itineraryRepository;
     private final AuthorizationService authorizationService;
     private final FileValidationService fileValidationService;
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
 
     @Transactional
     public void uploadOrUpdate(
@@ -63,7 +63,7 @@ public class ThumbnailService {
         try {
 
             newFilePath =
-                    fileStorageService.store(
+                    storageService.store(
                             file,
                             FileStorageCategory.THUMBNAIL
                     );
@@ -82,7 +82,7 @@ public class ThumbnailService {
                 if (oldFilePath != null
                         && !oldFilePath.equals(newFilePath)) {
 
-                    fileStorageService.delete(oldFilePath);
+                    storageService.delete(oldFilePath);
                 }
 
                 log.info(
@@ -118,7 +118,7 @@ public class ThumbnailService {
 
                 try {
 
-                    fileStorageService.delete(
+                    storageService.delete(
                             newFilePath
                     );
 
@@ -158,13 +158,13 @@ public class ThumbnailService {
     @Transactional(readOnly = true)
     public Resource getThumbnailResource(Thumbnail thumbnail) {
 
-        return fileStorageService.load(
+        return storageService.load(
                 thumbnail.getFilePath()
         );
     }
 
     public long getThumbnailLastModified(Thumbnail thumbnail) {
-        return fileStorageService.getLastModified(thumbnail.getFilePath());
+        return storageService.getLastModified(thumbnail.getFilePath());
     }
 
 }

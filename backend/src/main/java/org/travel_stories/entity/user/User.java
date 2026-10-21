@@ -107,4 +107,11 @@ public class User {
     )
     private List<SavedItinerary> savedItineraries = new ArrayList<>();
 
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private ProfilePicture profilePicture;
+
 }

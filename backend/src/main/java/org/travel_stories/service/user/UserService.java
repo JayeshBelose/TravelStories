@@ -9,19 +9,26 @@ import org.springframework.transaction.annotation.Transactional;
 import org.travel_stories.dto.user.social.response.FollowResponseDto;
 import org.travel_stories.dto.user.request.UserRequestDto;
 import org.travel_stories.dto.user.response.UserResponseDto;
+import org.travel_stories.entity.itinerary.Image;
+import org.travel_stories.entity.itinerary.Itinerary;
+import org.travel_stories.entity.itinerary.Thumbnail;
 import org.travel_stories.entity.user.User;
 import org.travel_stories.exception.auth.InvalidCredentialsException;
 import org.travel_stories.exception.operation.InvalidOperationException;
 import org.travel_stories.exception.resource.ResourceNotFoundException;
+import org.travel_stories.repository.itinerary.ImageRepository;
 import org.travel_stories.repository.itinerary.LikedItineraryRepository;
 import org.travel_stories.repository.itinerary.SavedItineraryRepository;
+import org.travel_stories.repository.itinerary.ThumbnailRepository;
 import org.travel_stories.repository.token.PasswordResetTokenRepository;
 import org.travel_stories.repository.user.FollowRepository;
+import org.travel_stories.repository.user.ProfilePictureRepository;
 import org.travel_stories.repository.user.UserRepository;
 import org.travel_stories.security.auth.AuthorizationService;
 import org.travel_stories.security.jwt.JwtUtil;
 import org.travel_stories.service.auth.PasswordValidationService;
 import org.travel_stories.service.auth.RefreshTokenService;
+import org.travel_stories.service.storage.StorageService;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +50,10 @@ public class UserService {
     private final PasswordValidationService passwordValidationService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
+    private final ImageRepository imageRepository;
+    private final ThumbnailRepository thumbnailRepository;
+    private final ProfilePictureRepository profilePictureRepository;
+    private final StorageService storageService;
 
     private static final int USER_SEARCH_LIMIT = 20;
 
@@ -447,9 +458,58 @@ public class UserService {
         followRepository.deleteByFollowerUserId(userId);
         followRepository.deleteByFollowingUserId(userId);
 
+        deleteUserStoredFiles(user);
+
         userRepository.delete(user);
 
         log.info("User {} deleted", userId);
+    }
+
+    private void deleteUserStoredFiles(
+            User user
+    ) {
+
+        /*
+         * Delete profile picture.
+         */
+        profilePictureRepository
+                .findByUserUserId(user.getUserId())
+                .map(profilePicture -> profilePicture.getFilePath())
+                .filter(filePath ->
+                        filePath != null
+                                && !filePath.isBlank()
+                )
+                .ifPresent(storageService::delete);
+
+        /*
+         * Delete itinerary images and thumbnails.
+         */
+        for (Itinerary itinerary : user.getItineraries()) {
+
+            UUID itineraryId =
+                    itinerary.getItineraryId();
+
+            imageRepository
+                    .findByItineraryId(itineraryId)
+                    .stream()
+                    .map(Image::getFilePath)
+                    .filter(filePath ->
+                            filePath != null
+                                    && !filePath.isBlank()
+                    )
+                    .forEach(storageService::delete);
+
+            thumbnailRepository
+                    .findByItineraryItineraryId(itineraryId)
+                    .map(Thumbnail::getFilePath)
+                    .filter(filePath ->
+                            filePath != null
+                                    && !filePath.isBlank()
+                    )
+                    .ifPresent(storageService::delete);
+
+            thumbnailRepository.deleteByItineraryItineraryId(itineraryId);
+        }
     }
 
 }
