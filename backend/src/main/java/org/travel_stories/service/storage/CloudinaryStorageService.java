@@ -41,12 +41,10 @@ public class CloudinaryStorageService
     ) {
 
         log.info(
-                "Cloudinary configuration loaded: cloudName={}, apiKeyPresent={}, apiSecretPresent={}, apiKeyLength={}, apiSecretLength={}",
+                "Cloudinary configuration loaded. cloudName={}, apiKeyPresent={}, apiSecretPresent={}",
                 cloudName,
                 apiKey != null && !apiKey.isBlank(),
-                apiSecret != null && !apiSecret.isBlank(),
-                apiKey != null ? apiKey.length() : 0,
-                apiSecret != null ? apiSecret.length() : 0
+                apiSecret != null && !apiSecret.isBlank()
         );
 
         this.cloudinary =
