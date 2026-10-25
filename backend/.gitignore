@@ -5,6 +5,7 @@ target/
 .kotlin
 .env
 *.sql
+!src/main/resources/db/migration/*.sql
 **/logs/
 
 ### IntelliJ IDEA ###
