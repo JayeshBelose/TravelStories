@@ -198,6 +198,10 @@ export default function Explore() {
         [appliedSearch, sortFilter, typeFilter],
     );
 
+    const closeItinerary = useCallback(() => {
+        setSelectedItinerary(null);
+    }, []);
+
     useEffect(() => {
         return () => {
             abortControllerRef.current?.abort();
@@ -553,8 +557,9 @@ export default function Explore() {
             )}
 
             <ItineraryOverlay
+                open={!!selectedItinerary}
                 itinerary={selectedItinerary}
-                onClose={() => setSelectedItinerary(null)}
+                onClose={closeItinerary}
                 allowRelatedItineraries={true}
             />
         </div>

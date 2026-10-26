@@ -18,6 +18,7 @@ import { getDayLocationsService } from "@/services/locationService";
 import { getLocationImagesService } from "@/services/imageService";
 
 export default function ItineraryOverlay({
+    open,
     itinerary,
     onClose,
     allowRelatedItineraries,
