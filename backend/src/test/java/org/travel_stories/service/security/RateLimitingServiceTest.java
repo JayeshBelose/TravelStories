@@ -1,4 +1,4 @@
-package org.travel_stories.service;
+package org.travel_stories.service.security;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -11,7 +11,6 @@ import org.travel_stories.exception.security.RateLimitExceededException;
 import org.travel_stories.security.ratelimit.BucketKey;
 import org.travel_stories.security.ratelimit.EndpointCategory;
 import org.travel_stories.security.ratelimit.RateLimitConfigurationRegistry;
-import org.travel_stories.service.security.RateLimitingService;
 
 import java.time.Duration;
 
