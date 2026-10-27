@@ -89,6 +89,7 @@ public class ItineraryService {
         dto.setTitle(itinerary.getTitle());
         dto.setStartDate(itinerary.getStartDate());
         dto.setEndDate(itinerary.getEndDate());
+        dto.setTotalDays(itinerary.getTotalDays());
         dto.setPublic(itinerary.isPublic());
         dto.setLikeCount(itinerary.getLikeCount());
         dto.setSaveCount(itinerary.getSaveCount());

@@ -20,6 +20,8 @@ public class ItineraryListResponseDto {
 
     private LocalDate endDate;
 
+    private Long totalDays;
+
     private boolean isPublic;
 
     private Integer likeCount;
